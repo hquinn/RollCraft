@@ -1,3 +1,5 @@
+using LegacyRoller.UnitTests.Helpers;
+
 namespace LegacyRoller.UnitTests;
 
 public class DiceExpressionParserTests
@@ -14,7 +16,7 @@ public class DiceExpressionParserTests
     public async Task Should_Parse_Input_Into_Dice_Expression(string input, string expected)
     {
         var result = DiceExpressionParser.Parse(input);
-        var actual = result.ToString();
+        var actual = result.GetSuccessValue().ToString();
         
         await Assert.That(actual).IsEqualTo(expected);
     }

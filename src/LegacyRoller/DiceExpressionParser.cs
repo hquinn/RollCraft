@@ -1,3 +1,5 @@
+using LitePrimitives;
+
 namespace LegacyRoller;
 
 public abstract class DiceExpression
@@ -36,15 +38,15 @@ public class Unary : DiceExpression
 
 public static class DiceExpressionParser
 {
-    public static DiceExpression Parse(string input)
+    public static Result<DiceExpression> Parse(string input)
     {
         double number = double.Parse(input);
 
         if (number < 0)
         {
-            return new Unary(new Number(-number));
+            return Result<DiceExpression>.Success(new Unary(new Number(-number)));
         }
         
-        return new Number(number);
+        return Result<DiceExpression>.Success(new Number(number));
     }
 }
