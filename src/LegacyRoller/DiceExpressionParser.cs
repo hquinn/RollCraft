@@ -19,11 +19,32 @@ public class Number : DiceExpression
     }
 }
 
+public class Unary : DiceExpression
+{
+    public DiceExpression Expression { get; }
+
+    public Unary(DiceExpression expression)
+    {
+        Expression = expression;
+    }
+    
+    public override string ToString()
+    {
+        return $"UNARY({Expression})";
+    }
+}
+
 public static class DiceExpressionParser
 {
     public static DiceExpression Parse(string input)
     {
         double number = double.Parse(input);
+
+        if (number < 0)
+        {
+            return new Unary(new Number(-number));
+        }
+        
         return new Number(number);
     }
 }
