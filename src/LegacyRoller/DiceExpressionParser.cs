@@ -23,6 +23,7 @@ public static class DiceExpressionParser
 {
     public static DiceExpression Parse(string input)
     {
-        return new Number(1);
+        double number = double.Parse(input);
+        return new Number(number);
     }
 }
