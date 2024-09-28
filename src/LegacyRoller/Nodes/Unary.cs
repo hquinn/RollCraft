@@ -1,4 +1,4 @@
-namespace LegacyRoller;
+namespace LegacyRoller.Nodes;
 
 internal class Unary : DiceExpression
 {

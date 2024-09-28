@@ -1,4 +1,5 @@
 using LegacyRoller.Errors;
+using LegacyRoller.Nodes;
 using LitePrimitives;
 
 namespace LegacyRoller;
@@ -76,6 +77,9 @@ public static class DiceExpressionParser
 
                 switch (token.TokenType)
                 {
+                    case TokenType.Minus:
+                        expression = new Subtract(left, right);
+                        break;
                     default:
                         return Result<DiceExpression>.Failure(new ParserError("InvalidToken", $"Invalid token found {token.TokenType}", index));
                 }
@@ -105,6 +109,7 @@ public static class DiceExpressionParser
     {
         return token.TokenType switch
         {
+            // Make sure prefix precedence is higher than infix precedence
             TokenType.Minus => 2,
             _ => 0
         };
