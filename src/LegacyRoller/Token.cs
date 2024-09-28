@@ -4,7 +4,8 @@ internal enum TokenType
 {
     Number,
     Minus,
-    Add,
+    Plus,
+    Asterisk,
 }
 
 internal readonly struct Token

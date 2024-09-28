@@ -18,6 +18,11 @@ public class DiceExpressionParserTests
     [Arguments("2+1", "ADD(NUMBER(2), NUMBER(1))")]
     [Arguments("-2+1", "ADD(UNARY(NUMBER(2)), NUMBER(1))")]
     [Arguments("2+1-1", "ADD(NUMBER(2), SUBTRACT(NUMBER(1), NUMBER(1)))")]
+    [Arguments("2*1", "MULTIPLY(NUMBER(2), NUMBER(1))")]
+    [Arguments("2*1+1", "ADD(MULTIPLY(NUMBER(2), NUMBER(1)), NUMBER(1))")]
+    [Arguments("2+1*1", "ADD(NUMBER(2), MULTIPLY(NUMBER(1), NUMBER(1)))")]
+    [Arguments("2*-1+1", "ADD(MULTIPLY(NUMBER(2), UNARY(NUMBER(1))), NUMBER(1))")]
+    [Arguments("2+1*-1", "ADD(NUMBER(2), MULTIPLY(NUMBER(1), UNARY(NUMBER(1))))")]
     public async Task Should_Parse_Input_Into_Dice_Expression(string input, string expected)
     {
         var result = DiceExpressionParser.Parse(input);

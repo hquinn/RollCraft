@@ -80,8 +80,11 @@ public static class DiceExpressionParser
                     case TokenType.Minus:
                         expression = new Subtract(left, right);
                         break;
-                    case TokenType.Add:
+                    case TokenType.Plus:
                         expression = new Add(left, right);
+                        break;
+                    case TokenType.Asterisk:
+                        expression = new Multiply(left, right);
                         break;
                     default:
                         return Result<DiceExpression>.Failure(new ParserError("InvalidToken", $"Invalid token found {token.TokenType}", index));
@@ -104,7 +107,8 @@ public static class DiceExpressionParser
         return token.TokenType switch
         {
             TokenType.Minus => 1,
-            TokenType.Add => 1,
+            TokenType.Plus => 1,
+            TokenType.Asterisk => 2,
             _ => 0
         };
     }
@@ -114,7 +118,7 @@ public static class DiceExpressionParser
         return token.TokenType switch
         {
             // Make sure prefix precedence is higher than infix precedence
-            TokenType.Minus => 2,
+            TokenType.Minus => 3,
             _ => 0
         };
     }
