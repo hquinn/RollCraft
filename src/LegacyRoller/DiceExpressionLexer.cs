@@ -71,7 +71,8 @@ internal static class DiceExpressionLexer
     {
         { "-", TokenType.Minus },
         { "+", TokenType.Plus },
-        { "*", TokenType.Asterisk }
+        { "*", TokenType.Asterisk },
+        { "/", TokenType.Slash }
     };
 
     private static Option<Token> GetOperator(ReadOnlySpan<char> input, ref int refIndex)

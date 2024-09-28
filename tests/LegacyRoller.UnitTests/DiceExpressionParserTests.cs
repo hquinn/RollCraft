@@ -23,6 +23,12 @@ public class DiceExpressionParserTests
     [Arguments("2+1*1", "ADD(NUMBER(2), MULTIPLY(NUMBER(1), NUMBER(1)))")]
     [Arguments("2*-1+1", "ADD(MULTIPLY(NUMBER(2), UNARY(NUMBER(1))), NUMBER(1))")]
     [Arguments("2+1*-1", "ADD(NUMBER(2), MULTIPLY(NUMBER(1), UNARY(NUMBER(1))))")]
+    [Arguments("2/1", "DIVIDE(NUMBER(2), NUMBER(1))")]
+    [Arguments("2/1+1", "ADD(DIVIDE(NUMBER(2), NUMBER(1)), NUMBER(1))")]
+    [Arguments("2+1/1", "ADD(NUMBER(2), DIVIDE(NUMBER(1), NUMBER(1)))")]
+    [Arguments("2/-1+1", "ADD(DIVIDE(NUMBER(2), UNARY(NUMBER(1))), NUMBER(1))")]
+    [Arguments("2+1/-1", "ADD(NUMBER(2), DIVIDE(NUMBER(1), UNARY(NUMBER(1))))")]
+    [Arguments("2+1/-1*2", "ADD(NUMBER(2), MULTIPLY(DIVIDE(NUMBER(1), UNARY(NUMBER(1))), NUMBER(2)))")]
     public async Task Should_Parse_Input_Into_Dice_Expression(string input, string expected)
     {
         var result = DiceExpressionParser.Parse(input);

@@ -6,6 +6,7 @@ internal enum TokenType
     Minus,
     Plus,
     Asterisk,
+    Slash,
 }
 
 internal readonly struct Token

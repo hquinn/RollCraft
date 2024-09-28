@@ -64,7 +64,11 @@ public static class DiceExpressionParser
         }
     }
     
-    private static Result<DiceExpression> ParseInfix(DiceExpression left, Token token, List<Token> tokens, ref int tokenIndex)
+    private static Result<DiceExpression> ParseInfix(
+        DiceExpression left, 
+        Token token, 
+        List<Token> tokens, 
+        ref int tokenIndex)
     {
         var precedence = GetInfixPrecedence(token);
         var rightResult = ParseExpression(tokens, precedence, ref tokenIndex);
@@ -86,8 +90,13 @@ public static class DiceExpressionParser
                     case TokenType.Asterisk:
                         expression = new Multiply(left, right);
                         break;
+                    case TokenType.Slash:
+                        expression = new Divide(left, right);
+                        break;
+                    case TokenType.Number:
                     default:
-                        return Result<DiceExpression>.Failure(new ParserError("InvalidToken", $"Invalid token found {token.TokenType}", index));
+                        return Result<DiceExpression>.Failure(
+                            new ParserError("InvalidToken", $"Invalid token found {token.TokenType}", index));
                 }
                 
                 return Result<DiceExpression>.Success(expression);
@@ -109,6 +118,7 @@ public static class DiceExpressionParser
             TokenType.Minus => 1,
             TokenType.Plus => 1,
             TokenType.Asterisk => 2,
+            TokenType.Slash => 2,
             _ => 0
         };
     }
