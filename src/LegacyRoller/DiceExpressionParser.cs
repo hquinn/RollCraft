@@ -80,6 +80,9 @@ public static class DiceExpressionParser
                     case TokenType.Minus:
                         expression = new Subtract(left, right);
                         break;
+                    case TokenType.Add:
+                        expression = new Add(left, right);
+                        break;
                     default:
                         return Result<DiceExpression>.Failure(new ParserError("InvalidToken", $"Invalid token found {token.TokenType}", index));
                 }
@@ -101,6 +104,7 @@ public static class DiceExpressionParser
         return token.TokenType switch
         {
             TokenType.Minus => 1,
+            TokenType.Add => 1,
             _ => 0
         };
     }

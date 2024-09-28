@@ -69,7 +69,8 @@ internal static class DiceExpressionLexer
     
     private static readonly Dictionary<string, TokenType> Operators = new()
     {
-        { "-", TokenType.Minus }
+        { "-", TokenType.Minus },
+        { "+", TokenType.Add }
     };
 
     private static Option<Token> GetOperator(ReadOnlySpan<char> input, ref int refIndex)

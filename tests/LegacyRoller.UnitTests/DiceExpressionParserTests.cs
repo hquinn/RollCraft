@@ -1,5 +1,3 @@
-using LegacyRoller.UnitTests.Helpers;
-
 namespace LegacyRoller.UnitTests;
 
 public class DiceExpressionParserTests
@@ -17,10 +15,13 @@ public class DiceExpressionParserTests
     [Arguments("---1", "UNARY(UNARY(UNARY(NUMBER(1))))")]
     [Arguments("2-1", "SUBTRACT(NUMBER(2), NUMBER(1))")]
     [Arguments("-2-1", "SUBTRACT(UNARY(NUMBER(2)), NUMBER(1))")]
+    [Arguments("2+1", "ADD(NUMBER(2), NUMBER(1))")]
+    [Arguments("-2+1", "ADD(UNARY(NUMBER(2)), NUMBER(1))")]
+    [Arguments("2+1-1", "ADD(NUMBER(2), SUBTRACT(NUMBER(1), NUMBER(1)))")]
     public async Task Should_Parse_Input_Into_Dice_Expression(string input, string expected)
     {
         var result = DiceExpressionParser.Parse(input);
-        var actual = result.GetSuccessValue().ToString();
+        var actual = result.Value!.ToString();
         
         await Assert.That(actual).IsEqualTo(expected);
     }
