@@ -1,6 +1,6 @@
 namespace LegacyRoller.Nodes;
 
-internal class Add : DiceExpression
+internal sealed class Add : DiceExpression
 {
     internal DiceExpression Left { get; }
     internal DiceExpression Right { get; }

@@ -1,6 +1,6 @@
 namespace LegacyRoller.Nodes;
 
-internal class Unary : DiceExpression
+internal sealed class Unary : DiceExpression
 {
     internal DiceExpression Expression { get; }
 

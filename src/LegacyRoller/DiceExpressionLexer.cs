@@ -1,4 +1,6 @@
+using System.Globalization;
 using LegacyRoller.Errors;
+using LegacyRoller.Tokens;
 using LitePrimitives;
 
 namespace LegacyRoller;
@@ -7,7 +9,7 @@ internal static class DiceExpressionLexer
 {
     internal static Result<List<Token>> Tokenize(ReadOnlySpan<char> input)
     {
-        var tokens = new List<Token>();
+        var tokens = new List<Token>(input.Length);
         var index = 0;
 
         while (index < input.Length)
@@ -18,81 +20,88 @@ internal static class DiceExpressionLexer
                 continue;
             }
             
-            var tokenOption = GetNumber(input, ref index);
+            var token = GetNumber(input, ref index);
 
-            if (tokenOption.IsNone)
+            if (token is null)
             {
-                tokenOption = GetOperator(input, ref index);
+                token = GetOperator(input, ref index);
             }
 
-            if (tokenOption.IsNone)
+            if (token is null)
             {
                 return Result<List<Token>>.Failure(new LexerError("InvalidToken", "Invalid token found", index));
             }
             
-            tokenOption.OnSome(token => tokens.Add(token));
+            tokens.Add(token.Value);
         }
 
         return Result<List<Token>>.Success(tokens);
     }
 
-    private static Option<Token> GetNumber(ReadOnlySpan<char> input, ref int refIndex)
+    private static Token? GetNumber(ReadOnlySpan<char> input, ref int refIndex)
     {
         var index = refIndex;
         var start = index;
 
         if (!char.IsDigit(input[index]))
         {
-            return Option<Token>.None();
+            return null;
         }
-        
-        do
+
+        var hasDecimalPoint = false;
+        while (index < input.Length)
         {
             var current = input[index];
-            
-            if (current != '.' && !char.IsDigit(current))
+
+            if (current == '.')
+            {
+                if (hasDecimalPoint)
+                {
+                    break;
+                }
+
+                hasDecimalPoint = true;
+            }
+            else if (!char.IsDigit(current))
             {
                 break;
             }
-            
+
             index++;
-        } while (index < input.Length);
-        
-        if (double.TryParse(input.Slice(start, index - start), out var number))
+        }
+
+        var numberSpan = input.Slice(start, index - start);
+
+        if (double.TryParse(numberSpan, NumberStyles.Float, CultureInfo.InvariantCulture, out var number))
         {
             refIndex = index;
-            return Option<Token>.Some(new Token(TokenType.Number, number));
+            return new Token(TokenType.Number, number);
         }
-        
-        return Option<Token>.None();
+
+        return null;
     }
-    
-    private static readonly Dictionary<string, TokenType> Operators = new()
-    {
-        { "-", TokenType.Minus },
-        { "+", TokenType.Plus },
-        { "*", TokenType.Asterisk },
-        { "/", TokenType.Slash }
-    };
 
-    private static Option<Token> GetOperator(ReadOnlySpan<char> input, ref int refIndex)
-    {
-        // List of operator strings sorted by length in decreasing order
-        var operatorStrings = Operators.Keys.OrderByDescending(op => op.Length);
+    private static readonly (string OperatorString, TokenType TokenType)[] SortedOperators =
+    [
+        ("-", TokenType.Minus),
+        ("+", TokenType.Plus),
+        ("*", TokenType.Asterisk),
+        ("/", TokenType.Slash)
+    ];
 
-        foreach (var op in operatorStrings)
+    private static Token? GetOperator(ReadOnlySpan<char> input, ref int refIndex)
+    {
+        foreach (var (opString, tokenType) in SortedOperators)
         {
-            var opSpan = op.AsSpan();
-            
-            if (refIndex + opSpan.Length <= input.Length &&
-                input.Slice(refIndex, opSpan.Length).SequenceEqual(opSpan))
+            var opLength = opString.Length;
+            if (refIndex + opLength <= input.Length &&
+                input.Slice(refIndex, opLength).StartsWith(opString.AsSpan()))
             {
-                var tokenType = Operators[op];
-                refIndex += opSpan.Length;
-                return Option<Token>.Some(new Token(tokenType));
+                refIndex += opLength;
+                return new Token(tokenType);
             }
         }
         
-        return Option<Token>.None();
+        return null;
     }
 }

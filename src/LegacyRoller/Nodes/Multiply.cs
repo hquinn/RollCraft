@@ -1,6 +1,6 @@
 namespace LegacyRoller.Nodes;
 
-internal class Multiply : DiceExpression
+internal sealed class Multiply : DiceExpression
 {
     internal DiceExpression Left { get; }
     internal DiceExpression Right { get; }

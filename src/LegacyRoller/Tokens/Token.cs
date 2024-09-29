@@ -1,13 +1,4 @@
-namespace LegacyRoller;
-
-internal enum TokenType
-{
-    Number,
-    Minus,
-    Plus,
-    Asterisk,
-    Slash,
-}
+namespace LegacyRoller.Tokens;
 
 internal readonly struct Token
 {

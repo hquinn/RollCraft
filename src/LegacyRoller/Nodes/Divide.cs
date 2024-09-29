@@ -1,6 +1,6 @@
 namespace LegacyRoller.Nodes;
 
-internal class Divide : DiceExpression
+internal sealed class Divide : DiceExpression
 {
     internal DiceExpression Left { get; }
     internal DiceExpression Right { get; }

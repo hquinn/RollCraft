@@ -1,6 +1,6 @@
 namespace LegacyRoller.Nodes;
 
-internal class Subtract : DiceExpression
+internal sealed class Subtract : DiceExpression
 {
     internal DiceExpression Left { get; }
     internal DiceExpression Right { get; }

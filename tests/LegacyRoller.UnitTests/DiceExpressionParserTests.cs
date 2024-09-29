@@ -17,7 +17,7 @@ public class DiceExpressionParserTests
     [Arguments("-2-1", "SUBTRACT(UNARY(NUMBER(2)), NUMBER(1))")]
     [Arguments("2+1", "ADD(NUMBER(2), NUMBER(1))")]
     [Arguments("-2+1", "ADD(UNARY(NUMBER(2)), NUMBER(1))")]
-    [Arguments("2+1-1", "ADD(NUMBER(2), SUBTRACT(NUMBER(1), NUMBER(1)))")]
+    [Arguments("2+1-1", "SUBTRACT(ADD(NUMBER(2), NUMBER(1)), NUMBER(1))")]
     [Arguments("2*1", "MULTIPLY(NUMBER(2), NUMBER(1))")]
     [Arguments("2*1+1", "ADD(MULTIPLY(NUMBER(2), NUMBER(1)), NUMBER(1))")]
     [Arguments("2+1*1", "ADD(NUMBER(2), MULTIPLY(NUMBER(1), NUMBER(1)))")]

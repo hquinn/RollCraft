@@ -1,6 +1,6 @@
 namespace LegacyRoller.Nodes;
 
-internal class Number : DiceExpression
+internal sealed class Number : DiceExpression
 {
     internal double Value { get; }
 
