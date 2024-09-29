@@ -20,12 +20,7 @@ internal static class DiceExpressionLexer
                 continue;
             }
             
-            var token = GetNumber(input, ref index);
-
-            if (token is null)
-            {
-                token = GetOperator(input, ref index);
-            }
+            var token = GetNumber(input, ref index) ?? GetOperator(input, ref index);
 
             if (token is null)
             {
