@@ -1,14 +1,23 @@
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using LegacyRoller.Errors;
-using LegacyRoller.Nodes;
 using LegacyRoller.Tokens;
+using LegacyRoller.Tokens.Handlers;
 using LitePrimitives;
 
 namespace LegacyRoller;
 
 public static class DiceExpressionParser
 {
+    // Match the order of the TokenHandlers by TokenType
+    private static readonly ITokenHandler[] TokenHandlers =
+    [
+        new MinusTokenHandler(),
+        new PlusTokenHandler(),
+        new AsteriskTokenHandler(),
+        new SlashTokenHandler(),
+        new NumberTokenHandler(),
+    ];
+    
     public static Result<DiceExpression> Parse(string input)
     {
         var tokensResult = DiceExpressionLexer.Tokenize(input.AsSpan());
@@ -23,7 +32,7 @@ public static class DiceExpressionParser
         return ParseExpression(ref reader);
     }
 
-    private static Result<DiceExpression> ParseExpression(ref TokenReader reader, int precedence = 0)
+    internal static Result<DiceExpression> ParseExpression(ref TokenReader reader, int precedence = 0)
     {
         if (!reader.TryConsume(out var token))
         {
@@ -31,7 +40,7 @@ public static class DiceExpressionParser
                 new ParserError("UnexpectedEnd", "Unexpected end of input", reader.Position));
         }
 
-        var leftResult = ParsePrefix(token, ref reader);
+        var leftResult = TokenHandlers[(int) token.TokenType].ParsePrefix(token, ref reader);
         if (leftResult.IsFailure)
         {
             return leftResult;
@@ -44,7 +53,9 @@ public static class DiceExpressionParser
                 break;
             }
 
-            if (precedence >= GetInfixPrecedence(nextToken))
+            var nextPrecedence = TokenHandlers[(int) nextToken.TokenType].GetInfixPrecedence();
+            
+            if (precedence >= nextPrecedence)
             {
                 break;
             }
@@ -61,73 +72,15 @@ public static class DiceExpressionParser
         return leftResult;
     }
 
-    private static Result<DiceExpression> ParsePrefix(Token token, ref TokenReader reader)
-    {
-        switch (token.TokenType)
-        {
-            case TokenType.Number:
-                return Result<DiceExpression>.Success(new Number(token.Value));
-            case TokenType.Minus:
-            {
-                var precedence = GetPrefixPrecedence(token);
-                var rightResult = ParseExpression(ref reader, precedence);
-                return rightResult.IsFailure
-                    ? rightResult
-                    : Result<DiceExpression>.Success(new Unary(rightResult.Value!));
-            }
-            case TokenType.Plus:
-            case TokenType.Asterisk:
-            case TokenType.Slash:
-            default:
-                return Result<DiceExpression>.Failure(
-                    new ParserError(
-                        "InvalidToken", $"Unexpected token '{token.TokenType}' at position {reader.Position - 1}"
-                        , reader.Position - 1));
-        }
-    }
-
     private static Result<DiceExpression> ParseInfix(DiceExpression left, Token token, ref TokenReader reader)
     {
-        var precedence = GetInfixPrecedence(token);
+        var precedence = TokenHandlers[(int) token.TokenType].GetInfixPrecedence();
         var rightResult = ParseExpression(ref reader, precedence);
         if (rightResult.IsFailure)
         {
             return rightResult;
         }
-
-        return token.TokenType switch
-        {
-            TokenType.Plus => Result<DiceExpression>.Success(new Add(left, rightResult.Value!)),
-            TokenType.Minus => Result<DiceExpression>.Success(new Subtract(left, rightResult.Value!)),
-            TokenType.Asterisk => Result<DiceExpression>.Success(new Multiply(left, rightResult.Value!)),
-            TokenType.Slash => Result<DiceExpression>.Success(new Divide(left, rightResult.Value!)),
-            _ => Result<DiceExpression>.Failure(
-                new ParserError(
-                    "InvalidOperator", $"Invalid operator '{token.TokenType}' at position {reader.Position - 1}"
-                    , reader.Position - 1))
-        };
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int GetInfixPrecedence(Token token)
-    {
-        return token.TokenType switch
-        {
-            TokenType.Plus => 1,
-            TokenType.Minus => 1,
-            TokenType.Asterisk => 2,
-            TokenType.Slash => 2,
-            _ => 0
-        };
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int GetPrefixPrecedence(Token token)
-    {
-        return token.TokenType switch
-        {
-            TokenType.Minus => 3,
-            _ => 0
-        };
+        
+        return TokenHandlers[(int) token.TokenType].ParseInfix(left, rightResult.Value!, token, ref reader);
     }
 }
