@@ -11,6 +11,7 @@ public static class DiceExpressionParser
     // Match the order of the TokenHandlers by TokenType
     private static readonly ITokenHandler[] TokenHandlers =
     [
+        new DiceTokenHandler(),
         new MinusTokenHandler(),
         new PlusTokenHandler(),
         new AsteriskTokenHandler(),

@@ -12,6 +12,19 @@ internal ref struct TokenReader
 
     public int Position { get; private set; }
 
+    public bool TryPeekBack(out Token token, int offset = 1)
+    {
+        var index = Position - offset;
+        if (index >= 0)
+        {
+            token = _tokens[index];
+            return true;
+        }
+
+        token = default;
+        return false;
+    }
+    
     public bool TryPeek(out Token token, int offset = 0)
     {
         var index = Position + offset;

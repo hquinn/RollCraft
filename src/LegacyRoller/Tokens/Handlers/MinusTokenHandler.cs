@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using LegacyRoller.Errors;
 using LegacyRoller.Nodes;
 using LitePrimitives;
 
@@ -9,6 +10,18 @@ internal sealed class MinusTokenHandler : ITokenHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Result<DiceExpression> ParsePrefix(Token token, ref TokenReader reader)
     {
+        if (!reader.TryPeek(out var nextToken))
+        {
+            return Result<DiceExpression>.Failure(
+                new ParserError("UnexpectedEnd", "Unexpected end of input", reader.Position));
+        }
+
+        // We want to treat '-dX' as '-1dX'
+        if (nextToken.TokenType == TokenType.Dice)
+        {
+            return Result<DiceExpression>.Success(new Unary(new Number(1)));
+        }
+        
         var operandResult = DiceExpressionParser.ParseExpression(ref reader, GetPrefixPrecedence());
         return operandResult.IsFailure 
             ? operandResult 

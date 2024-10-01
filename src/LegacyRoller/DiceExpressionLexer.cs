@@ -78,6 +78,7 @@ internal static class DiceExpressionLexer
 
     private static readonly (string OperatorString, TokenType TokenType)[] SortedOperators =
     [
+        ("d", TokenType.Dice),
         ("-", TokenType.Minus),
         ("+", TokenType.Plus),
         ("*", TokenType.Asterisk),
@@ -90,7 +91,7 @@ internal static class DiceExpressionLexer
         {
             var opLength = opString.Length;
             if (refIndex + opLength <= input.Length &&
-                input.Slice(refIndex, opLength).StartsWith(opString.AsSpan()))
+                input.Slice(refIndex, opLength).StartsWith(opString.AsSpan(), StringComparison.InvariantCultureIgnoreCase))
             {
                 refIndex += opLength;
                 return new Token(tokenType);
