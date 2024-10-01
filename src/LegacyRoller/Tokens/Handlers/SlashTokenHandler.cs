@@ -19,10 +19,4 @@ internal sealed class SlashTokenHandler : ITokenHandler
     {
         return Result<DiceExpression>.Success(new Divide(left, right));
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int GetInfixPrecedence()
-    {
-        return 2;
-    }
 }

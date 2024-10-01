@@ -33,7 +33,7 @@ public static class DiceExpressionParser
         return ParseExpression(ref reader);
     }
 
-    internal static Result<DiceExpression> ParseExpression(ref TokenReader reader, int precedence = 0)
+    internal static Result<DiceExpression> ParseExpression(ref TokenReader reader, byte precedence = 0)
     {
         if (!reader.TryConsume(out var token))
         {
@@ -41,7 +41,7 @@ public static class DiceExpressionParser
                 new ParserError("UnexpectedEnd", "Unexpected end of input", reader.Position));
         }
 
-        var leftResult = TokenHandlers[(int) token.TokenType].ParsePrefix(token, ref reader);
+        var leftResult = TokenHandlers[(byte) token.TokenDetails.TokenType].ParsePrefix(token, ref reader);
         if (leftResult.IsFailure)
         {
             return leftResult;
@@ -54,7 +54,7 @@ public static class DiceExpressionParser
                 break;
             }
 
-            var nextPrecedence = TokenHandlers[(int) nextToken.TokenType].GetInfixPrecedence();
+            var nextPrecedence = nextToken.TokenDetails.InfixPrecedence;
             
             if (precedence >= nextPrecedence)
             {
@@ -75,13 +75,13 @@ public static class DiceExpressionParser
 
     private static Result<DiceExpression> ParseInfix(DiceExpression left, Token token, ref TokenReader reader)
     {
-        var precedence = TokenHandlers[(int) token.TokenType].GetInfixPrecedence();
+        var precedence = token.TokenDetails.InfixPrecedence;
         var rightResult = ParseExpression(ref reader, precedence);
         if (rightResult.IsFailure)
         {
             return rightResult;
         }
         
-        return TokenHandlers[(int) token.TokenType].ParseInfix(left, rightResult.Value!, token, ref reader);
+        return TokenHandlers[(byte) token.TokenDetails.TokenType].ParseInfix(left, rightResult.Value!, token, ref reader);
     }
 }

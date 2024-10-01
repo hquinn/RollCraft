@@ -1,6 +1,6 @@
 namespace LegacyRoller.Tokens;
 
-internal enum TokenType
+public enum TokenType : byte
 {
     Dice,
     Minus,

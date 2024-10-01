@@ -5,9 +5,9 @@ using LitePrimitives;
 
 namespace LegacyRoller;
 
-internal static class DiceExpressionLexer
+public static class DiceExpressionLexer
 {
-    internal static Result<List<Token>> Tokenize(ReadOnlySpan<char> input)
+    public static Result<List<Token>> Tokenize(ReadOnlySpan<char> input)
     {
         var tokens = new List<Token>(input.Length);
         var index = 0;
@@ -70,31 +70,31 @@ internal static class DiceExpressionLexer
         if (double.TryParse(numberSpan, NumberStyles.Float, CultureInfo.InvariantCulture, out var number))
         {
             refIndex = index;
-            return new Token(TokenType.Number, number);
+            return new Token(number);
         }
 
         return null;
     }
 
-    private static readonly (string OperatorString, TokenType TokenType)[] SortedOperators =
+    private static readonly (string OperatorString, TokenType TokenType, byte Prefix, byte Infix)[] SortedOperators =
     [
-        ("d", TokenType.Dice),
-        ("-", TokenType.Minus),
-        ("+", TokenType.Plus),
-        ("*", TokenType.Asterisk),
-        ("/", TokenType.Slash)
+        ("d", TokenType.Dice, 4, 4),
+        ("-", TokenType.Minus, 6, 1),
+        ("+", TokenType.Plus, 0, 1),
+        ("*", TokenType.Asterisk, 0, 2),
+        ("/", TokenType.Slash, 0, 2)
     ];
 
     private static Token? GetOperator(ReadOnlySpan<char> input, ref int refIndex)
     {
-        foreach (var (opString, tokenType) in SortedOperators)
+        foreach (var (opString, tokenType, prefix, infix) in SortedOperators)
         {
             var opLength = opString.Length;
             if (refIndex + opLength <= input.Length &&
                 input.Slice(refIndex, opLength).StartsWith(opString.AsSpan(), StringComparison.InvariantCultureIgnoreCase))
             {
                 refIndex += opLength;
-                return new Token(tokenType);
+                return new Token(tokenType, prefix, infix);
             }
         }
         

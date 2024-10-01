@@ -19,10 +19,4 @@ internal sealed class AsteriskTokenHandler : ITokenHandler
     {
         return Result<DiceExpression>.Success(new Multiply(left, right));
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int GetInfixPrecedence()
-    {
-        return 2;
-    }
 }

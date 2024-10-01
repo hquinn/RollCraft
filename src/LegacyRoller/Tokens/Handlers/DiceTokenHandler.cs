@@ -10,7 +10,7 @@ internal sealed class DiceTokenHandler : ITokenHandler
         // Treat 'dX' as '1dX'
         var oneExpression = new Number(1);
 
-        var rightResult = DiceExpressionParser.ParseExpression(ref reader, GetPrefixPrecedence());
+        var rightResult = DiceExpressionParser.ParseExpression(ref reader, token.TokenDetails.PrefixPrecedence);
         if (rightResult.IsFailure)
         {
             return rightResult;
@@ -24,15 +24,5 @@ internal sealed class DiceTokenHandler : ITokenHandler
     public Result<DiceExpression> ParseInfix(DiceExpression left, DiceExpression right, Token token, ref TokenReader reader)
     {
         return Result<DiceExpression>.Success(new Dice(left, right));
-    }
-    
-    public int GetPrefixPrecedence()
-    {
-        return 4;
-    }
-
-    public int GetInfixPrecedence()
-    {
-        return 4;
     }
 }

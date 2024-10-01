@@ -19,10 +19,4 @@ internal sealed class PlusTokenHandler : ITokenHandler
     {
         return Result<DiceExpression>.Success(new Add(left, right));
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int GetInfixPrecedence()
-    {
-        return 1;
-    }
 }

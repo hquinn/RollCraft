@@ -18,13 +18,7 @@ internal sealed class NumberTokenHandler : ITokenHandler
     {
         return Result<DiceExpression>.Failure(
             new ParserError(
-                "InvalidOperator", $"Invalid operator '{token.TokenType}' at position {reader.Position - 1}"
+                "InvalidOperator", $"Invalid operator '{token.TokenDetails.TokenType}' at position {reader.Position - 1}"
                 , reader.Position - 1));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int GetInfixPrecedence()
-    {
-        return 0;
     }
 }

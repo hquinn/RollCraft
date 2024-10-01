@@ -17,12 +17,12 @@ internal sealed class MinusTokenHandler : ITokenHandler
         }
 
         // We want to treat '-dX' as '-1dX'
-        if (nextToken.TokenType == TokenType.Dice)
+        if (nextToken.TokenDetails.TokenType == TokenType.Dice)
         {
             return Result<DiceExpression>.Success(new Unary(new Number(1)));
         }
         
-        var operandResult = DiceExpressionParser.ParseExpression(ref reader, GetPrefixPrecedence());
+        var operandResult = DiceExpressionParser.ParseExpression(ref reader, token.TokenDetails.PrefixPrecedence);
         return operandResult.IsFailure 
             ? operandResult 
             : Result<DiceExpression>.Success(new Unary(operandResult.Value!));
@@ -32,17 +32,5 @@ internal sealed class MinusTokenHandler : ITokenHandler
     public Result<DiceExpression> ParseInfix(DiceExpression left, DiceExpression right, Token token, ref TokenReader reader)
     {
         return Result<DiceExpression>.Success(new Subtract(left, right));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int GetInfixPrecedence()
-    {
-        return 1;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int GetPrefixPrecedence()
-    {
-        return 6;
     }
 }
