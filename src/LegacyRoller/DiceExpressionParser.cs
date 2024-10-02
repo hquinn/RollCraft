@@ -13,6 +13,7 @@ public static class DiceExpressionParser
     [
         new DiceTokenHandler(),
         new MinimumTokenHandler(),
+        new MaximumTokenHandler(),
         
         new MinusTokenHandler(),
         new PlusTokenHandler(),

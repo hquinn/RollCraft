@@ -4,6 +4,7 @@ public enum TokenType : byte
 {
     Dice,
     Minimum,
+    Maximum,
     
     Minus,
     Plus,

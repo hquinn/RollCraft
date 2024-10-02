@@ -108,6 +108,11 @@ public static class DiceExpressionLexer
                     refIndex += 3;
                     return new Token(TokenType.Minimum, 45, 45);
                 }
+                if (identifier.StartsWith("max", StringComparison.OrdinalIgnoreCase))
+                {
+                    refIndex += 3;
+                    return new Token(TokenType.Maximum, 45, 45);
+                }
 
                 return null;
                 
