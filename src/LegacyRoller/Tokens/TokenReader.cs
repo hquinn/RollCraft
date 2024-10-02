@@ -36,4 +36,9 @@ internal ref struct TokenReader
         token = default;
         return false;
     }
+    
+    public void Advance()
+    {
+        Position++;
+    }
 }

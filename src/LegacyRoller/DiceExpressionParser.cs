@@ -12,6 +12,8 @@ public static class DiceExpressionParser
     private static readonly ITokenHandler[] TokenHandlers =
     [
         new DiceTokenHandler(),
+        new MinimumTokenHandler(),
+        
         new MinusTokenHandler(),
         new PlusTokenHandler(),
         new AsteriskTokenHandler(),
@@ -63,8 +65,8 @@ public static class DiceExpressionParser
                 break;
             }
 
-            reader.TryConsume(out token);
-            leftResult = ParseInfix(leftResult.Value!, token, ref reader);
+            reader.Advance();
+            leftResult = ParseInfix(leftResult.Value!, nextToken, ref reader);
             
             if (leftResult.IsFailure)
             {

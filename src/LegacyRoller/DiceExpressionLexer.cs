@@ -100,9 +100,20 @@ public static class DiceExpressionLexer
 
         switch (currentChar)
         {
+            case 'm' or 'M':
+                var identifier = input.Slice(index, 3);
+                
+                if (identifier.StartsWith("min", StringComparison.OrdinalIgnoreCase))
+                {
+                    refIndex += 3;
+                    return new Token(TokenType.Minimum, 45, 45);
+                }
+
+                return null;
+                
             case 'd' or 'D':
                 refIndex++;
-                return new Token(TokenType.Dice, 4, 4);
+                return new Token(TokenType.Dice, 50, 50);
 
             case '+':
                 refIndex++;
@@ -110,7 +121,7 @@ public static class DiceExpressionLexer
 
             case '-':
                 refIndex++;
-                return new Token(TokenType.Minus, 6, 1);
+                return new Token(TokenType.Minus, 80, 1);
 
             case '*':
                 refIndex++;
@@ -122,7 +133,7 @@ public static class DiceExpressionLexer
             
             case '(':
                 refIndex++;
-                return new Token(TokenType.LeftParenthesis, 20, 0);
+                return new Token(TokenType.LeftParenthesis, 100, 0);
 
             case ')':
                 refIndex++;

@@ -1,9 +1,13 @@
+using LegacyRoller.Modifiers;
+
 namespace LegacyRoller.Nodes;
 
-public class Dice : DiceExpression
+internal sealed class Dice : DiceExpression
 {
     internal DiceExpression CountOfDice { get; }
     internal DiceExpression CountOfSides { get; }
+    
+    internal List<IModifier> Modifiers { get; } = new();
 
     internal Dice(DiceExpression countOfDice, DiceExpression countOfSides)
     {
@@ -13,6 +17,7 @@ public class Dice : DiceExpression
     
     public override string ToString()
     {
-        return $"DICE({CountOfDice}, {CountOfSides})";
+        var modifiers = string.Join(", ", Modifiers);
+        return $"DICE({CountOfDice}, {CountOfSides}{(string.IsNullOrEmpty(modifiers) ? "" : $", {modifiers}")})";
     }
 }

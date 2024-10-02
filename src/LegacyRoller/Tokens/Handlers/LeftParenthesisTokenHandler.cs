@@ -4,7 +4,7 @@ using LitePrimitives;
 
 namespace LegacyRoller.Tokens.Handlers;
 
-internal class LeftParenthesisTokenHandler : ITokenHandler
+internal sealed class LeftParenthesisTokenHandler : ITokenHandler
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Result<DiceExpression> ParsePrefix(Token token, ref TokenReader reader)
