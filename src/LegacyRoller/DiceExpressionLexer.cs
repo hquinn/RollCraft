@@ -1,4 +1,3 @@
-using System.Globalization;
 using LegacyRoller.Errors;
 using LegacyRoller.Tokens;
 using LitePrimitives;
@@ -36,44 +35,56 @@ public static class DiceExpressionLexer
     private static Token? GetNumber(ReadOnlySpan<char> input, ref int refIndex)
     {
         var index = refIndex;
-        var start = index;
 
-        if (!char.IsDigit(input[index]))
-        {
-            return null;
-        }
-
+        var integerPart = 0L;
+        var fractionalPart = 0.0;
+        var fractionalDivider = 1.0;
         var hasDecimalPoint = false;
+        var hasDigits = false;
+
         while (index < input.Length)
         {
             var current = input[index];
 
-            if (current == '.')
+            if (char.IsDigit(current))
+            {
+                hasDigits = true;
+                var digit = current - '0';
+                if (!hasDecimalPoint)
+                {
+                    integerPart = integerPart * 10 + digit;
+                }
+                else
+                {
+                    fractionalDivider *= 10;
+                    fractionalPart += digit / fractionalDivider;
+                }
+                index++;
+            }
+            else if (current == '.')
             {
                 if (hasDecimalPoint)
                 {
-                    break;
+                    break; // Second decimal point encountered; invalid number
                 }
-
                 hasDecimalPoint = true;
+                index++;
             }
-            else if (!char.IsDigit(current))
+            else
             {
-                break;
+                break; // Non-digit character encountered; stop parsing
             }
-
-            index++;
         }
 
-        var numberSpan = input.Slice(start, index - start);
-
-        if (double.TryParse(numberSpan, NumberStyles.Float, CultureInfo.InvariantCulture, out var number))
+        if (!hasDigits)
         {
-            refIndex = index;
-            return new Token(number);
+            return null; // No digits were parsed
         }
 
-        return null;
+        var number = integerPart + fractionalPart;
+
+        refIndex = index;
+        return new Token(number);
     }
 
     private static readonly (string OperatorString, TokenType TokenType, byte Prefix, byte Infix)[] SortedOperators =
