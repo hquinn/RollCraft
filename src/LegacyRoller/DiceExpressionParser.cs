@@ -17,6 +17,8 @@ public static class DiceExpressionParser
         new AsteriskTokenHandler(),
         new SlashTokenHandler(),
         new NumberTokenHandler(),
+        new LeftParenthesisTokenHandler(),
+        new RightParenthesisTokenHandler(),
     ];
     
     public static Result<DiceExpression> Parse(string input)

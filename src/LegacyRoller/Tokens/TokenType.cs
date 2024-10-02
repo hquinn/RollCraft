@@ -8,4 +8,6 @@ public enum TokenType : byte
     Asterisk,
     Slash,
     Number,
+    LeftParenthesis,
+    RightParenthesis
 }

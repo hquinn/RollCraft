@@ -37,6 +37,10 @@ public class DiceExpressionParserTests
     [Arguments("-1d6", "DICE(UNARY(NUMBER(1)), NUMBER(6))")]
     [Arguments("-d6", "DICE(UNARY(NUMBER(1)), NUMBER(6))")]
     [Arguments("1d6+3", "ADD(DICE(NUMBER(1), NUMBER(6)), NUMBER(3))")]
+    [Arguments("(1+2)*3", "MULTIPLY(ADD(NUMBER(1), NUMBER(2)), NUMBER(3))")]
+    [Arguments("(1+(2+3))*3", "MULTIPLY(ADD(NUMBER(1), ADD(NUMBER(2), NUMBER(3))), NUMBER(3))")]
+    [Arguments("(1+2+3)*3", "MULTIPLY(ADD(ADD(NUMBER(1), NUMBER(2)), NUMBER(3)), NUMBER(3))")]
+    [Arguments("1d(2*3)", "DICE(NUMBER(1), MULTIPLY(NUMBER(2), NUMBER(3)))")]
     public async Task Should_Parse_Input_Into_Dice_Expression(string input, string expected)
     {
         var result = DiceExpressionParser.Parse(input);

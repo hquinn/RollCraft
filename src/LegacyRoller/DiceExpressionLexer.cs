@@ -119,6 +119,14 @@ public static class DiceExpressionLexer
             case '/':
                 refIndex++;
                 return new Token(TokenType.Slash, 0, 2);
+            
+            case '(':
+                refIndex++;
+                return new Token(TokenType.LeftParenthesis, 20, 0);
+
+            case ')':
+                refIndex++;
+                return new Token(TokenType.RightParenthesis, 0, 0);
         }
 
         return null;
