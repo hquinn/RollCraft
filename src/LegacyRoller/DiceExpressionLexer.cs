@@ -86,29 +86,41 @@ public static class DiceExpressionLexer
         refIndex = index;
         return new Token(number);
     }
-
-    private static readonly (string OperatorString, TokenType TokenType, byte Prefix, byte Infix)[] SortedOperators =
-    [
-        ("d", TokenType.Dice, 4, 4),
-        ("-", TokenType.Minus, 6, 1),
-        ("+", TokenType.Plus, 0, 1),
-        ("*", TokenType.Asterisk, 0, 2),
-        ("/", TokenType.Slash, 0, 2)
-    ];
-
+    
     private static Token? GetOperator(ReadOnlySpan<char> input, ref int refIndex)
     {
-        foreach (var (opString, tokenType, prefix, infix) in SortedOperators)
+        var index = refIndex;
+
+        if (index >= input.Length)
         {
-            var opLength = opString.Length;
-            if (refIndex + opLength <= input.Length &&
-                input.Slice(refIndex, opLength).StartsWith(opString.AsSpan(), StringComparison.InvariantCultureIgnoreCase))
-            {
-                refIndex += opLength;
-                return new Token(tokenType, prefix, infix);
-            }
+            return null;
         }
-        
+
+        var currentChar = input[index];
+
+        switch (currentChar)
+        {
+            case 'd' or 'D':
+                refIndex++;
+                return new Token(TokenType.Dice, 4, 4);
+
+            case '+':
+                refIndex++;
+                return new Token(TokenType.Plus, 0, 1);
+
+            case '-':
+                refIndex++;
+                return new Token(TokenType.Minus, 6, 1);
+
+            case '*':
+                refIndex++;
+                return new Token(TokenType.Asterisk, 0, 2);
+
+            case '/':
+                refIndex++;
+                return new Token(TokenType.Slash, 0, 2);
+        }
+
         return null;
     }
 }
