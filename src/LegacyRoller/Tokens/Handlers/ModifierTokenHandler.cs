@@ -1,11 +1,9 @@
 using LegacyRoller.Errors;
-using LegacyRoller.Modifiers;
-using LegacyRoller.Nodes;
 using LitePrimitives;
 
 namespace LegacyRoller.Tokens.Handlers;
 
-internal sealed class MinimumTokenHandler : ITokenHandler
+internal sealed class ModifierTokenHandler : ITokenHandler
 {
     public Result<DiceExpression> ParsePrefix(Token token, ref TokenReader reader)
     {
@@ -15,13 +13,7 @@ internal sealed class MinimumTokenHandler : ITokenHandler
 
     public Result<DiceExpression> ParseInfix(DiceExpression left, DiceExpression right, Token token, ref TokenReader reader)
     {
-        if (left is Dice dice)
-        {
-            dice.Modifiers.Add(new Minimum(right));
-            return Result<DiceExpression>.Success(dice);
-        }
-        
         return Result<DiceExpression>.Failure(
-            new ParserError("InvalidInfixOperator", "Minimum cannot be used as infix operator other than for a dice token", reader.Position));
+            new ParserError("InvalidInfix", "Invalid infix found", reader.Position));
     }
 }

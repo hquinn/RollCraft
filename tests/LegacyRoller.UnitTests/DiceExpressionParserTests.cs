@@ -51,6 +51,7 @@ public class DiceExpressionParserTests
     [Arguments("1d6max-3", "DICE(NUMBER(1), NUMBER(6), MAXIMUM=UNARY(NUMBER(3)))")]
     [Arguments("1d-6max-3", "DICE(NUMBER(1), UNARY(NUMBER(6)), MAXIMUM=UNARY(NUMBER(3)))")]
     [Arguments("1d6max3+3", "ADD(DICE(NUMBER(1), NUMBER(6), MAXIMUM=NUMBER(3)), NUMBER(3))")]
+    [Arguments("1d6max(3+3)+3", "ADD(DICE(NUMBER(1), NUMBER(6), MAXIMUM=ADD(NUMBER(3), NUMBER(3))), NUMBER(3))")]
     [Arguments("1d6min2max4", "DICE(NUMBER(1), NUMBER(6), MINIMUM=NUMBER(2), MAXIMUM=NUMBER(4))")]
     [Arguments("1d6min-2max4", "DICE(NUMBER(1), NUMBER(6), MINIMUM=UNARY(NUMBER(2)), MAXIMUM=NUMBER(4))")]
     public async Task Should_Parse_Input_Into_Dice_Expression(string input, string expected)
