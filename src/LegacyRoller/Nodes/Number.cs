@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace LegacyRoller.Nodes;
 
 internal sealed class Number : DiceExpression
@@ -11,6 +13,6 @@ internal sealed class Number : DiceExpression
     
     public override string ToString()
     {
-        return $"NUMBER({Value})";
+        return Value.ToString(CultureInfo.InvariantCulture);
     }
 }
