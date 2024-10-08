@@ -5,9 +5,9 @@ public readonly struct Token
     internal readonly TokenDetails TokenDetails;
     internal readonly double Value;
     
-    internal Token(TokenType tokenType, byte prefixPrecedence, byte infixPrecedence)
+    internal Token(TokenType tokenType, TokenCategory tokenCategory, byte prefixPrecedence, byte infixPrecedence)
     {
-        TokenDetails = new TokenDetails(tokenType, prefixPrecedence, infixPrecedence);
+        TokenDetails = new TokenDetails(tokenType, tokenCategory, prefixPrecedence, infixPrecedence);
         Value = 0;
     }
     
@@ -19,7 +19,7 @@ public readonly struct Token
     
     internal Token(double value)
     {
-        TokenDetails = new TokenDetails(TokenType.Number, 0, 0);
+        TokenDetails = new TokenDetails(TokenType.Number, TokenCategory.Operand, 0, 0);
         Value = value;
     }
 }
@@ -27,15 +27,15 @@ public readonly struct Token
 public readonly struct TokenDetails
 {
     internal readonly TokenType TokenType;
+    internal readonly TokenCategory TokenCategory;
     internal readonly byte PrefixPrecedence;
     internal readonly byte InfixPrecedence;
-    internal readonly byte Padding;
     
-    internal TokenDetails(TokenType tokenType, byte prefixPrecedence, byte infixPrecedence)
+    internal TokenDetails(TokenType tokenType, TokenCategory tokenCategory, byte prefixPrecedence, byte infixPrecedence)
     {
         TokenType = tokenType;
+        TokenCategory = tokenCategory;
         PrefixPrecedence = prefixPrecedence;
         InfixPrecedence = infixPrecedence;
-        Padding = 0;
     }
 }

@@ -106,43 +106,43 @@ public static class DiceExpressionLexer
                 if (identifier.StartsWith("min", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 3;
-                    return new Token(TokenType.Minimum, 45, 45);
+                    return new Token(TokenType.Minimum, TokenCategory.Modifier, 45, 45);
                 }
                 if (identifier.StartsWith("max", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 3;
-                    return new Token(TokenType.Maximum, 45, 45);
+                    return new Token(TokenType.Maximum, TokenCategory.Modifier, 45, 45);
                 }
 
                 return null;
                 
             case 'd' or 'D':
                 refIndex++;
-                return new Token(TokenType.Dice, 50, 50);
+                return new Token(TokenType.Dice, TokenCategory.Operator, 50, 50);
 
             case '+':
                 refIndex++;
-                return new Token(TokenType.Plus, 0, 1);
+                return new Token(TokenType.Plus, TokenCategory.Operator, 0, 1);
 
             case '-':
                 refIndex++;
-                return new Token(TokenType.Minus, 80, 1);
+                return new Token(TokenType.Minus, TokenCategory.Operator, 80, 1);
 
             case '*':
                 refIndex++;
-                return new Token(TokenType.Asterisk, 0, 2);
+                return new Token(TokenType.Asterisk, TokenCategory.Operator, 0, 2);
 
             case '/':
                 refIndex++;
-                return new Token(TokenType.Slash, 0, 2);
+                return new Token(TokenType.Slash, TokenCategory.Operator, 0, 2);
             
             case '(':
                 refIndex++;
-                return new Token(TokenType.LeftParenthesis, 100, 0);
+                return new Token(TokenType.LeftParenthesis, TokenCategory.Operator, 100, 0);
 
             case ')':
                 refIndex++;
-                return new Token(TokenType.RightParenthesis, 0, 0);
+                return new Token(TokenType.RightParenthesis, TokenCategory.Operator, 0, 0);
         }
 
         return null;
