@@ -7,9 +7,7 @@ internal sealed class Maximum : IModifier
         MaximumValue = maximum;
     }
 
-    public DiceExpression MaximumValue { get; }
-
-    public int Order => 1;
+    internal DiceExpression MaximumValue { get; }
     
     public override string ToString()
     {

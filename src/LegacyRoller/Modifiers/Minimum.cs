@@ -7,9 +7,7 @@ internal sealed class Minimum : IModifier
         MinimumValue = minimum;
     }
 
-    public DiceExpression MinimumValue { get; }
-
-    public int Order => 1;
+    internal DiceExpression MinimumValue { get; }
     
     public override string ToString()
     {
