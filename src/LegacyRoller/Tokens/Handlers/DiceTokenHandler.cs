@@ -126,7 +126,30 @@ internal sealed class DiceTokenHandler : ITokenHandler
                 };
                 
                 return Result<IModifier>.Success(new Exploding(comparison));
-                
+
+            case TokenType.Keep:
+            case TokenType.KeepHighest:
+            {
+                var countResult = DiceExpressionParser.ParseExpression(ref reader, token.TokenDetails.InfixPrecedence);
+                if (countResult.IsFailure)
+                {
+                    return countResult.Map<IModifier>(_ => null!);
+                }
+
+                return Result<IModifier>.Success(new KeepHighest(countResult.Value!));
+            }
+
+            case TokenType.KeepLowest:
+            {
+                var countResult = DiceExpressionParser.ParseExpression(ref reader, token.TokenDetails.InfixPrecedence);
+                if (countResult.IsFailure)
+                {
+                    return countResult.Map<IModifier>(_ => null!);
+                }
+
+                return Result<IModifier>.Success(new KeepLowest(countResult.Value!));
+            }
+
             default:
                 return Result<IModifier>.Failure(
                     new ParserError("UnknownModifier", $"Unknown modifier '{token.TokenDetails.TokenType}'", reader.Position - 1));

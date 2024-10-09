@@ -62,6 +62,9 @@ public class DiceExpressionParserTests
     [Arguments("1d6!>=5", "DICE(1, 6, EXPLODING=GREATERTHANEQUAL(5))")]
     [Arguments("1d6!<=5", "DICE(1, 6, EXPLODING=LESSTHANEQUAL(5))")]
     [Arguments("1d6!=(5*5)", "DICE(1, 6, EXPLODING=EQUAL(MULTIPLY(5, 5)))")]
+    [Arguments("4d6k3", "DICE(4, 6, KEEPHIGHEST=3)")]
+    [Arguments("4d6kh3", "DICE(4, 6, KEEPHIGHEST=3)")]
+    [Arguments("4d6kl3", "DICE(4, 6, KEEPLOWEST=3)")]
     public async Task Should_Parse_Input_Into_Dice_Expression(string input, string expected)
     {
         var result = DiceExpressionParser.Parse(input);

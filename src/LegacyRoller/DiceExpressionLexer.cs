@@ -101,13 +101,15 @@ public static class DiceExpressionLexer
         switch (currentChar)
         {
             case 'm' or 'M':
+            {
                 var identifier = input.Slice(index, 3);
-                
+
                 if (identifier.StartsWith("min", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 3;
                     return new Token(TokenType.Minimum, TokenCategory.Modifier, 45, 45);
                 }
+
                 if (identifier.StartsWith("max", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 3;
@@ -115,45 +117,70 @@ public static class DiceExpressionLexer
                 }
 
                 return null;
-            
+            }
+
+            case 'k' or 'K':
+            {
+                var identifier = input.Slice(index, 2);
+                
+                if (identifier.StartsWith("kh", StringComparison.OrdinalIgnoreCase))
+                {
+                    refIndex += 2;
+                    return new Token(TokenType.KeepHighest, TokenCategory.Modifier, 45, 45);
+                }
+                
+                if (identifier.StartsWith("kl", StringComparison.OrdinalIgnoreCase))
+                {
+                    refIndex += 2;
+                    return new Token(TokenType.KeepLowest, TokenCategory.Modifier, 45, 45);
+                }
+
+                refIndex++;
+                return new Token(TokenType.Keep, TokenCategory.Modifier, 45, 45);
+            }
+                
             case '!':
                 refIndex++;
-                return new Token(TokenType.Exploding, TokenCategory.Modifier, 40, 0);
+                return new Token(TokenType.Exploding, TokenCategory.Modifier, 45, 45);
             
             case '=':
                 refIndex++;
                 return new Token(TokenType.Equal, TokenCategory.Comparison, 40, 0);
-            
+
             case '<':
-                var symbol1 = input.Slice(index, 2);
-                
-                if (symbol1.StartsWith("<>", StringComparison.OrdinalIgnoreCase))
+            {
+                var symbol = input.Slice(index, 2);
+
+                if (symbol.StartsWith("<>", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 2;
                     return new Token(TokenType.NotEqual, TokenCategory.Comparison, 40, 0);
                 }
-                
-                if (symbol1.StartsWith("<=", StringComparison.OrdinalIgnoreCase))
+
+                if (symbol.StartsWith("<=", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 2;
                     return new Token(TokenType.LesserThanEqual, TokenCategory.Comparison, 40, 0);
                 }
-                
+
                 refIndex++;
                 return new Token(TokenType.LesserThan, TokenCategory.Comparison, 40, 0);
-            
+            }
+
             case '>':
-                var symbol2 = input.Slice(index, 2);
-                
-                if (symbol2.StartsWith(">=", StringComparison.OrdinalIgnoreCase))
+            {
+                var symbol = input.Slice(index, 2);
+
+                if (symbol.StartsWith(">=", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 2;
                     return new Token(TokenType.GreaterThanEqual, TokenCategory.Comparison, 40, 0);
                 }
-                
+
                 refIndex++;
                 return new Token(TokenType.GreaterThan, TokenCategory.Comparison, 40, 0);
-                
+            }
+            
             case 'd' or 'D':
                 refIndex++;
                 return new Token(TokenType.Dice, TokenCategory.Operator, 50, 50);
