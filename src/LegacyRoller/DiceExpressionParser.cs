@@ -16,6 +16,8 @@ public static class DiceExpressionParser
         new DiceTokenHandler(),
         ModifierTokenHandler,
         ModifierTokenHandler,
+        ModifierTokenHandler,
+        ModifierTokenHandler,
         
         new MinusTokenHandler(),
         new PlusTokenHandler(),

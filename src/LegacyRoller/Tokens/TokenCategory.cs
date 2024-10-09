@@ -5,4 +5,5 @@ internal enum TokenCategory : byte
     Operand,
     Operator,
     Modifier,
+    Comparison,
 }

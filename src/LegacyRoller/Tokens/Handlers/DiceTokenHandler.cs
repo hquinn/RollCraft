@@ -1,3 +1,4 @@
+using LegacyRoller.Comparisons;
 using LegacyRoller.Errors;
 using LegacyRoller.Modifiers;
 using LegacyRoller.Nodes;
@@ -98,6 +99,28 @@ internal sealed class DiceTokenHandler : ITokenHandler
                     return maxValueResult.Map<IModifier>(_ => null!);
                 }
                 return Result<IModifier>.Success(new Maximum(maxValueResult.Value!));
+            
+            case TokenType.Exploding:
+                if (!reader.TryPeek(out var nextToken) && nextToken.TokenDetails.TokenCategory != TokenCategory.Comparison)
+                {
+                    return Result<IModifier>.Success(new Exploding(new Max()));
+                }
+                
+                reader.Advance();
+                var comparisonResult = DiceExpressionParser.ParseExpression(ref reader, nextToken.TokenDetails.InfixPrecedence);
+                
+                if (comparisonResult.IsFailure)
+                {
+                    return comparisonResult.Map<IModifier>(_ => null!);
+                }
+                
+                IComparison comparison = nextToken.TokenDetails.TokenType switch
+                {
+                    TokenType.Equal => new Equal(comparisonResult.Value!),
+                    _ => new Max(),
+                };
+                
+                return Result<IModifier>.Success(new Exploding(comparison));
                 
             default:
                 return Result<IModifier>.Failure(

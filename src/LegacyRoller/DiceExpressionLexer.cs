@@ -115,6 +115,14 @@ public static class DiceExpressionLexer
                 }
 
                 return null;
+            
+            case '!':
+                refIndex++;
+                return new Token(TokenType.Exploding, TokenCategory.Modifier, 40, 0);
+            
+            case '=':
+                refIndex++;
+                return new Token(TokenType.Equal, TokenCategory.Comparison, 40, 0);
                 
             case 'd' or 'D':
                 refIndex++;

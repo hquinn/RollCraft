@@ -54,6 +54,9 @@ public class DiceExpressionParserTests
     [Arguments("1d6max(3+3)+3", "ADD(DICE(1, 6, MAXIMUM=ADD(3, 3)), 3)")]
     [Arguments("1d6min2max4", "DICE(1, 6, MINIMUM=2, MAXIMUM=4)")]
     [Arguments("1d6min-2max4", "DICE(1, 6, MINIMUM=UNARY(2), MAXIMUM=4)")]
+    [Arguments("1d6!", "DICE(1, 6, EXPLODING=MAX)")]
+    [Arguments("1d6!=5", "DICE(1, 6, EXPLODING=EQUAL(5))")]
+    [Arguments("1d6!=(5*5)", "DICE(1, 6, EXPLODING=EQUAL(MULTIPLY(5, 5)))")]
     public async Task Should_Parse_Input_Into_Dice_Expression(string input, string expected)
     {
         var result = DiceExpressionParser.Parse(input);
