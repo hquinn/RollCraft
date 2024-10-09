@@ -1,5 +1,4 @@
 using BenchmarkDotNet.Attributes;
-using LegacyRoller.Tokens;
 
 namespace LegacyRoller.Benchmarks;
 
@@ -7,6 +6,7 @@ namespace LegacyRoller.Benchmarks;
 public class ParserBenchmarker
 {
     private const string LongMathExpression = "1+2--3*4/5*-6-7+8*9/10--11/12*13+14*-15";
+    private const string DiceExpression = "1d6min2max5!=4+5";
     
     [Benchmark]
     public DiceExpression ParseLongMathExpression()
@@ -16,8 +16,8 @@ public class ParserBenchmarker
     
     
     [Benchmark]
-    public List<Token> LexerLongMathExpression()
+    public DiceExpression ParseDiceExpression()
     {
-        return DiceExpressionLexer.Tokenize(LongMathExpression).Value!;
+        return DiceExpressionParser.Parse(DiceExpression).Value!;
     }
 }

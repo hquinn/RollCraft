@@ -7,6 +7,11 @@ public enum TokenType : byte
     Maximum,
     Exploding,
     Equal,
+    NotEqual,
+    GreaterThan,
+    GreaterThanEqual,
+    LesserThan,
+    LesserThanEqual,
     
     Minus,
     Plus,

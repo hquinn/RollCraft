@@ -1,8 +1,8 @@
 namespace LegacyRoller.Comparisons;
 
-internal sealed class Equal : IComparison
+internal sealed class GreaterThanEqual : IComparison
 {
-    internal Equal(DiceExpression comparison)
+    internal GreaterThanEqual(DiceExpression comparison)
     {
         Comparison = comparison;
     }
@@ -11,6 +11,6 @@ internal sealed class Equal : IComparison
     
     public override string ToString()
     {
-        return $"EQUAL({Comparison})";
+        return $"GREATERTHANEQUAL({Comparison})";
     }
 }

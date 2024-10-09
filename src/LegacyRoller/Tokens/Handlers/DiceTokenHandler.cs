@@ -117,7 +117,12 @@ internal sealed class DiceTokenHandler : ITokenHandler
                 IComparison comparison = nextToken.TokenDetails.TokenType switch
                 {
                     TokenType.Equal => new Equal(comparisonResult.Value!),
-                    _ => new Max(),
+                    TokenType.NotEqual => new NotEqual(comparisonResult.Value!),
+                    TokenType.GreaterThan => new GreaterThan(comparisonResult.Value!),
+                    TokenType.GreaterThanEqual => new GreaterThanEqual(comparisonResult.Value!),
+                    TokenType.LesserThan => new LesserThan(comparisonResult.Value!),
+                    TokenType.LesserThanEqual => new LesserThanEqual(comparisonResult.Value!),
+                    _ => new Max()
                 };
                 
                 return Result<IModifier>.Success(new Exploding(comparison));

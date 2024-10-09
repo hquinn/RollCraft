@@ -1,8 +1,8 @@
 namespace LegacyRoller.Comparisons;
 
-internal sealed class Equal : IComparison
+internal sealed class NotEqual : IComparison
 {
-    internal Equal(DiceExpression comparison)
+    internal NotEqual(DiceExpression comparison)
     {
         Comparison = comparison;
     }
@@ -11,6 +11,6 @@ internal sealed class Equal : IComparison
     
     public override string ToString()
     {
-        return $"EQUAL({Comparison})";
+        return $"NOTEQUAL({Comparison})";
     }
 }

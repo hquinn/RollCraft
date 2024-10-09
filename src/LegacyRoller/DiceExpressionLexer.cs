@@ -123,6 +123,36 @@ public static class DiceExpressionLexer
             case '=':
                 refIndex++;
                 return new Token(TokenType.Equal, TokenCategory.Comparison, 40, 0);
+            
+            case '<':
+                var symbol1 = input.Slice(index, 2);
+                
+                if (symbol1.StartsWith("<>", StringComparison.OrdinalIgnoreCase))
+                {
+                    refIndex += 2;
+                    return new Token(TokenType.NotEqual, TokenCategory.Comparison, 40, 0);
+                }
+                
+                if (symbol1.StartsWith("<=", StringComparison.OrdinalIgnoreCase))
+                {
+                    refIndex += 2;
+                    return new Token(TokenType.LesserThanEqual, TokenCategory.Comparison, 40, 0);
+                }
+                
+                refIndex++;
+                return new Token(TokenType.LesserThan, TokenCategory.Comparison, 40, 0);
+            
+            case '>':
+                var symbol2 = input.Slice(index, 2);
+                
+                if (symbol2.StartsWith(">=", StringComparison.OrdinalIgnoreCase))
+                {
+                    refIndex += 2;
+                    return new Token(TokenType.GreaterThanEqual, TokenCategory.Comparison, 40, 0);
+                }
+                
+                refIndex++;
+                return new Token(TokenType.GreaterThan, TokenCategory.Comparison, 40, 0);
                 
             case 'd' or 'D':
                 refIndex++;

@@ -9,6 +9,7 @@ namespace LegacyRoller;
 public static class DiceExpressionParser
 {
     private static readonly ModifierTokenHandler ModifierTokenHandler = new();
+    private static readonly ComparisonTokenHandler ComparisonTokenHandler = new();
     
     // Match the order of the TokenHandlers by TokenType
     private static readonly ITokenHandler[] TokenHandlers =
@@ -17,7 +18,12 @@ public static class DiceExpressionParser
         ModifierTokenHandler,
         ModifierTokenHandler,
         ModifierTokenHandler,
-        ModifierTokenHandler,
+        ComparisonTokenHandler,
+        ComparisonTokenHandler,
+        ComparisonTokenHandler,
+        ComparisonTokenHandler,
+        ComparisonTokenHandler,
+        ComparisonTokenHandler,
         
         new MinusTokenHandler(),
         new PlusTokenHandler(),
