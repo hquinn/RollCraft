@@ -21,6 +21,8 @@ public static class DiceExpressionParser
         ModifierTokenHandler,
         ModifierTokenHandler,
         ModifierTokenHandler,
+        ModifierTokenHandler,
+        ModifierTokenHandler,
         ComparisonTokenHandler,
         ComparisonTokenHandler,
         ComparisonTokenHandler,

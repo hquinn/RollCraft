@@ -102,6 +102,11 @@ public static class DiceExpressionLexer
         {
             case 'm' or 'M':
             {
+                if (index + 2 >= input.Length)
+                {
+                    return null;
+                }
+                
                 var identifier = input.Slice(index, 3);
 
                 if (identifier.StartsWith("min", StringComparison.OrdinalIgnoreCase))
@@ -121,6 +126,12 @@ public static class DiceExpressionLexer
 
             case 'k' or 'K':
             {
+                if (index + 1 >= input.Length)
+                {
+                    refIndex++;
+                    return new Token(TokenType.Keep, TokenCategory.Modifier, 45, 45);
+                }
+                
                 var identifier = input.Slice(index, 2);
                 
                 if (identifier.StartsWith("kh", StringComparison.OrdinalIgnoreCase))
@@ -138,6 +149,26 @@ public static class DiceExpressionLexer
                 refIndex++;
                 return new Token(TokenType.Keep, TokenCategory.Modifier, 45, 45);
             }
+
+            case 'r' or 'R':
+            {
+                if (index + 1 >= input.Length)
+                {
+                    refIndex++;
+                    return new Token(TokenType.ReRoll, TokenCategory.Modifier, 45, 45);
+                }
+                
+                var identifier = input.Slice(index, 2);
+                
+                if (identifier.StartsWith("ro", StringComparison.OrdinalIgnoreCase))
+                {
+                    refIndex += 2;
+                    return new Token(TokenType.ReRollOnce, TokenCategory.Modifier, 45, 45);
+                }
+
+                refIndex++;
+                return new Token(TokenType.ReRoll, TokenCategory.Modifier, 45, 45);
+            }
                 
             case '!':
                 refIndex++;
@@ -149,6 +180,12 @@ public static class DiceExpressionLexer
 
             case '<':
             {
+                if (index + 1 >= input.Length)
+                {
+                    refIndex++;
+                    return new Token(TokenType.LesserThan, TokenCategory.Comparison, 40, 0);
+                }
+                
                 var symbol = input.Slice(index, 2);
 
                 if (symbol.StartsWith("<>", StringComparison.OrdinalIgnoreCase))
@@ -169,6 +206,12 @@ public static class DiceExpressionLexer
 
             case '>':
             {
+                if (index + 1 >= input.Length)
+                {
+                    refIndex++;
+                    return new Token(TokenType.GreaterThan, TokenCategory.Comparison, 40, 0);
+                }
+                
                 var symbol = input.Slice(index, 2);
 
                 if (symbol.StartsWith(">=", StringComparison.OrdinalIgnoreCase))

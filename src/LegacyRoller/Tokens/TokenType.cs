@@ -9,6 +9,8 @@ public enum TokenType : byte
     Keep,
     KeepHighest,
     KeepLowest,
+    ReRoll,
+    ReRollOnce,
     Equal,
     NotEqual,
     GreaterThan,

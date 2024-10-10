@@ -99,21 +99,24 @@ internal sealed class DiceTokenHandler : ITokenHandler
                     return maxValueResult.Map<IModifier>(_ => null!);
                 }
                 return Result<IModifier>.Success(new Maximum(maxValueResult.Value!));
-            
+
             case TokenType.Exploding:
-                if (!reader.TryPeek(out var nextToken) && nextToken.TokenDetails.TokenCategory != TokenCategory.Comparison)
+            {
+                if (!reader.TryPeek(out var nextToken) &&
+                    nextToken.TokenDetails.TokenCategory != TokenCategory.Comparison)
                 {
                     return Result<IModifier>.Success(new Exploding(new Max()));
                 }
-                
+
                 reader.Advance();
-                var comparisonResult = DiceExpressionParser.ParseExpression(ref reader, nextToken.TokenDetails.InfixPrecedence);
-                
+                var comparisonResult =
+                    DiceExpressionParser.ParseExpression(ref reader, nextToken.TokenDetails.InfixPrecedence);
+
                 if (comparisonResult.IsFailure)
                 {
                     return comparisonResult.Map<IModifier>(_ => null!);
                 }
-                
+
                 IComparison comparison = nextToken.TokenDetails.TokenType switch
                 {
                     TokenType.Equal => new Equal(comparisonResult.Value!),
@@ -124,9 +127,42 @@ internal sealed class DiceTokenHandler : ITokenHandler
                     TokenType.LesserThanEqual => new LesserThanEqual(comparisonResult.Value!),
                     _ => new Max()
                 };
-                
-                return Result<IModifier>.Success(new Exploding(comparison));
 
+                return Result<IModifier>.Success(new Exploding(comparison));
+            }
+
+            case TokenType.ReRollOnce:
+            case TokenType.ReRoll:
+            {
+                if (!reader.TryPeek(out var nextToken) &&
+                    nextToken.TokenDetails.TokenCategory != TokenCategory.Comparison)
+                {
+                    return Result<IModifier>.Success(new ReRoll(new Max(), token.TokenDetails.TokenType == TokenType.ReRollOnce));
+                }
+
+                reader.Advance();
+                var comparisonResult =
+                    DiceExpressionParser.ParseExpression(ref reader, nextToken.TokenDetails.InfixPrecedence);
+
+                if (comparisonResult.IsFailure)
+                {
+                    return comparisonResult.Map<IModifier>(_ => null!);
+                }
+
+                IComparison comparison = nextToken.TokenDetails.TokenType switch
+                {
+                    TokenType.Equal => new Equal(comparisonResult.Value!),
+                    TokenType.NotEqual => new NotEqual(comparisonResult.Value!),
+                    TokenType.GreaterThan => new GreaterThan(comparisonResult.Value!),
+                    TokenType.GreaterThanEqual => new GreaterThanEqual(comparisonResult.Value!),
+                    TokenType.LesserThan => new LesserThan(comparisonResult.Value!),
+                    TokenType.LesserThanEqual => new LesserThanEqual(comparisonResult.Value!),
+                    _ => new Max()
+                };
+
+                return Result<IModifier>.Success(new ReRoll(comparison, token.TokenDetails.TokenType == TokenType.ReRollOnce));
+            }
+            
             case TokenType.Keep:
             case TokenType.KeepHighest:
             {
