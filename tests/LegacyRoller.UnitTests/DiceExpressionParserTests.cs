@@ -61,7 +61,7 @@ public class DiceExpressionParserTests
     [Arguments("1d6!<5", "DICE(1, 6, EXPLODING=LESSTHAN(5))")]
     [Arguments("1d6!>=5", "DICE(1, 6, EXPLODING=GREATERTHANEQUAL(5))")]
     [Arguments("1d6!<=5", "DICE(1, 6, EXPLODING=LESSTHANEQUAL(5))")]
-    [Arguments("1d6!=(5*5)", "DICE(1, 6, EXPLODING=EQUAL(MULTIPLY(5, 5)))")]
+    [Arguments("1d6!=(2*2)", "DICE(1, 6, EXPLODING=EQUAL(MULTIPLY(2, 2)))")]
     [Arguments("4d6k3", "DICE(4, 6, KEEPHIGHEST=3)")]
     [Arguments("4d6kh3", "DICE(4, 6, KEEPHIGHEST=3)")]
     [Arguments("4d6kl3", "DICE(4, 6, KEEPLOWEST=3)")]
@@ -72,7 +72,7 @@ public class DiceExpressionParserTests
     [Arguments("1d6r<5", "DICE(1, 6, REROLL=LESSTHAN(5))")]
     [Arguments("1d6r>=5", "DICE(1, 6, REROLL=GREATERTHANEQUAL(5))")]
     [Arguments("1d6r<=5", "DICE(1, 6, REROLL=LESSTHANEQUAL(5))")]
-    [Arguments("1d6r=(5*5)", "DICE(1, 6, REROLL=EQUAL(MULTIPLY(5, 5)))")]
+    [Arguments("1d6r=(2*2)", "DICE(1, 6, REROLL=EQUAL(MULTIPLY(2, 2)))")]
     [Arguments("1d6ro", "DICE(1, 6, REROLLONCE=MAX)")]
     [Arguments("1d6ro=5", "DICE(1, 6, REROLLONCE=EQUAL(5))")]
     [Arguments("1d6ro<>5", "DICE(1, 6, REROLLONCE=NOTEQUAL(5))")]
@@ -80,7 +80,7 @@ public class DiceExpressionParserTests
     [Arguments("1d6ro<5", "DICE(1, 6, REROLLONCE=LESSTHAN(5))")]
     [Arguments("1d6ro>=5", "DICE(1, 6, REROLLONCE=GREATERTHANEQUAL(5))")]
     [Arguments("1d6ro<=5", "DICE(1, 6, REROLLONCE=LESSTHANEQUAL(5))")]
-    [Arguments("1d6ro=(5*5)", "DICE(1, 6, REROLLONCE=EQUAL(MULTIPLY(5, 5)))")]
+    [Arguments("1d6ro=(2*2)", "DICE(1, 6, REROLLONCE=EQUAL(MULTIPLY(2, 2)))")]
     public async Task Should_Parse_Input_Into_Dice_Expression(string input, string expected)
     {
         var result = DiceExpressionParser.Parse(input);

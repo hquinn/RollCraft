@@ -27,8 +27,8 @@ internal sealed class Subtract : DiceExpression
             return rightResult;
         }
 
-        var result = new DiceExpressionResult(leftResult.Value!.Result - rightResult.Value!.Result);
-        return Result<DiceExpressionResult>.Success(result);
+        leftResult.Value!.Result -= rightResult.Value!.Result;
+        return leftResult;
     }
     
     public override string ToString()

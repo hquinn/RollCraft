@@ -32,8 +32,9 @@ internal sealed class Divide : DiceExpression
             return Result<DiceExpressionResult>.Failure(new EvaluatorError("DivideByZero", "Division by zero detected!"));
         }
 
-        var result = new DiceExpressionResult(leftResult.Value!.Result / rightResult.Value!.Result);
-        return Result<DiceExpressionResult>.Success(result);
+        
+        leftResult.Value!.Result /= rightResult.Value!.Result;
+        return leftResult;
     }
     
     public override string ToString()
