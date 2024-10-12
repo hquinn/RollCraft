@@ -89,4 +89,76 @@ public class DiceExpressionParserTests
             success: async actual => await Assert.That(actual.ToString()).IsEqualTo(expected),
             failure: async error => await Task.Run(() => Assert.Fail(error.First().Message)));
     }
+
+    [Test]
+    [Arguments("x", "InvalidToken", "Invalid token found", 0)]
+    [Arguments("^", "InvalidToken", "Invalid token found", 0)]
+    [Arguments("1.", "InvalidToken", "Invalid token found", 0)]
+    [Arguments("1..", "InvalidToken", "Invalid token found", 0)]
+    [Arguments("1.0.", "InvalidToken", "Invalid token found", 3)]
+    public async Task Should_Return_Lexer_Error(string input, string expectedCode, string expectedMessage, int expectedIndex)
+    {
+        var result = DiceExpressionParser.Parse(input);
+
+        await result.PerformAsync(
+            success: async success => await Task.Run(() => Assert.Fail($"Expected a failure, but got {success}")),
+            failure: async error =>
+            {
+                await using var _ = Assert.Multiple();
+                
+                await Assert.That(error.First().Code).IsEqualTo(expectedCode);
+                await Assert.That(error.First().Message).IsEqualTo(expectedMessage);
+                await Assert.That((int)error.First().Metadata["Position"]).IsEqualTo(expectedIndex);
+            });
+    }
+    
+    [Test]
+    [Arguments("", "UnexpectedEnd", "Unexpected end of input", 0)]
+    [Arguments("-", "UnexpectedEnd", "Unexpected end of input", 1)]
+    [Arguments("--", "UnexpectedEnd", "Unexpected end of input", 2)]
+    [Arguments("(", "UnexpectedEnd", "Unexpected end of input", 1)]
+    [Arguments("1=", "UnexpectedEnd", "Unexpected end of input", 2)]
+    [Arguments("()", "UnexpectedRightParen", "Unexpected closing parenthesis", 2)]
+    [Arguments("1 1", "UnexpectedToken", "Unexpected token 'Number' at position 1", 1)]
+    [Arguments("*", "InvalidPrefix", "Invalid prefix found", 1)]
+    [Arguments("+", "InvalidPrefix", "Invalid prefix found", 1)]
+    [Arguments("/", "InvalidPrefix", "Invalid prefix found", 1)]
+    [Arguments("min3", "InvalidPrefix", "Invalid prefix found", 1)]
+    [Arguments("max3", "InvalidPrefix", "Invalid prefix found", 1)]
+    [Arguments("r", "InvalidPrefix", "Invalid prefix found", 1)]
+    [Arguments("ro", "InvalidPrefix", "Invalid prefix found", 1)]
+    [Arguments("!", "InvalidPrefix", "Invalid prefix found", 1)]
+    [Arguments("k", "InvalidPrefix", "Invalid prefix found", 1)]
+    [Arguments("kh", "InvalidPrefix", "Invalid prefix found", 1)]
+    [Arguments("kl", "InvalidPrefix", "Invalid prefix found", 1)]
+    [Arguments("1+*", "InvalidPrefix", "Invalid prefix found", 3)]
+    [Arguments("1=1", "InvalidInfix", "Invalid infix found", 3)]
+    [Arguments("1<>1", "InvalidInfix", "Invalid infix found", 3)]
+    [Arguments("1>1", "InvalidInfix", "Invalid infix found", 3)]
+    [Arguments("1>=1", "InvalidInfix", "Invalid infix found", 3)]
+    [Arguments("1<1", "InvalidInfix", "Invalid infix found", 3)]
+    [Arguments("1<=1", "InvalidInfix", "Invalid infix found", 3)]
+    [Arguments("1min1", "InvalidInfix", "Invalid infix found", 3)]
+    [Arguments("1max1", "InvalidInfix", "Invalid infix found", 3)]
+    [Arguments("1r1", "InvalidInfix", "Invalid infix found", 3)]
+    [Arguments("1ro1", "InvalidInfix", "Invalid infix found", 3)]
+    [Arguments("1!1", "InvalidInfix", "Invalid infix found", 3)]
+    [Arguments("1k1", "InvalidInfix", "Invalid infix found", 3)]
+    [Arguments("1kh1", "InvalidInfix", "Invalid infix found", 3)]
+    [Arguments("1kl1", "InvalidInfix", "Invalid infix found", 3)]
+    public async Task Should_Return_Parser_Error(string input, string expectedCode, string expectedMessage, int expectedIndex)
+    {
+        var result = DiceExpressionParser.Parse(input);
+
+        await result.PerformAsync(
+            success: async success => await Task.Run(() => Assert.Fail($"Expected a failure, but got {success}")),
+            failure: async error =>
+            {
+                await using var _ = Assert.Multiple();
+                
+                await Assert.That(error.First().Code).IsEqualTo(expectedCode);
+                await Assert.That(error.First().Message).IsEqualTo(expectedMessage);
+                await Assert.That((int)error.First().Metadata["Position"]).IsEqualTo(expectedIndex);
+            });
+    }
 }

@@ -25,7 +25,7 @@ public static class DiceExpressionLexer
             {
                 return Result<List<Token>>.Failure(new LexerError("InvalidToken", "Invalid token found", index));
             }
-            
+
             tokens.Add(token.Value);
         }
 
@@ -40,6 +40,7 @@ public static class DiceExpressionLexer
         var fractionalPart = 0.0;
         var fractionalDivider = 1.0;
         var hasDecimalPoint = false;
+        var hasDigitsAfterDecimal = false;
         var hasDigits = false;
 
         while (index < input.Length)
@@ -56,6 +57,7 @@ public static class DiceExpressionLexer
                 }
                 else
                 {
+                    hasDigitsAfterDecimal = true;
                     fractionalDivider *= 10;
                     fractionalPart += digit / fractionalDivider;
                 }
@@ -76,7 +78,7 @@ public static class DiceExpressionLexer
             }
         }
 
-        if (!hasDigits)
+        if (!hasDigits || (hasDecimalPoint && !hasDigitsAfterDecimal))
         {
             return null; // No digits were parsed
         }
@@ -176,14 +178,14 @@ public static class DiceExpressionLexer
             
             case '=':
                 refIndex++;
-                return new Token(TokenType.Equal, TokenCategory.Comparison, 40, 0);
+                return new Token(TokenType.Equal, TokenCategory.Comparison, 40, 40);
 
             case '<':
             {
                 if (index + 1 >= input.Length)
                 {
                     refIndex++;
-                    return new Token(TokenType.LesserThan, TokenCategory.Comparison, 40, 0);
+                    return new Token(TokenType.LesserThan, TokenCategory.Comparison, 40, 40);
                 }
                 
                 var symbol = input.Slice(index, 2);
@@ -191,17 +193,17 @@ public static class DiceExpressionLexer
                 if (symbol.StartsWith("<>", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 2;
-                    return new Token(TokenType.NotEqual, TokenCategory.Comparison, 40, 0);
+                    return new Token(TokenType.NotEqual, TokenCategory.Comparison, 40, 40);
                 }
 
                 if (symbol.StartsWith("<=", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 2;
-                    return new Token(TokenType.LesserThanEqual, TokenCategory.Comparison, 40, 0);
+                    return new Token(TokenType.LesserThanEqual, TokenCategory.Comparison, 40, 40);
                 }
 
                 refIndex++;
-                return new Token(TokenType.LesserThan, TokenCategory.Comparison, 40, 0);
+                return new Token(TokenType.LesserThan, TokenCategory.Comparison, 40, 40);
             }
 
             case '>':
@@ -209,7 +211,7 @@ public static class DiceExpressionLexer
                 if (index + 1 >= input.Length)
                 {
                     refIndex++;
-                    return new Token(TokenType.GreaterThan, TokenCategory.Comparison, 40, 0);
+                    return new Token(TokenType.GreaterThan, TokenCategory.Comparison, 40, 40);
                 }
                 
                 var symbol = input.Slice(index, 2);
@@ -217,11 +219,11 @@ public static class DiceExpressionLexer
                 if (symbol.StartsWith(">=", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 2;
-                    return new Token(TokenType.GreaterThanEqual, TokenCategory.Comparison, 40, 0);
+                    return new Token(TokenType.GreaterThanEqual, TokenCategory.Comparison, 40, 40);
                 }
 
                 refIndex++;
-                return new Token(TokenType.GreaterThan, TokenCategory.Comparison, 40, 0);
+                return new Token(TokenType.GreaterThan, TokenCategory.Comparison, 40, 40);
             }
             
             case 'd' or 'D':
@@ -246,11 +248,11 @@ public static class DiceExpressionLexer
             
             case '(':
                 refIndex++;
-                return new Token(TokenType.LeftParenthesis, TokenCategory.Operator, 100, 0);
+                return new Token(TokenType.LeftParenthesis, TokenCategory.Parenthesis, 100, 0);
 
             case ')':
                 refIndex++;
-                return new Token(TokenType.RightParenthesis, TokenCategory.Operator, 0, 0);
+                return new Token(TokenType.RightParenthesis, TokenCategory.Parenthesis, 0, 0);
         }
 
         return null;

@@ -50,8 +50,25 @@ public static class DiceExpressionParser
 
         var tokensAsSpan = CollectionsMarshal.AsSpan(tokensResult.Value!);
         var reader = new TokenReader(tokensAsSpan);
-        return ParseExpression(ref reader);
+        var expressionResult = ParseExpression(ref reader);
+
+        if (expressionResult.IsFailure)
+        {
+            return expressionResult;
+        }
+
+        if (reader.TryPeek(out var extraToken))
+        {
+            return Result<DiceExpression>.Failure(
+                new ParserError(
+                    "UnexpectedToken", 
+                    $"Unexpected token '{extraToken.TokenDetails.TokenType}' at position {reader.Position}", 
+                    reader.Position));
+        }
+
+        return expressionResult;
     }
+
 
     internal static Result<DiceExpression> ParseExpression(ref TokenReader reader, byte precedence = 0)
     {
