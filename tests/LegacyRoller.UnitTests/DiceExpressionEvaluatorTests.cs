@@ -1,3 +1,6 @@
+using LegacyRoller.UnitTests.Helpers;
+using LitePrimitives;
+
 namespace LegacyRoller.UnitTests;
 
 public class DiceExpressionEvaluatorTests
@@ -34,8 +37,7 @@ public class DiceExpressionEvaluatorTests
     [Arguments("(1+2+3)*3", 18.0)]
     public async Task Should_Return_Correct_Result_From_DiceExpression_For_Simple_Math(string input, double expected)
     {
-        var sut = new DiceExpressionEvaluator();
-        var result = sut.Evaluate(input);
+        var result = Evaluate(input);
 
         await result.PerformAsync(
             success: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
@@ -46,8 +48,7 @@ public class DiceExpressionEvaluatorTests
     [Arguments("1/0", "DivideByZero", "Division by zero detected!")]
     public async Task Should_Return_Evaluator_Error(string input, string expectedCode, string expectedMessage)
     {
-        var sut = new DiceExpressionEvaluator();
-        var result = sut.Evaluate(input);
+        var result = Evaluate(input);
 
         await result.PerformAsync(
             success: success => Assert.Fail($"Expected a failure, but got {success}"),
@@ -58,5 +59,12 @@ public class DiceExpressionEvaluatorTests
                 await Assert.That(error.First().Code).IsEqualTo(expectedCode);
                 await Assert.That(error.First().Message).IsEqualTo(expectedMessage);
             });
+    }
+
+    private static Result<DiceExpressionResult> Evaluate(string input)
+    {
+        var sut = new DiceExpressionEvaluator(new SequentialRandom());
+        var result = sut.Evaluate(input);
+        return result;
     }
 }
