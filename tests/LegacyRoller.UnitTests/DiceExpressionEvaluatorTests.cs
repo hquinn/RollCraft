@@ -7,6 +7,12 @@ public class DiceExpressionEvaluatorTests
     [Arguments("2", 2.0)]
     [Arguments("10", 10.0)]
     [Arguments("6.9", 6.9)]
+    [Arguments("-1", -1.0)]
+    [Arguments("-2", -2.0)]
+    [Arguments("-10", -10.0)]
+    [Arguments("-6.9", -6.9)]
+    [Arguments("--1", 1.0)]
+    [Arguments("---1", -1.0)]
     public async Task Should_Return_Correct_Result_From_DiceExpression(string input, double expected)
     {
         var sut = new DiceExpressionEvaluator();

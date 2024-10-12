@@ -13,7 +13,14 @@ internal sealed class Unary : DiceExpression
 
     protected override Result<DiceExpressionResult> EvaluateNode()
     {
-        throw new NotImplementedException();
+        var result = Expression.Evaluate();
+        if (result.IsFailure)
+        {
+            return result;
+        }
+
+        result.Value!.Result = -result.Value!.Result;
+        return result;
     }
     
     public override string ToString()

@@ -7,5 +7,5 @@ public class DiceExpressionResult
         Result = result;
     }
 
-    public double Result { get; }
+    public double Result { get; internal set; }
 }
