@@ -12,9 +12,9 @@ internal sealed class Number : DiceExpression
         Value = value;
     }
 
-    protected override Result<DiceExpressionResult> EvaluateNode(IRandom random)
+    internal override Result<double> EvaluateNode(IRandom random)
     {
-        return Result<DiceExpressionResult>.Success(new DiceExpressionResult(Value));
+        return Result<double>.Success(Value);
     }
     
     public override string ToString()

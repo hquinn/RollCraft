@@ -6,8 +6,12 @@ public abstract class DiceExpression
 {
     internal Result<DiceExpressionResult> Evaluate(IRandom random)
     {
-        return EvaluateNode(random);
+        var result = EvaluateNode(random);
+        
+        return result.IsSuccess
+            ? Result<DiceExpressionResult>.Success(new DiceExpressionResult(result.Value))
+            : result.Map<DiceExpressionResult>(_ => null!);
     }
 
-    protected abstract Result<DiceExpressionResult> EvaluateNode(IRandom random);
+    internal abstract Result<double> EvaluateNode(IRandom random);
 }

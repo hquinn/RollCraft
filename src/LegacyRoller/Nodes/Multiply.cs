@@ -13,22 +13,21 @@ internal sealed class Multiply : DiceExpression
         Right = right;
     }
 
-    protected override Result<DiceExpressionResult> EvaluateNode(IRandom random)
+    internal override Result<double> EvaluateNode(IRandom random)
     {        
-        var leftResult = Left.Evaluate(random);
+        var leftResult = Left.EvaluateNode(random);
         if (leftResult.IsFailure)
         {
             return leftResult;
         }
 
-        var rightResult = Right.Evaluate(random);
+        var rightResult = Right.EvaluateNode(random);
         if (rightResult.IsFailure)
         {
             return rightResult;
         }
 
-        leftResult.Value!.Result *= rightResult.Value!.Result;
-        return leftResult;
+        return Result<double>.Success(leftResult.Value * rightResult.Value);
     }
     
     public override string ToString()

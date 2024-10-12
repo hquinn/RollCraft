@@ -11,16 +11,15 @@ internal sealed class Unary : DiceExpression
         Expression = expression;
     }
 
-    protected override Result<DiceExpressionResult> EvaluateNode(IRandom random)
+    internal override Result<double> EvaluateNode(IRandom random)
     {
-        var result = Expression.Evaluate(random);
+        var result = Expression.EvaluateNode(random);
         if (result.IsFailure)
         {
             return result;
         }
 
-        result.Value!.Result = -result.Value!.Result;
-        return result;
+        return Result<double>.Success(-result.Value);
     }
     
     public override string ToString()
