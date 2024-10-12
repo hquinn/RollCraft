@@ -1,6 +1,7 @@
+using LegacyRoller.Tokens;
 using LitePrimitives;
 
-namespace LegacyRoller.Tokens.Handlers;
+namespace LegacyRoller.TokenHandlers;
 
 internal interface ITokenHandler
 {

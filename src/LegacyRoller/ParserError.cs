@@ -1,6 +1,6 @@
 using LitePrimitives;
 
-namespace LegacyRoller.Errors;
+namespace LegacyRoller;
 
 public class ParserError : IError
 {

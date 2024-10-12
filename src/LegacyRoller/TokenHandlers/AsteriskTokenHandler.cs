@@ -1,9 +1,10 @@
-using LegacyRoller.Errors;
+using LegacyRoller.Nodes;
+using LegacyRoller.Tokens;
 using LitePrimitives;
 
-namespace LegacyRoller.Tokens.Handlers;
+namespace LegacyRoller.TokenHandlers;
 
-internal sealed class ModifierTokenHandler : ITokenHandler
+internal sealed class AsteriskTokenHandler : ITokenHandler
 {
     public Result<DiceExpression> ParsePrefix(Token token, ref TokenReader reader)
     {
@@ -13,7 +14,6 @@ internal sealed class ModifierTokenHandler : ITokenHandler
 
     public Result<DiceExpression> ParseInfix(DiceExpression left, DiceExpression right, Token token, ref TokenReader reader)
     {
-        return Result<DiceExpression>.Failure(
-            new ParserError("InvalidInfix", "Invalid infix found", reader.Position));
+        return Result<DiceExpression>.Success(new Multiply(left, right));
     }
 }

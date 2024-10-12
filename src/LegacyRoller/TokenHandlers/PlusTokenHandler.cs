@@ -1,10 +1,10 @@
-using LegacyRoller.Errors;
 using LegacyRoller.Nodes;
+using LegacyRoller.Tokens;
 using LitePrimitives;
 
-namespace LegacyRoller.Tokens.Handlers;
+namespace LegacyRoller.TokenHandlers;
 
-internal sealed class AsteriskTokenHandler : ITokenHandler
+internal sealed class PlusTokenHandler : ITokenHandler
 {
     public Result<DiceExpression> ParsePrefix(Token token, ref TokenReader reader)
     {
@@ -14,6 +14,6 @@ internal sealed class AsteriskTokenHandler : ITokenHandler
 
     public Result<DiceExpression> ParseInfix(DiceExpression left, DiceExpression right, Token token, ref TokenReader reader)
     {
-        return Result<DiceExpression>.Success(new Multiply(left, right));
+        return Result<DiceExpression>.Success(new Add(left, right));
     }
 }

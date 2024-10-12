@@ -1,7 +1,7 @@
-using LegacyRoller.Errors;
+using LegacyRoller.Tokens;
 using LitePrimitives;
 
-namespace LegacyRoller.Tokens.Handlers;
+namespace LegacyRoller.TokenHandlers;
 
 internal sealed class ComparisonTokenHandler : ITokenHandler
 {

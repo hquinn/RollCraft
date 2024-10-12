@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
-using LegacyRoller.Errors;
+using LegacyRoller.Lexing;
+using LegacyRoller.TokenHandlers;
 using LegacyRoller.Tokens;
-using LegacyRoller.Tokens.Handlers;
 using LitePrimitives;
 
 namespace LegacyRoller;
