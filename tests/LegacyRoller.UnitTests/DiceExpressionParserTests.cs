@@ -89,30 +89,13 @@ public class DiceExpressionParserTests
             success: async actual => await Assert.That(actual.ToString()).IsEqualTo(expected),
             failure: async error => await Task.Run(() => Assert.Fail(error.First().Message)));
     }
-
+    
     [Test]
     [Arguments("x", "InvalidToken", "Invalid token found", 0)]
     [Arguments("^", "InvalidToken", "Invalid token found", 0)]
     [Arguments("1.", "InvalidToken", "Invalid token found", 0)]
     [Arguments("1..", "InvalidToken", "Invalid token found", 0)]
     [Arguments("1.0.", "InvalidToken", "Invalid token found", 3)]
-    public async Task Should_Return_Lexer_Error(string input, string expectedCode, string expectedMessage, int expectedIndex)
-    {
-        var result = DiceExpressionParser.Parse(input);
-
-        await result.PerformAsync(
-            success: async success => await Task.Run(() => Assert.Fail($"Expected a failure, but got {success}")),
-            failure: async error =>
-            {
-                await using var _ = Assert.Multiple();
-                
-                await Assert.That(error.First().Code).IsEqualTo(expectedCode);
-                await Assert.That(error.First().Message).IsEqualTo(expectedMessage);
-                await Assert.That((int)error.First().Metadata["Position"]).IsEqualTo(expectedIndex);
-            });
-    }
-    
-    [Test]
     [Arguments("", "UnexpectedEnd", "Unexpected end of input", 0)]
     [Arguments("-", "UnexpectedEnd", "Unexpected end of input", 1)]
     [Arguments("--", "UnexpectedEnd", "Unexpected end of input", 2)]
