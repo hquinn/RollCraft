@@ -14,8 +14,26 @@ internal sealed class Divide : DiceExpression
     }
 
     protected override Result<DiceExpressionResult> EvaluateNode()
-    {
-        throw new NotImplementedException();
+    {        
+        var leftResult = Left.Evaluate();
+        if (leftResult.IsFailure)
+        {
+            return leftResult;
+        }
+
+        var rightResult = Right.Evaluate();
+        if (rightResult.IsFailure)
+        {
+            return rightResult;
+        }
+        
+        if (rightResult.Value!.Result == 0)
+        {
+            return Result<DiceExpressionResult>.Failure(new EvaluatorError("DivideByZero", "Division by zero detected!"));
+        }
+
+        var result = new DiceExpressionResult(leftResult.Value!.Result / rightResult.Value!.Result);
+        return Result<DiceExpressionResult>.Success(result);
     }
     
     public override string ToString()
