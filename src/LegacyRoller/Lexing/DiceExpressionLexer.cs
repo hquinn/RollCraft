@@ -1,10 +1,9 @@
-using LegacyRoller.Errors;
 using LegacyRoller.Tokens;
 using LitePrimitives;
 
 namespace LegacyRoller;
 
-public static class DiceExpressionLexer
+internal static class DiceExpressionLexer
 {
     public static Result<List<Token>> Tokenize(ReadOnlySpan<char> input)
     {
