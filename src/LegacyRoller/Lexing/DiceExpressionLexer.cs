@@ -1,7 +1,7 @@
 using LegacyRoller.Tokens;
 using LitePrimitives;
 
-namespace LegacyRoller;
+namespace LegacyRoller.Lexing;
 
 internal static class DiceExpressionLexer
 {
