@@ -22,7 +22,7 @@ internal static class DiceExpressionLexer
 
             if (token is null)
             {
-                return Result<List<Token>>.Failure(new LexerError("InvalidToken", "Invalid token found", index));
+                return Result<List<Token>>.Failure(new ParserError("InvalidToken", "Invalid token found", index));
             }
 
             tokens.Add(token.Value);
