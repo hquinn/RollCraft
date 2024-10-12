@@ -12,7 +12,7 @@ internal sealed class Number : DiceExpression
         Value = value;
     }
 
-    protected override Result<DiceExpressionResult> EvaluateNode()
+    protected override Result<DiceExpressionResult> EvaluateNode(IRandom random)
     {
         return Result<DiceExpressionResult>.Success(new DiceExpressionResult(Value));
     }

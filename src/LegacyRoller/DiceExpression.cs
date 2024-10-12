@@ -4,10 +4,10 @@ namespace LegacyRoller;
 
 public abstract class DiceExpression
 {
-    public Result<DiceExpressionResult> Evaluate()
+    internal Result<DiceExpressionResult> Evaluate(IRandom random)
     {
-        return EvaluateNode();
+        return EvaluateNode(random);
     }
 
-    protected abstract Result<DiceExpressionResult> EvaluateNode();
+    protected abstract Result<DiceExpressionResult> EvaluateNode(IRandom random);
 }

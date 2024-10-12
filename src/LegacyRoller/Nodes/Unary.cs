@@ -11,9 +11,9 @@ internal sealed class Unary : DiceExpression
         Expression = expression;
     }
 
-    protected override Result<DiceExpressionResult> EvaluateNode()
+    protected override Result<DiceExpressionResult> EvaluateNode(IRandom random)
     {
-        var result = Expression.Evaluate();
+        var result = Expression.Evaluate(random);
         if (result.IsFailure)
         {
             return result;

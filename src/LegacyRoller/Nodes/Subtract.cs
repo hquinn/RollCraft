@@ -13,15 +13,15 @@ internal sealed class Subtract : DiceExpression
         Right = right;
     }
 
-    protected override Result<DiceExpressionResult> EvaluateNode()
+    protected override Result<DiceExpressionResult> EvaluateNode(IRandom random)
     {
-        var leftResult = Left.Evaluate();
+        var leftResult = Left.Evaluate(random);
         if (leftResult.IsFailure)
         {
             return leftResult;
         }
 
-        var rightResult = Right.Evaluate();
+        var rightResult = Right.Evaluate(random);
         if (rightResult.IsFailure)
         {
             return rightResult;

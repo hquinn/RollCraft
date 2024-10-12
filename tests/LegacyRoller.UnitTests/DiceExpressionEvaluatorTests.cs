@@ -32,7 +32,7 @@ public class DiceExpressionEvaluatorTests
     [Arguments("(1+2)*3", 9.0)]
     [Arguments("(1+(2+3))*3", 18.0)]
     [Arguments("(1+2+3)*3", 18.0)]
-    public async Task Should_Return_Correct_Result_From_DiceExpression(string input, double expected)
+    public async Task Should_Return_Correct_Result_From_DiceExpression_For_Simple_Math(string input, double expected)
     {
         var sut = new DiceExpressionEvaluator();
         var result = sut.Evaluate(input);

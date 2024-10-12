@@ -16,7 +16,7 @@ internal sealed class Dice : DiceExpression
         CountOfSides = countOfSides;
     }
 
-    protected override Result<DiceExpressionResult> EvaluateNode()
+    protected override Result<DiceExpressionResult> EvaluateNode(IRandom random)
     {
         throw new NotImplementedException();
     }
