@@ -87,7 +87,7 @@ public class DiceExpressionParserTests
 
         await result.PerformAsync(
             success: async actual => await Assert.That(actual.ToString()).IsEqualTo(expected),
-            failure: async error => await Task.Run(() => Assert.Fail(error.First().Message)));
+            failure: error => Assert.Fail(error.First().Message));
     }
     
     [Test]
@@ -134,7 +134,7 @@ public class DiceExpressionParserTests
         var result = DiceExpressionParser.Parse(input);
 
         await result.PerformAsync(
-            success: async success => await Task.Run(() => Assert.Fail($"Expected a failure, but got {success}")),
+            success: success => Assert.Fail($"Expected a failure, but got {success}"),
             failure: async error =>
             {
                 await using var _ = Assert.Multiple();
