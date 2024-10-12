@@ -1,3 +1,5 @@
+using LitePrimitives;
+
 namespace LegacyRoller.Nodes;
 
 internal sealed class Unary : DiceExpression
@@ -7,6 +9,11 @@ internal sealed class Unary : DiceExpression
     internal Unary(DiceExpression expression)
     {
         Expression = expression;
+    }
+
+    protected override Result<DiceExpressionResult> EvaluateNode()
+    {
+        throw new NotImplementedException();
     }
     
     public override string ToString()

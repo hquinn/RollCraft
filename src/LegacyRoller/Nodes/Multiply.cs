@@ -1,3 +1,5 @@
+using LitePrimitives;
+
 namespace LegacyRoller.Nodes;
 
 internal sealed class Multiply : DiceExpression
@@ -9,6 +11,11 @@ internal sealed class Multiply : DiceExpression
     {
         Left = left;
         Right = right;
+    }
+
+    protected override Result<DiceExpressionResult> EvaluateNode()
+    {
+        throw new NotImplementedException();
     }
     
     public override string ToString()

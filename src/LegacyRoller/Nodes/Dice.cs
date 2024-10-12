@@ -1,4 +1,5 @@
 using LegacyRoller.Modifiers;
+using LitePrimitives;
 
 namespace LegacyRoller.Nodes;
 
@@ -13,6 +14,11 @@ internal sealed class Dice : DiceExpression
     {
         CountOfDice = countOfDice;
         CountOfSides = countOfSides;
+    }
+
+    protected override Result<DiceExpressionResult> EvaluateNode()
+    {
+        throw new NotImplementedException();
     }
     
     public override string ToString()
