@@ -13,11 +13,11 @@ internal sealed class GreaterThanEqual : IComparison
 
     internal DiceExpression Comparison { get; }
 
-    public Result<bool> RollEquals(IRandom random, DiceRoll roll)
+    public Result<bool> RollEquals(IRoller roller, DiceRoll roll)
     {
         if (_comparisonValue is null)
         {
-            var result = Comparison.Evaluate(random);
+            var result = Comparison.Evaluate(roller);
             
             if (result.IsFailure)
             {

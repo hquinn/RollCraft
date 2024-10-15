@@ -12,7 +12,7 @@ internal sealed class Number : DiceExpression
         Value = value;
     }
 
-    internal override Result<(double Result, List<DiceRoll> Rolls)> EvaluateNode(IRandom random)
+    internal override Result<(double Result, List<DiceRoll> Rolls)> EvaluateNode(IRoller roller)
     {
         return Result<(double Result, List<DiceRoll> Rolls)>.Success((Value, []));
     }

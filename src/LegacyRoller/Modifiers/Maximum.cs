@@ -11,9 +11,9 @@ internal sealed class Maximum : IModifier
 
     internal DiceExpression MaximumValue { get; }
 
-    public Result<Unit> Modify(IRandom random, List<DiceRoll> diceRolls)
+    public Result<Unit> Modify(IRoller roller, List<DiceRoll> diceRolls)
     {        
-        var maximumValue = MaximumValue.Evaluate(random);
+        var maximumValue = MaximumValue.Evaluate(roller);
 
         if (maximumValue.IsFailure)
         {

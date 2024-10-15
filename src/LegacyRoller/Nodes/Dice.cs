@@ -16,15 +16,15 @@ internal sealed class Dice : DiceExpression
         CountOfSides = countOfSides;
     }
 
-    internal override Result<(double Result, List<DiceRoll> Rolls)> EvaluateNode(IRandom random)
+    internal override Result<(double Result, List<DiceRoll> Rolls)> EvaluateNode(IRoller roller)
     {        
-        var countOfDiceResult = CountOfDice.EvaluateNode(random);
+        var countOfDiceResult = CountOfDice.EvaluateNode(roller);
         if (countOfDiceResult.IsFailure)
         {
             return countOfDiceResult;
         }
 
-        var countOfSidesResult = CountOfSides.EvaluateNode(random);
+        var countOfSidesResult = CountOfSides.EvaluateNode(roller);
         if (countOfSidesResult.IsFailure)
         {
             return countOfSidesResult;
@@ -66,12 +66,12 @@ internal sealed class Dice : DiceExpression
         
         for (var i = 0; i < countInt; i++)
         {
-            diceRolls.Add(new(sidesInt, random.RollDice(sidesInt)));
+            diceRolls.Add(new(sidesInt, roller.RollDice(sidesInt)));
         }
         
         foreach (var modifier in Modifiers)
         {
-            var result = modifier.Modify(random, diceRolls);
+            var result = modifier.Modify(roller, diceRolls);
             if (result.IsFailure)
             {
                 return result.Map<(double Result, List<DiceRoll> Rolls)>(_ => default);

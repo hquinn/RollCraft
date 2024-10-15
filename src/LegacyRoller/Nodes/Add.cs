@@ -13,15 +13,15 @@ internal sealed class Add : DiceExpression
         Right = right;
     }
 
-    internal override Result<(double Result, List<DiceRoll> Rolls)> EvaluateNode(IRandom random)
+    internal override Result<(double Result, List<DiceRoll> Rolls)> EvaluateNode(IRoller roller)
     {
-        var leftResult = Left.EvaluateNode(random);
+        var leftResult = Left.EvaluateNode(roller);
         if (leftResult.IsFailure)
         {
             return leftResult;
         }
 
-        var rightResult = Right.EvaluateNode(random);
+        var rightResult = Right.EvaluateNode(roller);
         if (rightResult.IsFailure)
         {
             return rightResult;

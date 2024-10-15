@@ -1,6 +1,6 @@
 namespace LegacyRoller.UnitTests.Helpers;
 
-public class SequentialRandom : IRandom
+public class SequentialRoller : IRoller
 {
     private int _number = 0;
 

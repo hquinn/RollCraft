@@ -14,9 +14,9 @@ internal sealed class Keep : IModifier
 
     internal DiceExpression CountValue { get; }
 
-    public Result<Unit> Modify(IRandom random, List<DiceRoll> diceRolls)
+    public Result<Unit> Modify(IRoller roller, List<DiceRoll> diceRolls)
     {
-        var countValue = CountValue.Evaluate(random);
+        var countValue = CountValue.Evaluate(roller);
 
         if (countValue.IsFailure)
         {

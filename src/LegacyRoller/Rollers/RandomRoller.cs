@@ -1,6 +1,6 @@
-namespace LegacyRoller.Randomizer;
+namespace LegacyRoller.Rollers;
 
-internal class DefaultRandom : IRandom
+internal class RandomRoller : IRoller
 {
     public int RollDice(int dieSize)
     {

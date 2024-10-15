@@ -156,9 +156,62 @@ public class DiceExpressionEvaluatorTests
             });
     }
 
+    [Test]
+    public async Task Should_Return_Minimum_Rolls_When_Using_Minimum_Roller()
+    {
+        const int expected = 4;
+        var sut = DiceExpressionEvaluator.CreateMinimum();
+        var result = sut.Evaluate("4d6");
+        
+        await result.PerformAsync(
+            success: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
+            failure: error => Assert.Fail(error.First().Message));
+    }
+
+    [Test]
+    public async Task Should_Return_Maximum_Rolls_When_Using_Maximum_Roller()
+    {
+        const int expected = 24;
+        var sut = DiceExpressionEvaluator.CreateMaximum();
+        var result = sut.Evaluate("4d6");
+        
+        await result.PerformAsync(
+            success: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
+            failure: error => Assert.Fail(error.First().Message));
+    }
+
+    [Test]
+    public async Task Should_Return_Fixed_Average_Rolls_When_Using_Fixed_Average_Roller()
+    {
+        const int expected = 16;
+        var sut = DiceExpressionEvaluator.CreateFixedAverage();
+        var result = sut.Evaluate("4d6");
+        
+        await result.PerformAsync(
+            success: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
+            failure: error => Assert.Fail(error.First().Message));
+    }
+
+    [Test]
+    public async Task Should_Return_Random_Rolls_When_Using_Random_Roller()
+    {
+        var sut = DiceExpressionEvaluator.CreateRandom();
+        var result = sut.Evaluate("100d2");
+        
+        await result.PerformAsync(
+            success: async actual =>
+            {
+                await using var _ = Assert.Multiple();
+
+                await Assert.That(actual.Rolls.MaxBy(x => x.Roll)!.Roll).IsEqualTo(2);
+                await Assert.That(actual.Rolls.MinBy(x => x.Roll)!.Roll).IsEqualTo(1);
+            },
+            failure: error => Assert.Fail(error.First().Message));
+    }
+
     private static Result<DiceExpressionResult> Evaluate(string input)
     {
-        var sut = new DiceExpressionEvaluator(new SequentialRandom());
+        var sut = DiceExpressionEvaluator.CreateCustom(new SequentialRoller());
         var result = sut.Evaluate(input);
         return result;
     }

@@ -11,9 +11,9 @@ internal sealed class Minimum : IModifier
 
     internal DiceExpression MinimumValue { get; }
 
-    public Result<Unit> Modify(IRandom random, List<DiceRoll> diceRolls)
+    public Result<Unit> Modify(IRoller roller, List<DiceRoll> diceRolls)
     {
-        var minimumValue = MinimumValue.Evaluate(random);
+        var minimumValue = MinimumValue.Evaluate(roller);
 
         if (minimumValue.IsFailure)
         {

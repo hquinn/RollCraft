@@ -14,7 +14,7 @@ internal sealed class Exploding : IModifier
 
     internal IComparison Comparison { get; }
 
-    public Result<Unit> Modify(IRandom random, List<DiceRoll> diceRolls)
+    public Result<Unit> Modify(IRoller roller, List<DiceRoll> diceRolls)
     {
         var originalDiceRollCount = diceRolls.Count;
         
@@ -26,7 +26,7 @@ internal sealed class Exploding : IModifier
             }
             
             var diceRoll = diceRolls[index];
-            var comparisonResult = Comparison.RollEquals(random, diceRoll);
+            var comparisonResult = Comparison.RollEquals(roller, diceRoll);
 
             if (comparisonResult.IsFailure)
             {
@@ -40,7 +40,7 @@ internal sealed class Exploding : IModifier
             
             diceRoll.Modifier |= DiceModifier.Exploded;
 
-            var roll = random.RollDice(diceRoll.Sides);
+            var roll = roller.RollDice(diceRoll.Sides);
             var newDiceRoll = new DiceRoll(diceRoll.Sides, roll);
             diceRolls.Add(newDiceRoll);
         }

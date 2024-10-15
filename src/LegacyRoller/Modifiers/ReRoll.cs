@@ -16,7 +16,7 @@ internal sealed class ReRoll : IModifier
     internal IComparison Comparison { get; }
     internal bool ReRollOnce { get; }
 
-    public Result<Unit> Modify(IRandom random, List<DiceRoll> diceRolls)
+    public Result<Unit> Modify(IRoller roller, List<DiceRoll> diceRolls)
     {
         var iterationMax = ReRollOnce ? 1 : MaxIterationsPerDice;
         
@@ -25,7 +25,7 @@ internal sealed class ReRoll : IModifier
             for (var iteration = 0; iteration < iterationMax; iteration++)
             {
                 var diceRoll = diceRolls[index];
-                var comparisonResult = Comparison.RollEquals(random, diceRoll);
+                var comparisonResult = Comparison.RollEquals(roller, diceRoll);
 
                 if (comparisonResult.IsFailure)
                 {
@@ -39,10 +39,10 @@ internal sealed class ReRoll : IModifier
                 
                 diceRoll.Modifier |= DiceModifier.Rerolled;
 
-                var roll = random.RollDice(diceRoll.Sides);
+                var roll = roller.RollDice(diceRoll.Sides);
                 diceRoll.Roll = roll;
                 
-                comparisonResult = Comparison.RollEquals(random, diceRoll);
+                comparisonResult = Comparison.RollEquals(roller, diceRoll);
 
                 if (!comparisonResult.Value)
                 {

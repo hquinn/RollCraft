@@ -1,25 +1,45 @@
-using LegacyRoller.Randomizer;
+using LegacyRoller.Rollers;
 using LitePrimitives;
 
 namespace LegacyRoller;
 
 public class DiceExpressionEvaluator
 {
-    private readonly IRandom _random;
-
-    public DiceExpressionEvaluator()
-        : this(new DefaultRandom())
+    private readonly IRoller _roller;
+    
+    private DiceExpressionEvaluator(IRoller roller)
     {
+        _roller = roller;
     }
     
-    public DiceExpressionEvaluator(IRandom random)
+    public static DiceExpressionEvaluator CreateCustom(IRoller roller)
     {
-        _random = random;
+        return new DiceExpressionEvaluator(roller);
+    }
+
+    public static DiceExpressionEvaluator CreateRandom()
+    {
+        return new DiceExpressionEvaluator(new RandomRoller());
+    }
+    
+    public static DiceExpressionEvaluator CreateMinimum()
+    {
+        return new DiceExpressionEvaluator(new MinimumRoller());
+    }
+
+    public static DiceExpressionEvaluator CreateMaximum()
+    {
+        return new DiceExpressionEvaluator(new MaximumRoller());
+    }
+
+    public static DiceExpressionEvaluator CreateFixedAverage()
+    {
+        return new DiceExpressionEvaluator(new FixedAverageRoller());
     }
 
     public Result<DiceExpressionResult> Evaluate(DiceExpression expression)
     {
-        return expression.Evaluate(_random);
+        return expression.Evaluate(_roller);
     }
 
     public Result<DiceExpressionResult> Evaluate(string expression)
@@ -31,6 +51,6 @@ public class DiceExpressionEvaluator
             return parsedExpression.Map<DiceExpressionResult>(_ => null!);
         }
 
-        return parsedExpression.Value!.Evaluate(_random);
+        return parsedExpression.Value!.Evaluate(_roller);
     }
 }

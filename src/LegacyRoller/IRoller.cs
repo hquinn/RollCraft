@@ -1,6 +1,6 @@
 namespace LegacyRoller;
 
-public interface IRandom
+public interface IRoller
 {
     int RollDice(int dieSize);
 }
