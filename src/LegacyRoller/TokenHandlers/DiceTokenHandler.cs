@@ -102,7 +102,7 @@ internal sealed class DiceTokenHandler : ITokenHandler
 
             case TokenType.Exploding:
             {
-                if (!reader.TryPeek(out var nextToken) &&
+                if (!reader.TryPeek(out var nextToken) ||
                     nextToken.TokenDetails.TokenCategory != TokenCategory.Comparison)
                 {
                     return Result<IModifier>.Success(new Exploding(new Max()));
@@ -137,7 +137,7 @@ internal sealed class DiceTokenHandler : ITokenHandler
                 if (!reader.TryPeek(out var nextToken) &&
                     nextToken.TokenDetails.TokenCategory != TokenCategory.Comparison)
                 {
-                    return Result<IModifier>.Success(new ReRoll(new Max(), token.TokenDetails.TokenType == TokenType.ReRollOnce));
+                    return Result<IModifier>.Success(new ReRoll(new Min(), token.TokenDetails.TokenType == TokenType.ReRollOnce));
                 }
 
                 reader.Advance();
@@ -157,7 +157,7 @@ internal sealed class DiceTokenHandler : ITokenHandler
                     TokenType.GreaterThanEqual => new GreaterThanEqual(comparisonResult.Value!),
                     TokenType.LesserThan => new LesserThan(comparisonResult.Value!),
                     TokenType.LesserThanEqual => new LesserThanEqual(comparisonResult.Value!),
-                    _ => new Max()
+                    _ => new Min()
                 };
 
                 return Result<IModifier>.Success(new ReRoll(comparison, token.TokenDetails.TokenType == TokenType.ReRollOnce));
@@ -165,16 +165,6 @@ internal sealed class DiceTokenHandler : ITokenHandler
             
             case TokenType.Keep:
             case TokenType.KeepHighest:
-            {
-                var countResult = DiceExpressionParser.ParseExpression(ref reader, token.TokenDetails.InfixPrecedence);
-                if (countResult.IsFailure)
-                {
-                    return countResult.Map<IModifier>(_ => null!);
-                }
-
-                return Result<IModifier>.Success(new KeepHighest(countResult.Value!));
-            }
-
             case TokenType.KeepLowest:
             {
                 var countResult = DiceExpressionParser.ParseExpression(ref reader, token.TokenDetails.InfixPrecedence);
@@ -183,7 +173,7 @@ internal sealed class DiceTokenHandler : ITokenHandler
                     return countResult.Map<IModifier>(_ => null!);
                 }
 
-                return Result<IModifier>.Success(new KeepLowest(countResult.Value!));
+                return Result<IModifier>.Success(new Keep(countResult.Value!, token.TokenDetails.TokenType != TokenType.KeepLowest));
             }
 
             default:

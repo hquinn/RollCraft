@@ -13,7 +13,7 @@ internal sealed class Divide : DiceExpression
         Right = right;
     }
 
-    internal override Result<double> EvaluateNode(IRandom random)
+    internal override Result<(double Result, List<DiceRoll> Rolls)> EvaluateNode(IRandom random)
     {        
         var leftResult = Left.EvaluateNode(random);
         if (leftResult.IsFailure)
@@ -27,13 +27,15 @@ internal sealed class Divide : DiceExpression
             return rightResult;
         }
         
-        if (rightResult.Value == 0)
+        if (rightResult.Value.Result == 0)
         {
-            return Result<double>.Failure(new EvaluatorError("DivideByZero", "Division by zero detected!"));
+            return Result<(double Result, List<DiceRoll> Rolls)>.Failure(new EvaluatorError("DivideByZero", "Division by zero detected!"));
         }
-
         
-        return Result<double>.Success(leftResult.Value / rightResult.Value);
+        var result = leftResult.Value.Result / rightResult.Value.Result;
+        leftResult.Value.Rolls.AddRange(rightResult.Value.Rolls);
+        
+        return Result<(double Result, List<DiceRoll> Rolls)>.Success((result, leftResult.Value.Rolls));
     }
     
     public override string ToString()

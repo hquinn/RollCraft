@@ -17,6 +17,11 @@ public class DiceExpressionEvaluator
         _random = random;
     }
 
+    public Result<DiceExpressionResult> Evaluate(DiceExpression expression)
+    {
+        return expression.Evaluate(_random);
+    }
+
     public Result<DiceExpressionResult> Evaluate(string expression)
     {
         var parsedExpression = DiceExpressionParser.Parse(expression);

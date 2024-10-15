@@ -177,14 +177,14 @@ internal static class DiceExpressionLexer
             
             case '=':
                 refIndex++;
-                return new Token(TokenType.Equal, TokenCategory.Comparison, 40, 40);
+                return new Token(TokenType.Equal, TokenCategory.Comparison, 45, 45);
 
             case '<':
             {
                 if (index + 1 >= input.Length)
                 {
                     refIndex++;
-                    return new Token(TokenType.LesserThan, TokenCategory.Comparison, 40, 40);
+                    return new Token(TokenType.LesserThan, TokenCategory.Comparison, 45, 45);
                 }
                 
                 var symbol = input.Slice(index, 2);
@@ -192,17 +192,17 @@ internal static class DiceExpressionLexer
                 if (symbol.StartsWith("<>", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 2;
-                    return new Token(TokenType.NotEqual, TokenCategory.Comparison, 40, 40);
+                    return new Token(TokenType.NotEqual, TokenCategory.Comparison, 45, 45);
                 }
 
                 if (symbol.StartsWith("<=", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 2;
-                    return new Token(TokenType.LesserThanEqual, TokenCategory.Comparison, 40, 40);
+                    return new Token(TokenType.LesserThanEqual, TokenCategory.Comparison, 45, 45);
                 }
 
                 refIndex++;
-                return new Token(TokenType.LesserThan, TokenCategory.Comparison, 40, 40);
+                return new Token(TokenType.LesserThan, TokenCategory.Comparison, 45, 45);
             }
 
             case '>':
@@ -210,7 +210,7 @@ internal static class DiceExpressionLexer
                 if (index + 1 >= input.Length)
                 {
                     refIndex++;
-                    return new Token(TokenType.GreaterThan, TokenCategory.Comparison, 40, 40);
+                    return new Token(TokenType.GreaterThan, TokenCategory.Comparison, 45, 45);
                 }
                 
                 var symbol = input.Slice(index, 2);
@@ -218,11 +218,11 @@ internal static class DiceExpressionLexer
                 if (symbol.StartsWith(">=", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 2;
-                    return new Token(TokenType.GreaterThanEqual, TokenCategory.Comparison, 40, 40);
+                    return new Token(TokenType.GreaterThanEqual, TokenCategory.Comparison, 45, 45);
                 }
 
                 refIndex++;
-                return new Token(TokenType.GreaterThan, TokenCategory.Comparison, 40, 40);
+                return new Token(TokenType.GreaterThan, TokenCategory.Comparison, 45, 45);
             }
             
             case 'd' or 'D':

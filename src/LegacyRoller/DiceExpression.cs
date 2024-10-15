@@ -9,9 +9,9 @@ public abstract class DiceExpression
         var result = EvaluateNode(random);
         
         return result.IsSuccess
-            ? Result<DiceExpressionResult>.Success(new DiceExpressionResult(result.Value))
+            ? Result<DiceExpressionResult>.Success(new DiceExpressionResult(result.Value.Result, result.Value.Rolls))
             : result.Map<DiceExpressionResult>(_ => null!);
     }
 
-    internal abstract Result<double> EvaluateNode(IRandom random);
+    internal abstract Result<(double Result, List<DiceRoll> Rolls)> EvaluateNode(IRandom random);
 }

@@ -2,12 +2,11 @@ using LitePrimitives;
 
 namespace LegacyRoller.Comparisons;
 
-public class Max : IComparison
+public class Min : IComparison
 {
     public Result<bool> RollEquals(IRandom random, DiceRoll roll)
     {
-        // ReSharper disable once CompareOfFloatsByEqualityOperator
-        return Result<bool>.Success(roll.Roll == roll.Sides);
+        return Result<bool>.Success(roll.Roll == 1);
     }
 
     public void Reset()
@@ -16,6 +15,6 @@ public class Max : IComparison
     
     public override string ToString()
     {
-        return "MAX";
+        return "MIN";
     }
 }

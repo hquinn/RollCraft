@@ -1,11 +1,13 @@
 namespace LegacyRoller;
 
-public class DiceExpressionResult
+public sealed class DiceExpressionResult
 {
-    public DiceExpressionResult(double result)
+    public DiceExpressionResult(double result, List<DiceRoll>? rolls = null)
     {
         Result = result;
+        Rolls = rolls ?? [];
     }
-
-    public double Result { get; internal set; }
+    
+    public double Result { get; set; }
+    public List<DiceRoll> Rolls { get; set; }
 }

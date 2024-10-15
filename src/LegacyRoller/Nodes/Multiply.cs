@@ -13,7 +13,7 @@ internal sealed class Multiply : DiceExpression
         Right = right;
     }
 
-    internal override Result<double> EvaluateNode(IRandom random)
+    internal override Result<(double Result, List<DiceRoll> Rolls)> EvaluateNode(IRandom random)
     {        
         var leftResult = Left.EvaluateNode(random);
         if (leftResult.IsFailure)
@@ -26,8 +26,11 @@ internal sealed class Multiply : DiceExpression
         {
             return rightResult;
         }
-
-        return Result<double>.Success(leftResult.Value * rightResult.Value);
+        
+        var result = leftResult.Value.Result * rightResult.Value.Result;
+        leftResult.Value.Rolls.AddRange(rightResult.Value.Rolls);
+        
+        return Result<(double Result, List<DiceRoll> Rolls)>.Success((result, leftResult.Value.Rolls));
     }
     
     public override string ToString()
