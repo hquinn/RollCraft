@@ -1,24 +1,21 @@
 using BenchmarkDotNet.Attributes;
-using RollCraft.Full;
 
 namespace RollCraft.Benchmarks;
 
 [MemoryDiagnoser]
 public class ParserBenchmarker
 {
-    private const string LongMathExpression = "1+2--3*4/5*-6-7+8*9/10--11/12*13+14*-15";
     private const string DiceExpression = "4d10min2max8!=4r=5kh2+5";
     
     [Benchmark]
-    public DiceExpression ParseLongMathExpression()
+    public Full.DiceExpression Full_ParseDiceExpression()
     {
-        return DiceExpressionParser.Parse(LongMathExpression).Value!;
+        return Full.DiceExpressionParser.Parse(DiceExpression).Value!;
     }
     
-    
     [Benchmark]
-    public DiceExpression ParseDiceExpression()
+    public Simple.DiceExpression Simple_ParseDiceExpression()
     {
-        return DiceExpressionParser.Parse(DiceExpression).Value!;
+        return Simple.DiceExpressionParser.Parse(DiceExpression).Value!;
     }
 }

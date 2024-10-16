@@ -1,33 +1,50 @@
 using BenchmarkDotNet.Attributes;
-using RollCraft.Full;
 
 namespace RollCraft.Benchmarks;
 
 [MemoryDiagnoser]
 public class EvaluatorBenchmarker
 {
-    private readonly DiceExpressionEvaluator _evaluator = DiceExpressionEvaluator.CreateCustom(new SeededRoller(0));
-    private readonly DiceExpression LongMathExpression = DiceExpressionParser.Parse("1+2--3*4/5*-6-7+8*9/10--11/12*13+14*-15").Value!;
-    private readonly DiceExpression DiceExpression = DiceExpressionParser.Parse("4d10min2max8!=4r=5kh2+5").Value!;
+    private readonly Full.DiceExpressionEvaluator _fullEvaluator = Full.DiceExpressionEvaluator.CreateCustom(new FullSeededRoller(0));
+    private readonly Full.DiceExpression _fullDiceExpression = Full.DiceExpressionParser.Parse("4d10min2max8!=4r=5kh2+5").Value!;
+    
+    
+    private readonly Simple.DiceExpressionEvaluator _simpleEvaluator = Simple.DiceExpressionEvaluator.CreateCustom(new SimpleSeededRoller(0));
+    private readonly Simple.DiceExpression _simpleDiceExpression = Simple.DiceExpressionParser.Parse("4d10min2max8!=4r=5kh2+5").Value!;
     
     [Benchmark]
-    public DiceExpressionResult EvaluateLongMathExpression()
+    public Full.DiceExpressionResult Full_EvaluateDiceExpression()
     {
-        return _evaluator.Evaluate(LongMathExpression).Value!;
+        return _fullEvaluator.Evaluate(_fullDiceExpression).Value!;
     }
     
     [Benchmark]
-    public DiceExpressionResult EvaluateDiceExpression()
+    public Simple.DiceExpressionResult Simple_EvaluateDiceExpression()
     {
-        return _evaluator.Evaluate(DiceExpression).Value!;
+        return _simpleEvaluator.Evaluate(_simpleDiceExpression).Value!;
     }
 }
 
-public class SeededRoller : IRoller
+public class FullSeededRoller : Full.IRoller
 {
     private readonly Random _random;
 
-    public SeededRoller(int seed)
+    public FullSeededRoller(int seed)
+    {
+        _random = new Random(seed);
+    }
+
+    public int RollDice(int dieSize)
+    {
+        return _random.Next(1, dieSize + 1);
+    }
+}
+
+public class SimpleSeededRoller : Simple.IRoller
+{
+    private readonly Random _random;
+
+    public SimpleSeededRoller(int seed)
     {
         _random = new Random(seed);
     }

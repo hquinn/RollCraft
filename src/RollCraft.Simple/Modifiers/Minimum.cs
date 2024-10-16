@@ -1,6 +1,6 @@
 using LitePrimitives;
 
-namespace RollCraft.Full.Modifiers;
+namespace RollCraft.Simple.Modifiers;
 
 internal sealed class Minimum : IModifier
 {
@@ -20,14 +20,7 @@ internal sealed class Minimum : IModifier
             return minimumValue.Map<List<DiceRoll>>(_ => default!);
         }
         
-        var minimum = (long)minimumValue.Value!.Result;
-        
-        // Hack to check if the minimum is a valid integer
-        // ReSharper disable once CompareOfFloatsByEqualityOperator
-        if (minimumValue.Value.Result != minimum)
-        {
-            return Result<List<DiceRoll>>.Failure(new EvaluatorError("MinimumError", "Minimum must be an integer!"));
-        }
+        var minimum = minimumValue.Value!.Result;
         
         // A normal dice roll cannot have a minimum value less than 1
         if (minimum < 1)

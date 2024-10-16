@@ -54,6 +54,7 @@ internal sealed class LesserThan : IComparison
     public void Reset()
     {
         _comparisonValue = null;
+        _rolls = null;
     }
     
     public override string ToString()

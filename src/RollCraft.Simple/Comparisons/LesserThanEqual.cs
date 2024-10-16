@@ -1,6 +1,6 @@
 using LitePrimitives;
 
-namespace RollCraft.Full.Comparisons;
+namespace RollCraft.Simple.Comparisons;
 
 internal sealed class LesserThanEqual : IComparison
 {
@@ -24,15 +24,8 @@ internal sealed class LesserThanEqual : IComparison
             {
                 return result.Map<(bool Success, List<DiceRoll> Rolls)>(_ => default);
             }
-            
-            var comparison = (long) result.Value!.Result;
-            
-            // ReSharper disable once CompareOfFloatsByEqualityOperator
-            if (result.Value!.Result != comparison)
-            {
-                return Result<(bool Success, List<DiceRoll> Rolls)>.Failure(new EvaluatorError("ComparisonError", "Comparison must be an integer!"));
-            }
-            
+
+            var comparison = result.Value!.Result;
             if (comparison < 1)
             {
                 return Result<(bool Success, List<DiceRoll> Rolls)>.Failure(new EvaluatorError("ComparisonError", "Comparison must not be less than 1!"));

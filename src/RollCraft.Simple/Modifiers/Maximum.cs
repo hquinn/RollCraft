@@ -1,6 +1,6 @@
 using LitePrimitives;
 
-namespace RollCraft.Full.Modifiers;
+namespace RollCraft.Simple.Modifiers;
 
 internal sealed class Maximum : IModifier
 {
@@ -20,14 +20,7 @@ internal sealed class Maximum : IModifier
             return maximumValue.Map<List<DiceRoll>>(_ => default!);
         }
         
-        var maximum = (long)maximumValue.Value!.Result;
-        
-        // Hack to check if the maximum is a valid integer
-        // ReSharper disable once CompareOfFloatsByEqualityOperator
-        if (maximumValue.Value.Result != maximum)
-        {
-            return Result<List<DiceRoll>>.Failure(new EvaluatorError("MaximumError", "Maximum must be an integer!"));
-        }
+        var maximum = maximumValue.Value!.Result;
         
         // A normal dice roll cannot have a minimum value less than 1
         if (maximum < 1)
