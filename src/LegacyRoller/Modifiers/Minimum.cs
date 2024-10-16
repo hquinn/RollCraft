@@ -11,13 +11,13 @@ internal sealed class Minimum : IModifier
 
     internal DiceExpression MinimumValue { get; }
 
-    public Result<Unit> Modify(IRoller roller, List<DiceRoll> diceRolls)
+    public Result<List<DiceRoll>> Modify(IRoller roller, List<DiceRoll> diceRolls)
     {
         var minimumValue = MinimumValue.Evaluate(roller);
 
         if (minimumValue.IsFailure)
         {
-            return minimumValue.Map<Unit>(_ => default);
+            return minimumValue.Map<List<DiceRoll>>(_ => default);
         }
         
         var minimum = (long)minimumValue.Value!.Result;
@@ -26,19 +26,19 @@ internal sealed class Minimum : IModifier
         // ReSharper disable once CompareOfFloatsByEqualityOperator
         if (minimumValue.Value.Result != minimum)
         {
-            return Result<Unit>.Failure(new EvaluatorError("MinimumError", "Minimum must be an integer!"));
+            return Result<List<DiceRoll>>.Failure(new EvaluatorError("MinimumError", "Minimum must be an integer!"));
         }
         
         // A normal dice roll cannot have a minimum value less than 1
         if (minimum < 1)
         {
-            return Result<Unit>.Failure(new EvaluatorError("MinimumError", "Cannot have a minimum value less than 1!"));
+            return Result<List<DiceRoll>>.Failure(new EvaluatorError("MinimumError", "Cannot have a minimum value less than 1!"));
         }
 
         // A normal dice roll cannot have a maximum value more than the dice side count
         if (minimum > diceRolls[0].Sides)
         {
-            return Result<Unit>.Failure(new EvaluatorError("MinimumError", "Cannot have a minimum value greater than the dice side count!"));
+            return Result<List<DiceRoll>>.Failure(new EvaluatorError("MinimumError", "Cannot have a minimum value greater than the dice side count!"));
         }
         
         var minimumInt = (int)minimum;
@@ -52,7 +52,7 @@ internal sealed class Minimum : IModifier
             }
         }
         
-        return Result<Unit>.Success(default);
+        return Result<List<DiceRoll>>.Success(minimumValue.Value.Rolls);
     }
     
     public override string ToString()

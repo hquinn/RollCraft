@@ -16,9 +16,11 @@ internal sealed class ReRoll : IModifier
     internal IComparison Comparison { get; }
     internal bool ReRollOnce { get; }
 
-    public Result<Unit> Modify(IRoller roller, List<DiceRoll> diceRolls)
+    public Result<List<DiceRoll>> Modify(IRoller roller, List<DiceRoll> diceRolls)
     {
         var iterationMax = ReRollOnce ? 1 : MaxIterationsPerDice;
+        var firstComparison = true;
+        List<DiceRoll> comparisonRolls = null!;
         
         for (var index = 0; index < diceRolls.Count; index++)
         {
@@ -29,10 +31,16 @@ internal sealed class ReRoll : IModifier
 
                 if (comparisonResult.IsFailure)
                 {
-                    return comparisonResult.Map<Unit>(_ => default);
+                    return comparisonResult.Map<List<DiceRoll>>(_ => default!);
                 }
 
-                if (!comparisonResult.Value)
+                if (firstComparison)
+                {
+                    firstComparison = false;
+                    comparisonRolls = comparisonResult.Value.Rolls;
+                }
+
+                if (!comparisonResult.Value.Success)
                 {
                     break;
                 }
@@ -44,7 +52,7 @@ internal sealed class ReRoll : IModifier
                 
                 comparisonResult = Comparison.RollEquals(roller, diceRoll);
 
-                if (!comparisonResult.Value)
+                if (!comparisonResult.Value.Success)
                 {
                     break;
                 }
@@ -53,7 +61,7 @@ internal sealed class ReRoll : IModifier
 
         Comparison.Reset();
         
-        return Result<Unit>.Success(default);
+        return Result<List<DiceRoll>>.Success(comparisonRolls!);
     }
 
     public override string ToString()

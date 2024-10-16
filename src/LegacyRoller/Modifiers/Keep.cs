@@ -14,13 +14,13 @@ internal sealed class Keep : IModifier
 
     internal DiceExpression CountValue { get; }
 
-    public Result<Unit> Modify(IRoller roller, List<DiceRoll> diceRolls)
+    public Result<List<DiceRoll>> Modify(IRoller roller, List<DiceRoll> diceRolls)
     {
         var countValue = CountValue.Evaluate(roller);
 
         if (countValue.IsFailure)
         {
-            return countValue.Map<Unit>(_ => default);
+            return countValue.Map<List<DiceRoll>>(_ => default!);
         }
 
         var count = (long)countValue.Value!.Result;
@@ -29,18 +29,18 @@ internal sealed class Keep : IModifier
         // ReSharper disable once CompareOfFloatsByEqualityOperator
         if (countValue.Value.Result != count)
         {
-            return Result<Unit>.Failure(new EvaluatorError("KeepError", "Keep must be an integer!"));
+            return Result<List<DiceRoll>>.Failure(new EvaluatorError("KeepError", "Keep must be an integer!"));
         }
         
         // Cannot keep negative numbers
         if (count <= -1)
         {
-            return Result<Unit>.Failure(new EvaluatorError("KeepError", "Keep must be zero or more!"));
+            return Result<List<DiceRoll>>.Failure(new EvaluatorError("KeepError", "Keep must be zero or more!"));
         }
         
         if (count > diceRolls.Count)
         {
-            return Result<Unit>.Failure(new EvaluatorError("KeepError", "Keep must be less or equal than number of dice rolled!"));
+            return Result<List<DiceRoll>>.Failure(new EvaluatorError("KeepError", "Keep must be less or equal than number of dice rolled!"));
         }
         
         var countInt = (int)count;
@@ -54,7 +54,7 @@ internal sealed class Keep : IModifier
             KeepLowest(diceRolls, countInt);
         }
 
-        return Result<Unit>.Success(default);
+        return Result<List<DiceRoll>>.Success(countValue.Value.Rolls);
     }
 
     private static void KeepHighest(List<DiceRoll> diceRolls, int count)

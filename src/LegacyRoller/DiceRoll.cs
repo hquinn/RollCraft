@@ -2,7 +2,7 @@ using System.Text;
 
 namespace LegacyRoller;
 
-public sealed class DiceRoll : IComparable<DiceRoll>
+public sealed class DiceRoll : IEquatable<DiceRoll>, IComparable<DiceRoll>
 {
     public DiceRoll(int sides, int roll, DiceModifier modifier = DiceModifier.None)
     {
@@ -18,7 +18,7 @@ public sealed class DiceRoll : IComparable<DiceRoll>
     public override string ToString()
     {
         var result = new StringBuilder(Roll.ToString());
-
+        
         if (Modifier != DiceModifier.None)
         {
             if ((Modifier & DiceModifier.Minimum) != 0) result.Append('^');
@@ -30,9 +30,26 @@ public sealed class DiceRoll : IComparable<DiceRoll>
 
         return result.ToString();
     }
-
+    
     public int CompareTo(DiceRoll? other)
     {
         return Roll.CompareTo(other!.Roll);
+    }
+
+    public bool Equals(DiceRoll? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return Sides == other.Sides && Roll == other.Roll && Modifier == other.Modifier;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DiceRoll other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Sides, Roll, (int)Modifier);
     }
 }

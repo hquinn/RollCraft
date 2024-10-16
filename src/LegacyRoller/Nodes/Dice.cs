@@ -68,7 +68,8 @@ internal sealed class Dice : DiceExpression
         {
             diceRolls.Add(new(sidesInt, roller.RollDice(sidesInt)));
         }
-        
+
+        var modifierRolls = new List<DiceRoll>();
         foreach (var modifier in Modifiers)
         {
             var result = modifier.Modify(roller, diceRolls);
@@ -76,6 +77,8 @@ internal sealed class Dice : DiceExpression
             {
                 return result.Map<(double Result, List<DiceRoll> Rolls)>(_ => default);
             }
+            
+            modifierRolls.AddRange(result.Value!);
         }
 
         var total = 0.0;
@@ -92,6 +95,7 @@ internal sealed class Dice : DiceExpression
         // This should preserve the ordering of when the dice was rolled
         countOfDiceResult.Value.Rolls.AddRange(countOfSidesResult.Value!.Rolls);
         countOfDiceResult.Value.Rolls.AddRange(diceRolls);
+        countOfDiceResult.Value.Rolls.AddRange(modifierRolls);
         
         return Result<(double Result, List<DiceRoll> Rolls)>.Success((countIsNegative ? -total : total, countOfDiceResult.Value.Rolls));
     }
