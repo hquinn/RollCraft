@@ -23,6 +23,11 @@ public class DiceExpressionEvaluator<TNumber>
     {
         return new DiceExpressionEvaluator<TNumber>(new RandomRoller());
     }
+
+    public static DiceExpressionEvaluator<TNumber> CreateSeededRandom(int seed)
+    {
+        return new DiceExpressionEvaluator<TNumber>(new SeededRandomRoller(seed));
+    }
     
     public static DiceExpressionEvaluator<TNumber> CreateMinimum()
     {
@@ -54,5 +59,29 @@ public class DiceExpressionEvaluator<TNumber>
         }
 
         return parsedExpression.Value!.Evaluate(_roller);
+    }
+
+    public Result<DiceExpressionResult<TNumber>>[] Evaluate(DiceExpression<TNumber> expression, int repeatCount)
+    {
+        var results = new Result<DiceExpressionResult<TNumber>>[repeatCount];
+        
+        for (var i = 0; i < repeatCount; i++)
+        {
+            results[i] = Evaluate(expression);
+        }
+        
+        return results;
+    }
+
+    public Result<DiceExpressionResult<TNumber>>[] Evaluate(string expression, int repeatCount)
+    {
+        var results = new Result<DiceExpressionResult<TNumber>>[repeatCount];
+
+        for (var i = 0; i < repeatCount; i++)
+        {
+            results[i] =  Evaluate(expression);
+        }
+
+        return results;
     }
 }
