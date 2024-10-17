@@ -44,6 +44,16 @@ public class DiceExpressionEvaluator<TNumber>
         return new DiceExpressionEvaluator<TNumber>(new FixedAverageRoller());
     }
 
+    public Result<DiceExpressionResult<TNumber>> Evaluate(Result<DiceExpression<TNumber>> expression)
+    {
+        if (expression.IsFailure)
+        {
+            return Result<DiceExpressionResult<TNumber>>.Failure(expression.Errors!);
+        }
+        
+        return Evaluate(expression.Value!);
+    }
+
     public Result<DiceExpressionResult<TNumber>> Evaluate(DiceExpression<TNumber> expression)
     {
         return expression.Evaluate(_roller);

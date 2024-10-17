@@ -12,4 +12,9 @@ public sealed class DiceExpressionResult<TNumber> where TNumber : INumber<TNumbe
     
     public TNumber Result { get; set; }
     public List<DiceRoll> Rolls { get; set; }
+
+    public override string ToString()
+    {
+        return $"{Result}: [{string.Join(", ", Rolls)}]";
+    }
 }
