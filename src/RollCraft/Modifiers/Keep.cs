@@ -85,15 +85,7 @@ internal sealed class Keep<TNumber> : IModifier
             }
         }
         
-        for (var index = 0; index < diceRolls.Count; index++)
-        {
-            if (keptRolls.Contains(index))
-            {
-                continue;
-            }
-            
-            diceRolls[index].Modifier |= DiceModifier.Dropped;
-        }
+        DropRolls(diceRolls, keptRolls);
     }
 
     private static void KeepLowest(List<DiceRoll> diceRolls, int count)
@@ -126,6 +118,11 @@ internal sealed class Keep<TNumber> : IModifier
             }
         }
         
+        DropRolls(diceRolls, keptRolls);
+    }
+
+    private static void DropRolls(List<DiceRoll> diceRolls, Span<int> keptRolls)
+    {
         for (var index = 0; index < diceRolls.Count; index++)
         {
             if (keptRolls.Contains(index))
