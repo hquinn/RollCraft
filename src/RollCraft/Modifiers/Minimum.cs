@@ -19,7 +19,7 @@ internal sealed class Minimum<TNumber> : IModifier
 
         if (minimumValue.IsFailure)
         {
-            return Result<List<DiceRoll>>.Failure(minimumValue.Errors!);
+            return Result<List<DiceRoll>>.Failure(minimumValue.Error!);
         }
         
         if (!TNumber.IsInteger(minimumValue.Value!.Result))

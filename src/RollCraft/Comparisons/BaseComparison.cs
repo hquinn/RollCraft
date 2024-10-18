@@ -24,7 +24,7 @@ internal abstract class BaseComparison<TNumber> : IComparison
             
             if (result.IsFailure)
             {
-                return Result<(bool Success, List<DiceRoll> Rolls)>.Failure(result.Errors!);
+                return Result<(bool Success, List<DiceRoll> Rolls)>.Failure(result.Error!);
             }
             
             // ReSharper disable once CompareOfFloatsByEqualityOperator

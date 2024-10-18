@@ -71,7 +71,7 @@ internal sealed class Dice<TNumber> : DiceExpression<TNumber> where TNumber : IN
             var result = modifier.Modify(roller, diceRolls);
             if (result.IsFailure)
             {
-                return Result<(TNumber Result, List<DiceRoll> Rolls)>.Failure(result.Errors!);
+                return Result<(TNumber Result, List<DiceRoll> Rolls)>.Failure(result.Error!);
             }
             
             modifierRolls.AddRange(result.Value!);

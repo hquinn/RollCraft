@@ -19,7 +19,7 @@ internal sealed class Maximum<TNumber> : IModifier
 
         if (maximumValue.IsFailure)
         {
-            return Result<List<DiceRoll>>.Failure(maximumValue.Errors!);
+            return Result<List<DiceRoll>>.Failure(maximumValue.Error!);
         }
         
         if (!TNumber.IsInteger(maximumValue.Value!.Result))

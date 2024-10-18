@@ -89,7 +89,7 @@ public class DiceExpressionEvaluatorTests
 
         await result.PerformAsync(
             success: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
-            failure: error => Assert.Fail(error.First().Message));
+            failure: error => Assert.Fail(error.Message));
     }
 
     [Test]
@@ -151,8 +151,8 @@ public class DiceExpressionEvaluatorTests
             {
                 await using var _ = Assert.Multiple();
                 
-                await Assert.That(error.First().Code).IsEqualTo(expectedCode);
-                await Assert.That(error.First().Message).IsEqualTo(expectedMessage);
+                await Assert.That(error.Code).IsEqualTo(expectedCode);
+                await Assert.That(error.Message).IsEqualTo(expectedMessage);
             });
     }
 
@@ -165,7 +165,7 @@ public class DiceExpressionEvaluatorTests
         
         await result.PerformAsync(
             success: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
-            failure: error => Assert.Fail(error.First().Message));
+            failure: error => Assert.Fail(error.Message));
     }
 
     [Test]
@@ -177,7 +177,7 @@ public class DiceExpressionEvaluatorTests
         
         await result.PerformAsync(
             success: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
-            failure: error => Assert.Fail(error.First().Message));
+            failure: error => Assert.Fail(error.Message));
     }
 
     [Test]
@@ -189,7 +189,7 @@ public class DiceExpressionEvaluatorTests
         
         await result.PerformAsync(
             success: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
-            failure: error => Assert.Fail(error.First().Message));
+            failure: error => Assert.Fail(error.Message));
     }
 
     [Test]
@@ -206,7 +206,7 @@ public class DiceExpressionEvaluatorTests
                 await Assert.That(actual.Rolls.MaxBy(x => x.Roll)!.Roll).IsEqualTo(2);
                 await Assert.That(actual.Rolls.MinBy(x => x.Roll)!.Roll).IsEqualTo(1);
             },
-            failure: error => Assert.Fail(error.First().Message));
+            failure: error => Assert.Fail(error.Message));
     }
 
     [Test]
@@ -222,7 +222,7 @@ public class DiceExpressionEvaluatorTests
 
                 await Assert.That(actual.Rolls).IsEquivalentCollectionTo(data.Expected);
             },
-            failure: error => Assert.Fail(error.First().Message));
+            failure: error => Assert.Fail(error.Message));
     }
 
     private static Result<DiceExpressionResult<double>> Evaluate(string input, bool useMaxRoller = false)

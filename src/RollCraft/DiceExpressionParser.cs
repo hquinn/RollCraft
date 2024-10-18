@@ -61,7 +61,7 @@ public class DiceExpressionParser
 
         if (tokensResult.IsFailure)
         {
-            return Result<DiceExpression<TNumber>>.Failure(tokensResult.Errors!);
+            return Result<DiceExpression<TNumber>>.Failure(tokensResult.Error!);
         }
 
         var tokensAsSpan = CollectionsMarshal.AsSpan(tokensResult.Value!);

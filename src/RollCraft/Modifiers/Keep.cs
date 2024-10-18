@@ -22,7 +22,7 @@ internal sealed class Keep<TNumber> : IModifier
 
         if (countValue.IsFailure)
         {
-            return Result<List<DiceRoll>>.Failure(countValue.Errors!);
+            return Result<List<DiceRoll>>.Failure(countValue.Error!);
         }
         
         if (!TNumber.IsInteger(countValue.Value!.Result))

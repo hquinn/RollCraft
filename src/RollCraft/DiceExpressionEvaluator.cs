@@ -48,7 +48,7 @@ public class DiceExpressionEvaluator<TNumber>
     {
         if (expression.IsFailure)
         {
-            return Result<DiceExpressionResult<TNumber>>.Failure(expression.Errors!);
+            return Result<DiceExpressionResult<TNumber>>.Failure(expression.Error!);
         }
         
         return Evaluate(expression.Value!);
@@ -65,7 +65,7 @@ public class DiceExpressionEvaluator<TNumber>
 
         if (parsedExpression.IsFailure)
         {
-            return Result<DiceExpressionResult<TNumber>>.Failure(parsedExpression.Errors!);
+            return Result<DiceExpressionResult<TNumber>>.Failure(parsedExpression.Error!);
         }
 
         return parsedExpression.Value!.Evaluate(_roller);

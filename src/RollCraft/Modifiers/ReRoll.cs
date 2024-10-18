@@ -31,7 +31,7 @@ internal sealed class ReRoll : IModifier
 
                 if (comparisonResult.IsFailure)
                 {
-                    return Result<List<DiceRoll>>.Failure(comparisonResult.Errors!);
+                    return Result<List<DiceRoll>>.Failure(comparisonResult.Error!);
                 }
 
                 if (firstComparison)

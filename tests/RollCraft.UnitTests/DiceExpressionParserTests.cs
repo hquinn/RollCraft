@@ -85,7 +85,7 @@ public class DiceExpressionParserTests
 
         await result.PerformAsync(
             success: async actual => await Assert.That(actual.ToString()).IsEqualTo(expected),
-            failure: error => Assert.Fail(error.First().Message));
+            failure: error => Assert.Fail(error.Message));
     }
     
     [Test]
@@ -137,9 +137,9 @@ public class DiceExpressionParserTests
             {
                 await using var _ = Assert.Multiple();
                 
-                await Assert.That(error.First().Code).IsEqualTo(expectedCode);
-                await Assert.That(error.First().Message).IsEqualTo(expectedMessage);
-                await Assert.That((int)error.First().Metadata["Position"]).IsEqualTo(expectedIndex);
+                await Assert.That(error.Code).IsEqualTo(expectedCode);
+                await Assert.That(error.Message).IsEqualTo(expectedMessage);
+                await Assert.That((int)error.Metadata["Position"]).IsEqualTo(expectedIndex);
             });
     }
 }

@@ -29,7 +29,7 @@ internal sealed class DiceTokenHandler : ITokenHandler
         
         if (modifiersResult.IsFailure)
         {
-            return Result<DiceExpression<TNumber>>.Failure(modifiersResult.Errors!);
+            return Result<DiceExpression<TNumber>>.Failure(modifiersResult.Error!);
         }
 
         return Result<DiceExpression<TNumber>>.Success(diceExpression);
@@ -46,7 +46,7 @@ internal sealed class DiceTokenHandler : ITokenHandler
         
         if (modifiersResult.IsFailure)
         {
-            return Result<DiceExpression<TNumber>>.Failure(modifiersResult.Errors!);
+            return Result<DiceExpression<TNumber>>.Failure(modifiersResult.Error!);
         }
 
         return Result<DiceExpression<TNumber>>.Success(diceExpression);
@@ -75,7 +75,7 @@ internal sealed class DiceTokenHandler : ITokenHandler
 
             if (modifierResult.IsFailure)
             {
-                return Result<Unit>.Failure(modifierResult.Errors!);
+                return Result<Unit>.Failure(modifierResult.Error!);
             }
 
             modifiers.Add(modifierResult.Value!);
@@ -102,7 +102,7 @@ internal sealed class DiceTokenHandler : ITokenHandler
 
                 if (comparisonResult.IsFailure)
                 {
-                    return Result<IModifier>.Failure(comparisonResult.Errors!);
+                    return Result<IModifier>.Failure(comparisonResult.Error!);
                 }
 
                 var comparison = comparisonResult.Value ?? DefaultMaxComparison;
@@ -117,7 +117,7 @@ internal sealed class DiceTokenHandler : ITokenHandler
 
                 if (comparisonResult.IsFailure)
                 {
-                    return Result<IModifier>.Failure(comparisonResult.Errors!);
+                    return Result<IModifier>.Failure(comparisonResult.Error!);
                 }
 
                 var comparison = comparisonResult.Value ?? DefaultMinComparison;
@@ -134,7 +134,7 @@ internal sealed class DiceTokenHandler : ITokenHandler
                 var countResult = DiceExpressionParser.ParseExpression(ref reader, token.TokenDetails.InfixPrecedence);
                 if (countResult.IsFailure)
                 {
-                    return Result<IModifier>.Failure(countResult.Errors!);
+                    return Result<IModifier>.Failure(countResult.Error!);
                 }
 
                 return Result<IModifier>.Success(new Keep<TNumber>(countResult.Value!,
@@ -163,7 +163,7 @@ internal sealed class DiceTokenHandler : ITokenHandler
         var comparisonResult = DiceExpressionParser.ParseExpression(ref reader, nextToken.TokenDetails.InfixPrecedence);
         if (comparisonResult.IsFailure)
         {
-            return Result<IComparison?>.Failure(comparisonResult.Errors!);
+            return Result<IComparison?>.Failure(comparisonResult.Error!);
         }
 
         IComparison? comparison = nextToken.TokenDetails.TokenType switch
@@ -188,7 +188,7 @@ internal sealed class DiceTokenHandler : ITokenHandler
         var valueResult = DiceExpressionParser.ParseExpression(ref reader, precedence);
         if (valueResult.IsFailure)
         {
-            return Result<IModifier>.Failure(valueResult.Errors!);
+            return Result<IModifier>.Failure(valueResult.Error!);
         }
 
         var modifier = createModifier(valueResult.Value!);

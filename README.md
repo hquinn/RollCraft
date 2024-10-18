@@ -53,7 +53,7 @@ Result<DiceExpressionResult<int>> result = evaluator.Evaluate("2d6 + 3");
 
 result.Perform(
     success: (r) => Console.WriteLine(r),
-    failure: (e) => Console.WriteLine($"Error: {e[0].Message}")
+    failure: (e) => Console.WriteLine($"Error: {e.Message}")
 );
 ```
 

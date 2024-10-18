@@ -1,16 +1,13 @@
-﻿using System.Linq.Expressions;
-using System.Text;
-using LitePrimitives;
+﻿using LitePrimitives;
 using RollCraft;
 using Spectre.Console;
-using Spectre.Console.Rendering;
 
 var randomEvaluator = DiceExpressionEvaluator<double>.CreateRandom();
 var minimumEvaluator = DiceExpressionEvaluator<double>.CreateMinimum();
 var maximumEvaluator = DiceExpressionEvaluator<double>.CreateMaximum();
 var fixedAverageEvaluator = DiceExpressionEvaluator<double>.CreateFixedAverage();
 
-var doYouWishToContinue = true;
+bool doYouWishToContinue;
 
 do
 {
@@ -22,7 +19,7 @@ do
    var diceExpressionInput = AnsiConsole.Prompt(
       new TextPrompt<string>("Please enter the [green]dice expression[/] to evaluate:")
          .PromptStyle(new Style().Foreground(Color.Yellow))
-         .Validate((n) =>
+         .Validate(n =>
          {
             if (string.IsNullOrWhiteSpace(n))
             {
@@ -45,7 +42,7 @@ do
             grid.AddEmptyRow();
             AnsiConsole.Write(grid);
          },
-         failure: errors => AnsiConsole.Write(new Markup($"[red]Failed:[/] [yellow]{errors.First().Message}[/]{Environment.NewLine}{Environment.NewLine}")));
+         failure: errors => AnsiConsole.Write(new Markup($"[red]Failed:[/] [yellow]{errors.Message}[/]{Environment.NewLine}{Environment.NewLine}")));
    
    doYouWishToContinue = AnsiConsole.Prompt(
       new TextPrompt<bool>("Do you wish to continue?")
