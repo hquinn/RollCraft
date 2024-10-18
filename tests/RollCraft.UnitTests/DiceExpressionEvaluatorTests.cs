@@ -82,7 +82,7 @@ public class DiceExpressionEvaluatorTests
     [Arguments("10d10ro<=5", 55.0)]
     [Arguments("10d10ro=(2*2)", 52.0)]
     [Arguments("1+2--3*4/5*-6-7+8*9/10--11/12*13+14*-15", -209.28333333333333)]
-    [Arguments("4d10min2max8!=4r=5kh2+5", 13.0)]
+    [Arguments("4d10min2max8!=4r=5kh2+5", 15.0)]
     public async Task Should_Return_Correct_Result_From_DiceExpression_For_Simple_Math(string input, double expected)
     {
         var result = Evaluate(input);

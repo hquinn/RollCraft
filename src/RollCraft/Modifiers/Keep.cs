@@ -43,82 +43,64 @@ internal sealed class Keep<TNumber> : IModifier
             return Result<List<DiceRoll>>.Failure(new EvaluatorError("KeepError", "Keep must be less or equal than number of dice rolled!"));
         }
 
-        if (_keepHighest)
-        {
-            KeepHighest(diceRolls, count);
-        }
-        else
-        {
-            KeepLowest(diceRolls, count);
-        }
+        KeepRolls(diceRolls, count, _keepHighest);
 
         return Result<List<DiceRoll>>.Success(countValue.Value.Rolls);
     }
 
-    private static void KeepHighest(List<DiceRoll> diceRolls, int count)
+    private static void KeepRolls(List<DiceRoll> diceRolls, int count, bool keepHighest)
     {
-        int keptCount = 0;
-        
+        var keptCount = 0;
         Span<int> keptRolls = stackalloc int[count];
 
         for (var index = 0; index < diceRolls.Count; index++)
         {
-            var diceRoll = diceRolls[index];
-            var roll = diceRoll.Roll;
-            
+            var roll = diceRolls[index].Roll;
+
             if (keptCount < count)
             {
-                keptRolls[keptCount] = index;
-                keptCount++;
-                continue;
+                keptRolls[keptCount++] = index;
             }
-
-            for (var keptIndex = 0; keptIndex < keptCount; keptIndex++)
+            else
             {
-                var keptRoll = diceRolls[keptRolls[keptIndex]];
-                
-                if (roll > keptRoll.Roll)
-                {
-                    keptRolls[keptIndex] = index;
-                    break;
-                }
+                ReplaceKeptRolls(diceRolls, keepHighest, keptRolls, keptCount, roll, index);
             }
         }
-        
-        DropRolls(diceRolls, keptRolls);
+
+        DropRolls(diceRolls, keptRolls.Slice(0, keptCount));
     }
 
-    private static void KeepLowest(List<DiceRoll> diceRolls, int count)
+    private static void ReplaceKeptRolls(List<DiceRoll> diceRolls, bool keepHighest, Span<int> keptRolls, int keptCount, int roll,
+        int index)
     {
-        int keptCount = 0;
-        
-        Span<int> keptRolls = stackalloc int[count];
+        var targetValue = diceRolls[keptRolls[0]].Roll;
+        var targetIndex = 0;
 
-        for (var index = 0; index < diceRolls.Count; index++)
+        // Find the kept roll to potentially replace
+        for (var keptIndex = 1; keptIndex < keptCount; keptIndex++)
         {
-            var diceRoll = diceRolls[index];
-            var roll = diceRoll.Roll;
-            
-            if (keptCount < count)
-            {
-                keptRolls[keptCount] = index;
-                keptCount++;
-                continue;
-            }
+            var keptRollValue = diceRolls[keptRolls[keptIndex]].Roll;
 
-            for (var keptIndex = 0; keptIndex < keptCount; keptIndex++)
+            var condition = keepHighest
+                ? keptRollValue < targetValue
+                : keptRollValue > targetValue;
+
+            if (condition)
             {
-                var keptRoll = diceRolls[keptRolls[keptIndex]];
-                
-                if (roll < keptRoll.Roll)
-                {
-                    keptRolls[keptIndex] = index;
-                    break;
-                }
+                targetValue = keptRollValue;
+                targetIndex = keptIndex;
             }
         }
-        
-        DropRolls(diceRolls, keptRolls);
+
+        // Decide whether to replace the kept roll
+        var replaceCondition = keepHighest
+            ? roll > targetValue
+            : roll < targetValue;
+
+        if (replaceCondition)
+        {
+            keptRolls[targetIndex] = index;
+        }
     }
 
     private static void DropRolls(List<DiceRoll> diceRolls, Span<int> keptRolls)
