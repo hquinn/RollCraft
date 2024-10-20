@@ -135,7 +135,7 @@ public class DiceExpressionParserTests
             success: success => Assert.Fail($"Expected a failure, but got {success}"),
             failure: async error =>
             {
-                await using var _ = Assert.Multiple();
+                using var _ = Assert.Multiple();
                 
                 await Assert.That(error.Code).IsEqualTo(expectedCode);
                 await Assert.That(error.Message).IsEqualTo(expectedMessage);

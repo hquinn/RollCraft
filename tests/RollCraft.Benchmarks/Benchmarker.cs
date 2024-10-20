@@ -3,7 +3,6 @@ using BenchmarkDotNet.Attributes;
 namespace RollCraft.Benchmarks;
 
 [MemoryDiagnoser]
-[ShortRunJob]
 public class Benchmarker
 {
     private const string DiceExpression = "4d10min2max8!=4r=5kh2+5";

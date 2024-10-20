@@ -149,7 +149,7 @@ public class DiceExpressionEvaluatorTests
             success: success => Assert.Fail($"Expected a failure, but got {success}"),
             failure: async error =>
             {
-                await using var _ = Assert.Multiple();
+                using var _ = Assert.Multiple();
                 
                 await Assert.That(error.Code).IsEqualTo(expectedCode);
                 await Assert.That(error.Message).IsEqualTo(expectedMessage);
@@ -201,7 +201,7 @@ public class DiceExpressionEvaluatorTests
         await result.PerformAsync(
             success: async actual =>
             {
-                await using var _ = Assert.Multiple();
+                using var _ = Assert.Multiple();
 
                 await Assert.That(actual.Rolls.MaxBy(x => x.Roll)!.Roll).IsEqualTo(2);
                 await Assert.That(actual.Rolls.MinBy(x => x.Roll)!.Roll).IsEqualTo(1);
@@ -218,7 +218,7 @@ public class DiceExpressionEvaluatorTests
         await result.PerformAsync(
             success: async actual =>
             {
-                await using var _ = Assert.Multiple();
+                using var _ = Assert.Multiple();
 
                 await Assert.That(actual.Rolls).IsEquivalentCollectionTo(data.Expected);
             },
