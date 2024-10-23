@@ -1,5 +1,6 @@
 using System.Numerics;
 using LitePrimitives;
+using RollCraft.Helpers;
 using RollCraft.Modifiers;
 
 namespace RollCraft.Nodes;
@@ -80,7 +81,7 @@ internal sealed class Dice<TNumber> : DiceExpression<TNumber> where TNumber : IN
         var total = TNumber.Zero;
         foreach (var diceRoll in diceRolls)
         {
-            if ((diceRoll.Modifier & DiceModifier.Dropped) != 0)
+            if (diceRoll.HasDiceDropped())
             {
                 continue;
             }

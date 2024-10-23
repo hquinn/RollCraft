@@ -1,5 +1,6 @@
 using LitePrimitives;
 using RollCraft.Comparisons;
+using RollCraft.Helpers;
 
 namespace RollCraft.Modifiers;
 
@@ -28,6 +29,12 @@ internal sealed class Exploding : IModifier
             }
             
             var diceRoll = diceRolls[index];
+            
+            if (diceRoll.HasDiceDropped() || diceRoll.HasDiceExploded())
+            {
+                continue;
+            }
+            
             var comparisonResult = Comparison.RollEquals(roller, diceRoll);
 
             if (comparisonResult.IsFailure)

@@ -5,35 +5,71 @@ namespace RollCraft.Benchmarks;
 [MemoryDiagnoser]
 public class Benchmarker
 {
-    private const string DiceExpression = "4d10min2max8!=4r=5kh2+5";
+    private const string DiceExpression1 = "1d6+3";
+    private const string DiceExpression2 = "4d6kh3";
+    private const string DiceExpression3 = "4d10min2max8!=4r=5kh2+5";
+    private const string DiceExpression4 = "1+2*3-4+5*6-7+8*9-10+11*12-13+14*15-16";
+    private const string DiceExpression5 = "(1d6)d(1d10)min4!=(1d8)k(1d4)ro=10";
     
     private readonly DiceExpressionEvaluator<double> _fullEvaluator = DiceExpressionEvaluator<double>.CreateMaximum();
-    private readonly DiceExpression<double> _fullDiceExpression = DiceExpressionParser.Parse<double>(DiceExpression).Value!;
-    
     private readonly DiceExpressionEvaluator<int> _simpleEvaluator = DiceExpressionEvaluator<int>.CreateMaximum();
-    private readonly DiceExpression<int> _simpleDiceExpression = DiceExpressionParser.Parse<int>(DiceExpression).Value!;
-    
-    [Benchmark]
-    public DiceExpression<double> Full_ParseDiceExpression()
+
+    public IEnumerable<string> Expressions =>
+    [
+        DiceExpression1,
+        DiceExpression2,
+        DiceExpression3,
+        DiceExpression4,
+        DiceExpression5,
+    ];
+
+    public IEnumerable<DiceExpression<double>> FullDiceExpressions
     {
-        return DiceExpressionParser.Parse<double>(DiceExpression).Value!;
+        get
+        {
+            foreach (var expression in Expressions)
+            {
+                yield return DiceExpressionParser.Parse<double>(expression).Value!;
+            }
+        }
+    }
+    
+    public IEnumerable<DiceExpression<int>> SimpleDiceExpressions
+    {
+        get
+        {
+            foreach (var expression in Expressions)
+            {
+                yield return DiceExpressionParser.Parse<int>(expression).Value!;
+            }
+        }
+    }
+                        
+    [Benchmark]
+    [ArgumentsSource(nameof(Expressions))]
+    public DiceExpression<double> Full_Parse(string expression)
+    {
+        return DiceExpressionParser.Parse<double>(expression).Value!;
     }
     
     [Benchmark]
-    public DiceExpression<int> Simple_ParseDiceExpression()
+    [ArgumentsSource(nameof(Expressions))]
+    public DiceExpression<int> Simple_Parse(string expression)
     {
-        return DiceExpressionParser.Parse<int>(DiceExpression).Value!;
+        return DiceExpressionParser.Parse<int>(expression).Value!;
     }
     
     [Benchmark]
-    public DiceExpressionResult<int> Simple_EvaluateDiceExpression()
+    [ArgumentsSource(nameof(FullDiceExpressions))]
+    public DiceExpressionResult<double> Full_Evaluate(DiceExpression<double> expression)
     {
-        return _simpleEvaluator.Evaluate(_simpleDiceExpression).Value!;
+        return _fullEvaluator.Evaluate(expression).Value!;
     }
     
     [Benchmark]
-    public DiceExpressionResult<double> Full_EvaluateDiceExpression()
+    [ArgumentsSource(nameof(SimpleDiceExpressions))]
+    public DiceExpressionResult<int> Simple_Evaluate(DiceExpression<int> expression)
     {
-        return _fullEvaluator.Evaluate(_fullDiceExpression).Value!;
+        return _simpleEvaluator.Evaluate(expression).Value!;
     }
 }

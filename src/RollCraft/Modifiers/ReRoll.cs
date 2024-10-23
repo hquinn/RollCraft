@@ -1,5 +1,6 @@
 using LitePrimitives;
 using RollCraft.Comparisons;
+using RollCraft.Helpers;
 
 namespace RollCraft.Modifiers;
 
@@ -24,9 +25,16 @@ internal sealed class ReRoll : IModifier
         
         for (var index = 0; index < diceRolls.Count; index++)
         {
+            var diceRoll = diceRolls[index];
+                
+            if (diceRoll.HasDiceDropped())
+            {
+                continue;
+            }
+            
             for (var iteration = 0; iteration < iterationMax; iteration++)
             {
-                var diceRoll = diceRolls[index];
+                
                 var comparisonResult = Comparison.RollEquals(roller, diceRoll);
 
                 if (comparisonResult.IsFailure)
