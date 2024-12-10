@@ -220,7 +220,7 @@ public class DiceExpressionEvaluatorTests
             {
                 using var _ = Assert.Multiple();
 
-                await Assert.That(actual.Rolls).IsEquivalentCollectionTo(data.Expected);
+                await Assert.That(actual.Rolls).IsEquivalentTo(data.Expected);
             },
             failure: error => Assert.Fail(error.Message));
     }
