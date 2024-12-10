@@ -1,6 +1,8 @@
+using System.Collections.ObjectModel;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using LitePrimitives;
+using RollCraft.Helpers;
 using RollCraft.Lexing;
 using RollCraft.TokenHandlers;
 using RollCraft.Tokens;
@@ -50,7 +52,7 @@ public class DiceExpressionParser
             // not null when numberType == typeof(double) => DiceExpressionLexer.Tokenize<double, DoubleLexer>(input.AsSpan()),
             _ when numberType == typeof(int) => (Result<List<Token<TNumber>>>)(object)DiceExpressionLexer.Tokenize<int, IntLexer>(input),
             _ when numberType == typeof(double) => (Result<List<Token<TNumber>>>)(object)DiceExpressionLexer.Tokenize<double, DoubleLexer>(input),
-            _ => Result<List<Token<TNumber>>>.Failure(new ParserError("InvalidNumberType", "Invalid number type", 0))
+            _ => ErrorHelpers.Create("Parsing.InvalidNumberType", "Invalid number type", 0)
         };
     }
     
@@ -75,11 +77,10 @@ public class DiceExpressionParser
 
         if (reader.TryPeek(out var extraToken))
         {
-            return Result<DiceExpression<TNumber>>.Failure(
-                new ParserError(
-                    "UnexpectedToken", 
+            return ErrorHelpers.Create(
+                    "Parsing.UnexpectedToken", 
                     $"Unexpected token '{extraToken.TokenDetails.TokenType}' at position {reader.Position}", 
-                    reader.Position));
+                    reader.Position);
         }
 
         return expressionResult;
@@ -91,8 +92,10 @@ public class DiceExpressionParser
     {
         if (!reader.TryConsume(out var token))
         {
-            return Result<DiceExpression<TNumber>>.Failure(
-                new ParserError("UnexpectedEnd", "Unexpected end of input", reader.Position));
+            return ErrorHelpers.Create(
+                "Parsing.UnexpectedEnd", 
+                "Unexpected end of input", 
+                reader.Position);
         }
 
         var leftResult = TokenHandlers[(byte) token.TokenDetails.TokenType].ParsePrefix(token, ref reader);

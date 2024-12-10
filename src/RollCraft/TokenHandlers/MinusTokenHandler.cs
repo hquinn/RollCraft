@@ -1,5 +1,6 @@
 using System.Numerics;
 using LitePrimitives;
+using RollCraft.Helpers;
 using RollCraft.Nodes;
 using RollCraft.Tokens;
 
@@ -12,8 +13,7 @@ internal sealed class MinusTokenHandler : ITokenHandler
     {
         if (!reader.TryPeek(out var nextToken))
         {
-            return Result<DiceExpression<TNumber>>.Failure(
-                new ParserError("UnexpectedEnd", "Unexpected end of input", reader.Position));
+            return ErrorHelpers.Create("Parsing.UnexpectedEnd", "Unexpected end of input", reader.Position);
         }
 
         // We want to treat '-dX' as '-1dX'

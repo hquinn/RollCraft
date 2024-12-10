@@ -1,5 +1,6 @@
 using System.Numerics;
 using LitePrimitives;
+using RollCraft.Helpers;
 using RollCraft.Nodes;
 using RollCraft.Tokens;
 
@@ -19,9 +20,9 @@ internal sealed class NumberTokenHandler : ITokenHandler
         Token<TNumber> token, 
         ref TokenReader<TNumber> reader) where TNumber : INumber<TNumber>
     {
-        return Result<DiceExpression<TNumber>>.Failure(
-            new ParserError(
-                "InvalidOperator", $"Invalid operator '{token.TokenDetails.TokenType}' at position {reader.Position - 1}"
-                , reader.Position - 1));
+        return ErrorHelpers.Create(
+            "Parsing.InvalidOperator",
+            $"Invalid operator '{token.TokenDetails.TokenType}' at position {reader.Position - 1}",
+            reader.Position - 1);
     }
 }

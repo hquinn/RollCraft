@@ -1,5 +1,6 @@
 using System.Numerics;
 using LitePrimitives;
+using RollCraft.Helpers;
 using RollCraft.Tokens;
 
 namespace RollCraft.Lexing;
@@ -25,7 +26,7 @@ internal static class DiceExpressionLexer
 
             if (token is null)
             {
-                return Result<List<Token<TNumber>>>.Failure(new ParserError("InvalidToken", "Invalid token found", index));
+                return ErrorHelpers.Create("Parsing.InvalidToken", "Invalid token found", index);
             }
 
             tokens.Add(token.Value);

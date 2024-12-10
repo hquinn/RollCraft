@@ -24,7 +24,7 @@ internal sealed class Minimum<TNumber> : IModifier
         
         if (!TNumber.IsInteger(minimumValue.Value!.Result))
         {
-            return Result<List<DiceRoll>>.Failure(new EvaluatorError("MinimumError", "Minimum must be an integer!"));
+            return Error.Default("Evaluator.MinimumError", "Minimum must be an integer!");
         }
 
         var minimum = int.CreateSaturating(minimumValue.Value!.Result);
@@ -32,13 +32,13 @@ internal sealed class Minimum<TNumber> : IModifier
         // A normal dice roll cannot have a minimum value less than 1
         if (minimum < 1)
         {
-            return Result<List<DiceRoll>>.Failure(new EvaluatorError("MinimumError", "Cannot have a minimum value less than 1!"));
+            return Error.Default("Evaluator.MinimumError", "Cannot have a minimum value less than 1!");
         }
 
         // A normal dice roll cannot have a maximum value more than the dice side count
         if (minimum > diceRolls[0].Sides)
         {
-            return Result<List<DiceRoll>>.Failure(new EvaluatorError("MinimumError", "Cannot have a minimum value greater than the dice side count!"));
+            return Error.Default("Evaluator.MinimumError", "Cannot have a minimum value greater than the dice side count!");
         }
 
         foreach (var diceRoll in diceRolls)

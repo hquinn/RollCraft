@@ -1,5 +1,6 @@
 using System.Numerics;
 using LitePrimitives;
+using RollCraft.Helpers;
 using RollCraft.Tokens;
 
 namespace RollCraft.TokenHandlers;
@@ -20,8 +21,7 @@ internal sealed class LeftParenthesisTokenHandler: ITokenHandler
         // Expect a closing ')'
         if (!reader.TryConsume(out var closingToken) || closingToken.TokenDetails.TokenType != TokenType.RightParenthesis)
         {
-            return Result<DiceExpression<TNumber>>.Failure(
-                new ParserError("ExpectedClosingParen", "Expected closing parenthesis", reader.Position));
+            return ErrorHelpers.Create("Parsing.ExpectedClosingParen", "Expected closing parenthesis", reader.Position);
         }
 
         return expressionResult;
@@ -33,7 +33,9 @@ internal sealed class LeftParenthesisTokenHandler: ITokenHandler
         Token<TNumber> token, 
         ref TokenReader<TNumber> reader) where TNumber : INumber<TNumber>
     {
-        return Result<DiceExpression<TNumber>>.Failure(
-            new ParserError("InvalidInfixOperator", "Left parenthesis cannot be used as infix operator", reader.Position));
+        return ErrorHelpers.Create(
+            "Parsing.InvalidInfixOperator", 
+            "Left parenthesis cannot be used as infix operator",
+            reader.Position);
     }
 }

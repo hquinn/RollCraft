@@ -27,7 +27,7 @@ internal sealed class Keep<TNumber> : IModifier
         
         if (!TNumber.IsInteger(countValue.Value!.Result))
         {
-            return Result<List<DiceRoll>>.Failure(new EvaluatorError("KeepError", "Keep must be an integer!"));
+            return Error.Default("Evaluator.KeepError", "Keep must be an integer!");
         }
 
         var count = int.CreateSaturating(countValue.Value!.Result);
@@ -35,12 +35,12 @@ internal sealed class Keep<TNumber> : IModifier
         // Cannot keep negative numbers
         if (count <= -1)
         {
-            return Result<List<DiceRoll>>.Failure(new EvaluatorError("KeepError", "Keep must be zero or more!"));
+            return Error.Default("Evaluator.KeepError", "Keep must be zero or more!");
         }
         
         if (count > diceRolls.Count)
         {
-            return Result<List<DiceRoll>>.Failure(new EvaluatorError("KeepError", "Keep must be less or equal than number of dice rolled!"));
+            return Error.Default("Evaluator.KeepError", "Keep must be less or equal than number of dice rolled!");
         }
 
         KeepRolls(diceRolls, count, _keepHighest);

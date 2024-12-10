@@ -1,6 +1,7 @@
 using System.Numerics;
 using LitePrimitives;
 using RollCraft.Comparisons;
+using RollCraft.Helpers;
 using RollCraft.Modifiers;
 using RollCraft.Nodes;
 using RollCraft.Tokens;
@@ -142,9 +143,10 @@ internal sealed class DiceTokenHandler : ITokenHandler
             }
 
             default:
-                return Result<IModifier>.Failure(
-                    new ParserError("UnknownModifier", $"Unknown modifier '{token.TokenDetails.TokenType}'",
-                        reader.Position - 1));
+                return ErrorHelpers.Create(
+                    "Parsing.UnknownModifier", 
+                    $"Unknown modifier '{token.TokenDetails.TokenType}'",
+                    reader.Position - 1);
         }
     }
     

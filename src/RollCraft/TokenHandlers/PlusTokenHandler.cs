@@ -1,5 +1,6 @@
 using System.Numerics;
 using LitePrimitives;
+using RollCraft.Helpers;
 using RollCraft.Nodes;
 using RollCraft.Tokens;
 
@@ -10,8 +11,7 @@ internal sealed class PlusTokenHandler : ITokenHandler
     public Result<DiceExpression<TNumber>> ParsePrefix<TNumber>(Token<TNumber> token, ref TokenReader<TNumber> reader)
         where TNumber : INumber<TNumber>
     {
-        return Result<DiceExpression<TNumber>>.Failure(
-            new ParserError("InvalidPrefix", "Invalid prefix found", reader.Position));
+        return ErrorHelpers.Create("Parsing.InvalidPrefix", "Invalid prefix found", reader.Position);
     }
 
     public Result<DiceExpression<TNumber>> ParseInfix<TNumber>(

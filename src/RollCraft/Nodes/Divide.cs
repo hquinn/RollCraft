@@ -30,7 +30,7 @@ internal sealed class Divide<TNumber> : DiceExpression<TNumber> where TNumber : 
         
         if (TNumber.IsZero(rightResult.Value.Result))
         {
-            return Result<(TNumber Result, List<DiceRoll> Rolls)>.Failure(new EvaluatorError("DivideByZero", "Division by zero detected!"));
+            return Error.Default("Evaluator.DivideByZero", "Division by zero detected!");
         }
         
         var result = leftResult.Value.Result / rightResult.Value.Result;

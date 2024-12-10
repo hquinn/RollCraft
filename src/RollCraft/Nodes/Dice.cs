@@ -34,26 +34,26 @@ internal sealed class Dice<TNumber> : DiceExpression<TNumber> where TNumber : IN
         
         if (!TNumber.IsInteger(countOfDiceResult.Value.Result))
         {
-            return Result<(TNumber Result, List<DiceRoll> Rolls)>.Failure(new EvaluatorError("DiceError", "Dice count must be an integer!"));
+            return Error.Default("Evaluator.DiceError", "Dice count must be an integer!");
         }
 
         var diceCount = int.CreateSaturating(countOfDiceResult.Value.Result);
 
         if (diceCount == 0)
         {
-            return Result<(TNumber Result, List<DiceRoll> Rolls)>.Failure(new EvaluatorError("DiceError", "Dice count must not be 0!"));
+            return Error.Default("Evaluator.DiceError", "Dice count must not be 0!");
         }
         
         if (!TNumber.IsInteger(countOfSidesResult.Value.Result))
         {
-            return Result<(TNumber Result, List<DiceRoll> Rolls)>.Failure(new EvaluatorError("DiceError", "Dice sides must be an integer!"));
+            return Error.Default("Evaluator.DiceError", "Dice sides must be an integer!");
         }
 
         var sides = int.CreateSaturating(countOfSidesResult.Value.Result);
         
         if (sides < 1)
         {
-            return Result<(TNumber Result, List<DiceRoll> Rolls)>.Failure(new EvaluatorError("DiceError", "Dice sides must not be 0 or less!"));
+            return Error.Default("Evaluator.DiceError", "Dice sides must not be 0 or less!");
         }
         
         var diceRolls = new List<DiceRoll>();

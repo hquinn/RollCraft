@@ -30,19 +30,19 @@ internal abstract class BaseComparison<TNumber> : IComparison
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (!TNumber.IsInteger(result.Value!.Result))
             {
-                return Result<(bool Success, List<DiceRoll> Rolls)>.Failure(new EvaluatorError("ComparisonError", "Comparison must be an integer!"));
+                return Error.Default("Evaluator.ComparisonError", "Comparison must be an integer!");
             }
 
             var comparison = int.CreateSaturating(result.Value!.Result);
             
             if (comparison < 1)
             {
-                return Result<(bool Success, List<DiceRoll> Rolls)>.Failure(new EvaluatorError("ComparisonError", "Comparison must not be less than 1!"));
+                return Error.Default("Evaluator.ComparisonError", "Comparison must not be less than 1!");
             }
             
             if (comparison > roll.Sides)
             {
-                return Result<(bool Success, List<DiceRoll> Rolls)>.Failure(new EvaluatorError("ComparisonError", "Comparison must not be greater than the dice side count!"));
+                return Error.Default("Evaluator.ComparisonError", "Comparison must not be greater than the dice side count!");
             }
             
             _comparisonValue = comparison;
