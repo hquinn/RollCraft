@@ -1,0 +1,64 @@
+# This name will appear in the "Actions" tab of your GitHub repository.
+name: .NET Cross-Platform Release
+
+# This workflow runs when you push a tag that starts with 'v' (e.g., v1.0, v1.0.1).
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    # Use the latest version of Ubuntu to run the build process.
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checks out your repository's code so the workflow can access it.
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # 2. Sets up the specified version of the .NET SDK.
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x' # Use the .NET version your project targets.
+
+      # 3. Define the platforms you want to build for.
+      # Each platform has a Runtime Identifier (RID).
+      # win-x64 -> Windows
+      # linux-x64 -> Linux
+      # osx-x64 -> macOS
+      - name: Set up build matrix
+        id: matrix
+        run: |
+          echo "platforms=[ \"win-x64\", \"linux-x64\", \"osx-x64\" ]" >> $GITHUB_OUTPUT
+
+      # 4. Build the project for each platform defined above.
+      # This command creates a self-contained, single-file executable.
+      - name: Build for each platform
+        run: |
+          for rid in ${{ fromJson(steps.matrix.outputs.platforms) }}; do
+            dotnet publish ./RollCraft.Avalonia/RollCraft.Avalonia.csproj \
+              --configuration Release \
+              --runtime $rid \
+              --output ./publish/$rid \
+              /p:PublishSingleFile=true \
+              /p:PublishTrimmed=true \
+              --self-contained true
+          done
+
+      # 5. Zip the published output for each platform to make downloads easier.
+      - name: Zip the artifacts
+        run: |
+          for rid in ${{ fromJson(steps.matrix.outputs.platforms) }}; do
+            7z a ./publish/RollCraft-${rid}.zip ./publish/$rid/*
+          done
+      
+      # 6. Create the GitHub Release and upload the zipped files.
+      # This uses the tag name for the release title and attaches the compiled apps.
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./publish/*.zip # Uploads all .zip files from the publish folder.
+          fail_on_unmatched_files: true
+          # This uses the commit messages between this tag and the last one as the release notes.
+          generate_release_notes: true
