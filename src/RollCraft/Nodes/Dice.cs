@@ -1,5 +1,5 @@
 using System.Numerics;
-using LitePrimitives;
+using MonadCraft;
 using RollCraft.Helpers;
 using RollCraft.Modifiers;
 
@@ -18,7 +18,7 @@ internal sealed class Dice<TNumber> : DiceExpression<TNumber> where TNumber : IN
         CountOfSides = countOfSides;
     }
 
-    internal override Result<(TNumber Result, List<DiceRoll> Rolls)> EvaluateNode(IRoller roller)
+    internal override Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)> EvaluateNode(IRoller roller)
     {        
         var countOfDiceResult = CountOfDice.EvaluateNode(roller);
         if (countOfDiceResult.IsFailure)
@@ -34,26 +34,26 @@ internal sealed class Dice<TNumber> : DiceExpression<TNumber> where TNumber : IN
         
         if (!TNumber.IsInteger(countOfDiceResult.Value.Result))
         {
-            return Error.Default("Evaluator.DiceError", "Dice count must be an integer!");
+            return new EvaluatorError("Evaluator.DiceError", "Dice count must be an integer!");
         }
 
         var diceCount = int.CreateSaturating(countOfDiceResult.Value.Result);
 
         if (diceCount == 0)
         {
-            return Error.Default("Evaluator.DiceError", "Dice count must not be 0!");
+            return new EvaluatorError("Evaluator.DiceError", "Dice count must not be 0!");
         }
         
         if (!TNumber.IsInteger(countOfSidesResult.Value.Result))
         {
-            return Error.Default("Evaluator.DiceError", "Dice sides must be an integer!");
+            return new EvaluatorError("Evaluator.DiceError", "Dice sides must be an integer!");
         }
 
         var sides = int.CreateSaturating(countOfSidesResult.Value.Result);
         
         if (sides < 1)
         {
-            return Error.Default("Evaluator.DiceError", "Dice sides must not be 0 or less!");
+            return new EvaluatorError("Evaluator.DiceError", "Dice sides must not be 0 or less!");
         }
         
         var diceRolls = new List<DiceRoll>();
@@ -72,10 +72,10 @@ internal sealed class Dice<TNumber> : DiceExpression<TNumber> where TNumber : IN
             var result = modifier.Modify(roller, diceRolls);
             if (result.IsFailure)
             {
-                return Result<(TNumber Result, List<DiceRoll> Rolls)>.Failure(result.Error!);
+                return Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)>.Failure(result.Error);
             }
             
-            modifierRolls.AddRange(result.Value!);
+            modifierRolls.AddRange(result.Value);
         }
 
         var total = TNumber.Zero;
@@ -90,11 +90,11 @@ internal sealed class Dice<TNumber> : DiceExpression<TNumber> where TNumber : IN
         }
         
         // This should preserve the ordering of when the dice was rolled
-        countOfDiceResult.Value.Rolls.AddRange(countOfSidesResult.Value!.Rolls);
+        countOfDiceResult.Value.Rolls.AddRange(countOfSidesResult.Value.Rolls);
         countOfDiceResult.Value.Rolls.AddRange(diceRolls);
         countOfDiceResult.Value.Rolls.AddRange(modifierRolls);
         
-        return Result<(TNumber Result, List<DiceRoll> Rolls)>.Success((countIsNegative ? -total : total, countOfDiceResult.Value.Rolls));
+        return Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)>.Success((countIsNegative ? -total : total, countOfDiceResult.Value.Rolls));
     }
     
     public override string ToString()

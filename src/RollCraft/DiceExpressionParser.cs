@@ -1,8 +1,6 @@
-using System.Collections.ObjectModel;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using LitePrimitives;
-using RollCraft.Helpers;
+using MonadCraft;
 using RollCraft.Lexing;
 using RollCraft.TokenHandlers;
 using RollCraft.Tokens;
@@ -42,31 +40,30 @@ public class DiceExpressionParser
         new RightParenthesisTokenHandler(),
     ];
     
-    private static Result<List<Token<TNumber>>> Tokenize<TNumber>(ReadOnlySpan<char> input)
+    private static Result<IRollError, List<Token<TNumber>>> Tokenize<TNumber>(ReadOnlySpan<char> input)
         where TNumber : INumber<TNumber>
     {
         var numberType = typeof(TNumber);
         
         return numberType switch
         {
-            // not null when numberType == typeof(double) => DiceExpressionLexer.Tokenize<double, DoubleLexer>(input.AsSpan()),
-            _ when numberType == typeof(int) => (Result<List<Token<TNumber>>>)(object)DiceExpressionLexer.Tokenize<int, IntLexer>(input),
-            _ when numberType == typeof(double) => (Result<List<Token<TNumber>>>)(object)DiceExpressionLexer.Tokenize<double, DoubleLexer>(input),
-            _ => ErrorHelpers.Create("Parsing.InvalidNumberType", "Invalid number type", 0)
+            _ when numberType == typeof(int) => (Result<IRollError, List<Token<TNumber>>>)(object)DiceExpressionLexer.Tokenize<int, IntLexer>(input),
+            _ when numberType == typeof(double) => (Result<IRollError, List<Token<TNumber>>>)(object)DiceExpressionLexer.Tokenize<double, DoubleLexer>(input),
+            _ => new ParserError("Parsing.InvalidNumberType", "Invalid number type", 0)
         };
     }
     
-    public static Result<DiceExpression<TNumber>> Parse<TNumber>(string input)
+    public static Result<IRollError, DiceExpression<TNumber>> Parse<TNumber>(string input)
         where TNumber : INumber<TNumber>
     {
         var tokensResult = Tokenize<TNumber>(input);
 
         if (tokensResult.IsFailure)
         {
-            return Result<DiceExpression<TNumber>>.Failure(tokensResult.Error!);
+            return Result<IRollError, DiceExpression<TNumber>>.Failure(tokensResult.Error);
         }
 
-        var tokensAsSpan = CollectionsMarshal.AsSpan(tokensResult.Value!);
+        var tokensAsSpan = CollectionsMarshal.AsSpan(tokensResult.Value);
         var reader = new TokenReader<TNumber>(tokensAsSpan);
         var expressionResult = ParseExpression(ref reader);
 
@@ -77,7 +74,7 @@ public class DiceExpressionParser
 
         if (reader.TryPeek(out var extraToken))
         {
-            return ErrorHelpers.Create(
+            return new ParserError(
                     "Parsing.UnexpectedToken", 
                     $"Unexpected token '{extraToken.TokenDetails.TokenType}' at position {reader.Position}", 
                     reader.Position);
@@ -87,12 +84,12 @@ public class DiceExpressionParser
     }
 
 
-    internal static Result<DiceExpression<TNumber>> ParseExpression<TNumber>(ref TokenReader<TNumber> reader, byte precedence = 0)
+    internal static Result<IRollError, DiceExpression<TNumber>> ParseExpression<TNumber>(ref TokenReader<TNumber> reader, byte precedence = 0)
         where TNumber : INumber<TNumber>
     {
         if (!reader.TryConsume(out var token))
         {
-            return ErrorHelpers.Create(
+            return new ParserError(
                 "Parsing.UnexpectedEnd", 
                 "Unexpected end of input", 
                 reader.Position);
@@ -119,7 +116,7 @@ public class DiceExpressionParser
             }
 
             reader.Advance();
-            leftResult = ParseInfix(leftResult.Value!, nextToken, ref reader);
+            leftResult = ParseInfix(leftResult.Value, nextToken, ref reader);
             
             if (leftResult.IsFailure)
             {
@@ -130,7 +127,7 @@ public class DiceExpressionParser
         return leftResult;
     }
 
-    private static Result<DiceExpression<TNumber>> ParseInfix<TNumber>(
+    private static Result<IRollError, DiceExpression<TNumber>> ParseInfix<TNumber>(
         DiceExpression<TNumber> left, 
         Token<TNumber> token, 
         ref TokenReader<TNumber> reader) where TNumber : INumber<TNumber>
@@ -142,6 +139,6 @@ public class DiceExpressionParser
             return rightResult;
         }
         
-        return TokenHandlers[(byte) token.TokenDetails.TokenType].ParseInfix(left, rightResult.Value!, token, ref reader);
+        return TokenHandlers[(byte) token.TokenDetails.TokenType].ParseInfix(left, rightResult.Value, token, ref reader);
     }
 }

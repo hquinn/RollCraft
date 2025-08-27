@@ -1,0 +1,94 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:RollCraft.Avalonia.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="RollCraft.Avalonia.Views.MainWindow"
+        Title="RollCraft"
+        x:DataType="vm:MainViewModel">
+
+    <Design.DataContext>
+        <vm:MainViewModel/>
+    </Design.DataContext>
+    
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="20" RowDefinitions="Auto, Auto, Auto, *, Auto">
+            <TextBlock Grid.Row="0" Text="RollCraft" FontSize="48" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Center"/>
+
+            <StackPanel Grid.Row="1" Margin="0,20,0,0" Spacing="10">
+                <Grid ColumnDefinitions="Auto, *, Auto, Auto" VerticalAlignment="Center">
+                    <TextBlock Text="Dice Expression:" VerticalAlignment="Center" Margin="0,0,10,0" Grid.Column="0" FontWeight="Medium"/>
+                    <TextBox Text="{Binding DiceExpression, Mode=TwoWay}" Watermark="e.g., 2d6 + 5" Grid.Column="1" VerticalAlignment="Center"/>
+
+                    <TextBlock Text="Times:" VerticalAlignment="Center" Margin="20,0,10,0" Grid.Column="2" FontWeight="Medium"/>
+                    <NumericUpDown Value="{Binding RepeatInput, Mode=TwoWay}" Minimum="1" Grid.Column="3" Width="120" VerticalAlignment="Center" Increment="1"/>
+                </Grid>
+                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center" Margin="0,10,0,0">
+                    <Button Content="Evaluate" Command="{Binding EvaluateCommand}" IsDefault="True" Classes="accent"/>
+                    <Button Content="Clear" Command="{Binding ClearCommand}"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Expander Grid.Row="2" Header="Expression Syntax Guide" Margin="0,15,0,0">
+                <Border Padding="10" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" CornerRadius="3">
+                    <StackPanel Spacing="5">
+                        <TextBlock TextWrapping="Wrap"><Run FontWeight="Bold">Basic Syntax:</Run></TextBlock>
+                        <TextBlock Text=" • Arithmetic: +, -, *, /" Margin="10,0,0,0"/>
+                        <TextBlock Text=" • Grouping: (, )" Margin="10,0,0,0"/>
+                        <TextBlock Text=" • Dice: NdM (e.g., 3d6 for three 6-sided dice)" Margin="10,0,0,0"/>
+                        
+                        <TextBlock TextWrapping="Wrap" Margin="0,10,0,0"><Run FontWeight="Bold">Dice Modifiers:</Run> (Append to a dice expression, e.g., 4d6kh3)</TextBlock>
+                        <TextBlock Text=" • ! : Exploding (4d6! explodes on 6)" Margin="10,0,0,0"/>
+                        <TextBlock Text=" • k, kh : Keep Highest (4d6kh3 keeps the highest 3 dice)" Margin="10,0,0,0"/>
+                        <TextBlock Text=" • r : Reroll indefinitely (4d6r rerolls on 1)" Margin="10,0,0,0"/>
+                        <TextBlock Text=" • ro : Reroll Once (4d6ro rerolls on 1 once)" Margin="10,0,0,0"/>
+                        <TextBlock Text=" • min : Minimum value (4d6min2 treats rolls below 2 as 2)" Margin="10,0,0,0"/>
+                        <TextBlock Text=" • max : Maximum value (4d6max5 treats rolls above 5 as 5)" Margin="10,0,0,0"/>
+
+                        <TextBlock TextWrapping="Wrap" Margin="0,10,0,0"><Run FontWeight="Bold">Compare Operators:</Run> (For !, r, and ro modifiers)</TextBlock>
+                        <TextBlock Text=" • Operators: &lt;=, &lt;, >=, >, =, &lt;>" Margin="10,0,0,0"/>
+                        <TextBlock Text=" • Example: 4d6r&lt;=2 (rerolls any dice that roll a 1 or a 2)" Margin="10,0,0,0"/>
+                        <TextBlock Text=" • Example: 4d6!>4 (explodes on a 5 or a 6)" Margin="10,0,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Expander>
+
+            <ListBox Grid.Row="3" Margin="0,20,0,0" ItemsSource="{Binding Results}" BorderThickness="0" Background="Transparent">
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="Margin" Value="0,0,0,10"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                </ListBox.Styles>
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:EvaluationResultViewModel">
+                        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10">
+                            <Grid ColumnDefinitions="1.2*, *, 2*" RowDefinitions="Auto, *">
+                                <TextBlock Text="Category" FontWeight="Bold" Grid.Row="0" Grid.Column="0" Margin="5"/>
+                                <TextBlock Text="Result" FontWeight="Bold" Grid.Row="0" Grid.Column="1" Margin="5"/>
+                                <TextBlock Text="Rolls" FontWeight="Bold" Grid.Row="0" Grid.Column="2" Margin="5"/>
+
+                                <ItemsControl ItemsSource="{Binding Rows}" Grid.Row="1" Grid.ColumnSpan="3">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:ResultRowViewModel">
+                                            <Grid ColumnDefinitions="1.2*, *, 2*">
+                                                <TextBlock Text="{Binding Category}" Grid.Column="0" Margin="5" Foreground="CornflowerBlue"/>
+                                                <TextBlock Text="{Binding Result}" Grid.Column="1" Margin="5" Foreground="Goldenrod"/>
+                                                <TextBlock Text="{Binding Rolls}" Grid.Column="2" Margin="5" Foreground="IndianRed"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            
+            <TextBlock Grid.Row="4" Text="{Binding ErrorText}" Foreground="Red" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,0" IsVisible="{Binding !!ErrorText}"/>
+
+        </Grid>
+    </ScrollViewer>
+</Window>

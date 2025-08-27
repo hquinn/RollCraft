@@ -1,5 +1,5 @@
 using System.Numerics;
-using LitePrimitives;
+using MonadCraft;
 
 namespace RollCraft.Comparisons;
 
@@ -16,7 +16,7 @@ internal abstract class BaseComparison<TNumber> : IComparison
     
     internal DiceExpression<TNumber> Comparison { get; }
 
-    public Result<(bool Success, List<DiceRoll> Rolls)> RollEquals(IRoller roller, DiceRoll roll)
+    public Result<IRollError, (bool Success, List<DiceRoll> Rolls)> RollEquals(IRoller roller, DiceRoll roll)
     {       
         if (_comparisonValue is null)
         {
@@ -24,32 +24,32 @@ internal abstract class BaseComparison<TNumber> : IComparison
             
             if (result.IsFailure)
             {
-                return Result<(bool Success, List<DiceRoll> Rolls)>.Failure(result.Error!);
+                return Result<IRollError, (bool Success, List<DiceRoll> Rolls)>.Failure(result.Error);
             }
             
             // ReSharper disable once CompareOfFloatsByEqualityOperator
-            if (!TNumber.IsInteger(result.Value!.Result))
+            if (!TNumber.IsInteger(result.Value.Result))
             {
-                return Error.Default("Evaluator.ComparisonError", "Comparison must be an integer!");
+                return new EvaluatorError("Evaluator.ComparisonError", "Comparison must be an integer!");
             }
 
-            var comparison = int.CreateSaturating(result.Value!.Result);
+            var comparison = int.CreateSaturating(result.Value.Result);
             
             if (comparison < 1)
             {
-                return Error.Default("Evaluator.ComparisonError", "Comparison must not be less than 1!");
+                return new EvaluatorError("Evaluator.ComparisonError", "Comparison must not be less than 1!");
             }
             
             if (comparison > roll.Sides)
             {
-                return Error.Default("Evaluator.ComparisonError", "Comparison must not be greater than the dice side count!");
+                return new EvaluatorError("Evaluator.ComparisonError", "Comparison must not be greater than the dice side count!");
             }
             
             _comparisonValue = comparison;
-            _rolls = result.Value!.Rolls;
+            _rolls = result.Value.Rolls;
         }
         
-        return Result<(bool Success, List<DiceRoll> Rolls)>.Success((Compare(roll.Roll, _comparisonValue.Value), _rolls!));
+        return Result<IRollError, (bool Success, List<DiceRoll> Rolls)>.Success((Compare(roll.Roll, _comparisonValue.Value), _rolls!));
     }
     
     protected abstract bool Compare(int roll, int comparisonValue);

@@ -29,7 +29,7 @@ public class Benchmarker
         {
             foreach (var expression in Expressions)
             {
-                yield return DiceExpressionParser.Parse<double>(expression).Value!;
+                yield return DiceExpressionParser.Parse<double>(expression).Value;
             }
         }
     }
@@ -40,7 +40,7 @@ public class Benchmarker
         {
             foreach (var expression in Expressions)
             {
-                yield return DiceExpressionParser.Parse<int>(expression).Value!;
+                yield return DiceExpressionParser.Parse<int>(expression).Value;
             }
         }
     }
@@ -49,27 +49,27 @@ public class Benchmarker
     [ArgumentsSource(nameof(Expressions))]
     public DiceExpression<double> Full_Parse(string expression)
     {
-        return DiceExpressionParser.Parse<double>(expression).Value!;
+        return DiceExpressionParser.Parse<double>(expression).Value;
     }
     
     [Benchmark]
     [ArgumentsSource(nameof(Expressions))]
     public DiceExpression<int> Simple_Parse(string expression)
     {
-        return DiceExpressionParser.Parse<int>(expression).Value!;
+        return DiceExpressionParser.Parse<int>(expression).Value;
     }
     
     [Benchmark]
     [ArgumentsSource(nameof(FullDiceExpressions))]
-    public DiceExpressionResult<double> Full_Evaluate(DiceExpression<double> expression)
+    public DiceExpressionResult<IRollError, double> Full_Evaluate(DiceExpression<double> expression)
     {
-        return _fullEvaluator.Evaluate(expression).Value!;
+        return _fullEvaluator.Evaluate(expression).Value;
     }
     
     [Benchmark]
     [ArgumentsSource(nameof(SimpleDiceExpressions))]
-    public DiceExpressionResult<int> Simple_Evaluate(DiceExpression<int> expression)
+    public DiceExpressionResult<IRollError, int> Simple_Evaluate(DiceExpression<int> expression)
     {
-        return _simpleEvaluator.Evaluate(expression).Value!;
+        return _simpleEvaluator.Evaluate(expression).Value;
     }
 }

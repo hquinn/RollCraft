@@ -1,4 +1,4 @@
-using LitePrimitives;
+using MonadCraft;
 using RollCraft.UnitTests.Helpers;
 
 namespace RollCraft.UnitTests;
@@ -87,9 +87,9 @@ public class DiceExpressionEvaluatorTests
     {
         var result = Evaluate(input);
 
-        await result.PerformAsync(
-            success: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
-            failure: error => Assert.Fail(error.Message));
+        await result.SwitchAsync(
+            onSuccess: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
+            onFailure: error => Assert.Fail(error.Message));
     }
 
     [Test]
@@ -145,13 +145,13 @@ public class DiceExpressionEvaluatorTests
     {
         var result = Evaluate(input);
 
-        await result.PerformAsync(
-            success: success => Assert.Fail($"Expected a failure, but got {success}"),
-            failure: async error =>
+        await result.SwitchAsync(
+            onSuccess: success => Assert.Fail($"Expected a failure, but got {success}"),
+            onFailure: async error =>
             {
                 using var _ = Assert.Multiple();
                 
-                await Assert.That(error.Code).IsEqualTo(expectedCode);
+                await Assert.That(error.ErrorCode).IsEqualTo(expectedCode);
                 await Assert.That(error.Message).IsEqualTo(expectedMessage);
             });
     }
@@ -163,9 +163,9 @@ public class DiceExpressionEvaluatorTests
         var sut = DiceExpressionEvaluator<double>.CreateMinimum();
         var result = sut.Evaluate("4d6");
         
-        await result.PerformAsync(
-            success: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
-            failure: error => Assert.Fail(error.Message));
+        await result.SwitchAsync(
+            onSuccess: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
+            onFailure: error => Assert.Fail(error.Message));
     }
 
     [Test]
@@ -175,9 +175,9 @@ public class DiceExpressionEvaluatorTests
         var sut = DiceExpressionEvaluator<double>.CreateMaximum();
         var result = sut.Evaluate("4d6");
         
-        await result.PerformAsync(
-            success: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
-            failure: error => Assert.Fail(error.Message));
+        await result.SwitchAsync(
+            onSuccess: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
+            onFailure: error => Assert.Fail(error.Message));
     }
 
     [Test]
@@ -187,9 +187,9 @@ public class DiceExpressionEvaluatorTests
         var sut = DiceExpressionEvaluator<double>.CreateFixedAverage();
         var result = sut.Evaluate("4d6");
         
-        await result.PerformAsync(
-            success: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
-            failure: error => Assert.Fail(error.Message));
+        await result.SwitchAsync(
+            onSuccess: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
+            onFailure: error => Assert.Fail(error.Message));
     }
 
     [Test]
@@ -198,15 +198,15 @@ public class DiceExpressionEvaluatorTests
         var sut = DiceExpressionEvaluator<double>.CreateRandom();
         var result = sut.Evaluate("100d2");
         
-        await result.PerformAsync(
-            success: async actual =>
+        await result.SwitchAsync(
+            onSuccess: async actual =>
             {
                 using var _ = Assert.Multiple();
 
                 await Assert.That(actual.Rolls.MaxBy(x => x.Roll)!.Roll).IsEqualTo(2);
                 await Assert.That(actual.Rolls.MinBy(x => x.Roll)!.Roll).IsEqualTo(1);
             },
-            failure: error => Assert.Fail(error.Message));
+            onFailure: error => Assert.Fail(error.Message));
     }
 
     [Test]
@@ -215,17 +215,17 @@ public class DiceExpressionEvaluatorTests
     {
         var result = Evaluate(data.Input, RollerType.Exact, data.Rolls);
         
-        await result.PerformAsync(
-            success: async actual =>
+        await result.SwitchAsync(
+            onSuccess: async actual =>
             {
                 using var _ = Assert.Multiple();
 
                 await Assert.That(actual.Rolls).IsEquivalentTo(data.Expected);
             },
-            failure: error => Assert.Fail(error.Message));
+            onFailure: error => Assert.Fail(error.Message));
     }
 
-    private static Result<DiceExpressionResult<double>> Evaluate(string input, RollerType rollerType = RollerType.Sequential, int[] rolls = default!)
+    private static Result<IRollError, DiceExpressionResult<IRollError, double>> Evaluate(string input, RollerType rollerType = RollerType.Sequential, int[] rolls = default!)
     {
         return rollerType switch
         {
@@ -236,7 +236,7 @@ public class DiceExpressionEvaluatorTests
         };
     }
 
-    public enum RollerType
+    private enum RollerType
     {
         Sequential,
         Max,
@@ -244,186 +244,188 @@ public class DiceExpressionEvaluatorTests
     }
     
     public record RollsTestData(string Input, List<DiceRoll> Expected, int[] Rolls);
-
+    
+#pragma warning disable TUnit0046
     public static IEnumerable<RollsTestData> RollsTestMethodData()
+#pragma warning restore TUnit0046
     {
-        yield return new RollsTestData("4d6", 
-        [
-            new(6, 1), 
-            new(6, 2), 
-            new(6, 3), 
-            new(6, 4)
-        ], 
-        [ 
-            1, 2, 3, 4 
-        ]);
-        
-        yield return new RollsTestData("(1d4)d6", 
-        [
-            new(4, 2), 
-            new(6, 4),
-            new(6, 6)
-        ], 
-        [ 
-            2, 
-            4, 6 
-        ]);
-        
-        yield return new RollsTestData("(1d4)d(1d6)", 
-        [
-            new(4, 3), 
-            new(6, 5),
-            new(5, 1),
-            new(5, 2),
-            new(5, 5)
-        ], 
-        [ 
-            3, 
-            5, 
-            1, 2, 5 
-        ]);
-        
-        yield return new RollsTestData("4d6min2max4", 
-        [
-            new(6, 2, DiceModifier.Minimum), 
-            new(6, 2), 
-            new(6, 3),
-            new(6, 4, DiceModifier.Maximum)
-        ], 
-        [ 
-            1, 2, 3, 5 
-        ]);
-        
-        yield return new RollsTestData("4d6k(1d4)", 
-        [
-            new(6, 4), 
-            new(6, 3, DiceModifier.Dropped), 
-            new(6, 3), 
-            new(6, 5), 
-            new(4, 3)
-        ], 
-        [ 
-            4, 3, 3, 5, 
-            3 
-        ]);   
-        
-        yield return new RollsTestData("1d6+1d8-1d10*1d12/1d20", 
-        [
-            new(6, 1), 
-            new(8, 5), 
-            new(10, 3), 
-            new(12, 12), 
-            new(20, 7)
-        ], 
-        [ 
-            1, 
-            5, 
-            3, 
-            12, 
-            7 
-        ]);
-        
-        yield return new RollsTestData("(1d6)d(1d10)k(1d4)!=(1d8)", 
-        [
-            new(6, 6), 
-            new(10, 10), 
-            new(10, 9, DiceModifier.Dropped), 
-            new(10, 10), 
-            new(10, 8, DiceModifier.Dropped), 
-            new(10, 10), 
-            new(10, 6, DiceModifier.Dropped), 
-            new(10, 5, DiceModifier.Dropped), 
-            new(4, 2),
-            new(8, 5)
-        ], 
-        [ 
-            6, 
-            10, 
-            9, 10, 8, 10, 6, 5, 
-            2, 
-            5
-        ]);
-        
-        yield return new RollsTestData("(1d6)d(1d10)min4!=(1d8)k(1d4)", 
-        [
-            new(6, 6), 
-            new(10, 10), 
-            new(10, 9, DiceModifier.Dropped), 
-            new(10, 10), 
-            new(10, 8, DiceModifier.Dropped), 
-            new(10, 10), 
-            new(10, 4, DiceModifier.Minimum | DiceModifier.Dropped), 
-            new(10, 5, DiceModifier.Exploded | DiceModifier.Dropped), 
-            new(10, 1, DiceModifier.Dropped), 
-            new(8, 5),
-            new(4, 2),
-        ], 
-        [ 
-            6, 
-            10, 
-            9, 10, 8, 10, 3, 5, 
-            5,
-            1,
-            2
-        ]);
-        
-        yield return new RollsTestData("4d6ro", 
-        [
-            new(6, 6, DiceModifier.Rerolled), 
-            new(6, 2), 
-            new(6, 3),
-            new(6, 5)
-        ], 
-        [ 
-            1, 2, 3, 5,
-            6
-        ]);
-        
-        yield return new RollsTestData("4d6r", 
-        [
-            new(6, 2, DiceModifier.Rerolled), 
-            new(6, 2), 
-            new(6, 3),
-            new(6, 5)
-        ], 
-        [ 
-            1, 2, 3, 5,
-            1, 1, 2
-        ]);
-        
-        yield return new RollsTestData("4d6r<3", 
-        [
-            new(6, 3, DiceModifier.Rerolled), 
-            new(6, 4, DiceModifier.Rerolled), 
-            new(6, 3),
-            new(6, 5)
-        ], 
-        [ 
-            1, 2, 3, 5,
-            1, 1, 3,
-            2, 1, 4
-        ]);
-        
-        yield return new RollsTestData("4d6k3r", 
-        [
-            new(6, 1, DiceModifier.Dropped), 
-            new(6, 2), 
-            new(6, 3),
-            new(6, 5)
-        ], 
-        [ 
-            1, 2, 3, 5, 
-        ]);
-        
-        yield return new RollsTestData("4d6k3r", 
-        [
-            new(6, 1, DiceModifier.Dropped), 
-            new(6, 2), 
-            new(6, 3),
-            new(6, 5)
-        ], 
-        [ 
-            1, 2, 3, 5, 
-        ]);
+        yield return new RollsTestData("4d6",
+            [
+                new(6, 1),
+                new(6, 2),
+                new(6, 3),
+                new(6, 4)
+            ],
+            [
+                1, 2, 3, 4
+            ]);
+
+        yield return new RollsTestData("(1d4)d6",
+            [
+                new(4, 2),
+                new(6, 4),
+                new(6, 6)
+            ],
+            [
+                2,
+                4, 6
+            ]);
+
+        yield return new RollsTestData("(1d4)d(1d6)",
+            [
+                new(4, 3),
+                new(6, 5),
+                new(5, 1),
+                new(5, 2),
+                new(5, 5)
+            ],
+            [
+                3,
+                5,
+                1, 2, 5
+            ]);
+
+        yield return new RollsTestData("4d6min2max4",
+            [
+                new(6, 2, DiceModifier.Minimum),
+                new(6, 2),
+                new(6, 3),
+                new(6, 4, DiceModifier.Maximum)
+            ],
+            [
+                1, 2, 3, 5
+            ]);
+
+        yield return new RollsTestData("4d6k(1d4)",
+            [
+                new(6, 4),
+                new(6, 3, DiceModifier.Dropped),
+                new(6, 3),
+                new(6, 5),
+                new(4, 3)
+            ],
+            [
+                4, 3, 3, 5,
+                3
+            ]);
+
+        yield return new RollsTestData("1d6+1d8-1d10*1d12/1d20",
+            [
+                new(6, 1),
+                new(8, 5),
+                new(10, 3),
+                new(12, 12),
+                new(20, 7)
+            ],
+            [
+                1,
+                5,
+                3,
+                12,
+                7
+            ]);
+
+        yield return new RollsTestData("(1d6)d(1d10)k(1d4)!=(1d8)",
+            [
+                new(6, 6),
+                new(10, 10),
+                new(10, 9, DiceModifier.Dropped),
+                new(10, 10),
+                new(10, 8, DiceModifier.Dropped),
+                new(10, 10),
+                new(10, 6, DiceModifier.Dropped),
+                new(10, 5, DiceModifier.Dropped),
+                new(4, 2),
+                new(8, 5)
+            ],
+            [
+                6,
+                10,
+                9, 10, 8, 10, 6, 5,
+                2,
+                5
+            ]);
+
+        yield return new RollsTestData("(1d6)d(1d10)min4!=(1d8)k(1d4)",
+            [
+                new(6, 6),
+                new(10, 10),
+                new(10, 9, DiceModifier.Dropped),
+                new(10, 10),
+                new(10, 8, DiceModifier.Dropped),
+                new(10, 10),
+                new(10, 4, DiceModifier.Minimum | DiceModifier.Dropped),
+                new(10, 5, DiceModifier.Exploded | DiceModifier.Dropped),
+                new(10, 1, DiceModifier.Dropped),
+                new(8, 5),
+                new(4, 2)
+            ],
+            [
+                6,
+                10,
+                9, 10, 8, 10, 3, 5,
+                5,
+                1,
+                2
+            ]);
+
+        yield return new RollsTestData("4d6ro",
+            [
+                new(6, 6, DiceModifier.Rerolled),
+                new(6, 2),
+                new(6, 3),
+                new(6, 5)
+            ],
+            [
+                1, 2, 3, 5,
+                6
+            ]);
+
+        yield return new RollsTestData("4d6r",
+            [
+                new(6, 2, DiceModifier.Rerolled),
+                new(6, 2),
+                new(6, 3),
+                new(6, 5)
+            ],
+            [
+                1, 2, 3, 5,
+                1, 1, 2
+            ]);
+
+        yield return new RollsTestData("4d6r<3",
+            [
+                new(6, 3, DiceModifier.Rerolled),
+                new(6, 4, DiceModifier.Rerolled),
+                new(6, 3),
+                new(6, 5)
+            ],
+            [
+                1, 2, 3, 5,
+                1, 1, 3,
+                2, 1, 4
+            ]);
+
+        yield return new RollsTestData("4d6k3r",
+            [
+                new(6, 1, DiceModifier.Dropped),
+                new(6, 2),
+                new(6, 3),
+                new(6, 5)
+            ],
+            [
+                1, 2, 3, 5
+            ]);
+
+        yield return new RollsTestData("4d6k3r",
+            [
+                new(6, 1, DiceModifier.Dropped),
+                new(6, 2),
+                new(6, 3),
+                new(6, 5)
+            ],
+            [
+                1, 2, 3, 5
+            ]);
     }
 }

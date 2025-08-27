@@ -1,12 +1,12 @@
-using LitePrimitives;
+using MonadCraft;
 
 namespace RollCraft.Comparisons;
 
 public class Min : IComparison
 {
-    public Result<(bool Success, List<DiceRoll> Rolls)> RollEquals(IRoller roller, DiceRoll roll)
+    public Result<IRollError, (bool Success, List<DiceRoll> Rolls)> RollEquals(IRoller roller, DiceRoll roll)
     {
-        return Result<(bool Success, List<DiceRoll> Rolls)>.Success((roll.Roll == 1, []));
+        return Result<IRollError, (bool Success, List<DiceRoll> Rolls)>.Success((roll.Roll == 1, []));
     }
 
     public void Reset()

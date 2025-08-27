@@ -1,5 +1,5 @@
 using System.Numerics;
-using LitePrimitives;
+using MonadCraft;
 using RollCraft.Helpers;
 using RollCraft.Tokens;
 
@@ -7,7 +7,7 @@ namespace RollCraft.Lexing;
 
 internal static class DiceExpressionLexer
 {
-    public static Result<List<Token<TNumber>>> Tokenize<TNumber, TNumberLexer>(ReadOnlySpan<char> input)
+    public static Result<IRollError, List<Token<TNumber>>> Tokenize<TNumber, TNumberLexer>(ReadOnlySpan<char> input)
         where TNumberLexer : INumberLexer<TNumber>
         where TNumber : INumber<TNumber>
     {
@@ -26,13 +26,13 @@ internal static class DiceExpressionLexer
 
             if (token is null)
             {
-                return ErrorHelpers.Create("Parsing.InvalidToken", "Invalid token found", index);
+                return new ParserError("Parsing.InvalidToken", "Invalid token found", index);
             }
 
             tokens.Add(token.Value);
         }
 
-        return Result<List<Token<TNumber>>>.Success(tokens);
+        return Result<IRollError, List<Token<TNumber>>>.Success(tokens);
     }
     
     private static Token<TNumber>? GetOperator<TNumber>(ReadOnlySpan<char> input, ref int refIndex)

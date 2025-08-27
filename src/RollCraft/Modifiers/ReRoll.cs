@@ -1,4 +1,4 @@
-using LitePrimitives;
+using MonadCraft;
 using RollCraft.Comparisons;
 using RollCraft.Helpers;
 
@@ -17,7 +17,7 @@ internal sealed class ReRoll : IModifier
     internal IComparison Comparison { get; }
     internal bool ReRollOnce { get; }
 
-    public Result<List<DiceRoll>> Modify(IRoller roller, List<DiceRoll> diceRolls)
+    public Result<IRollError, List<DiceRoll>> Modify(IRoller roller, List<DiceRoll> diceRolls)
     {
         var iterationMax = ReRollOnce ? 1 : MaxIterationsPerDice;
         var firstComparison = true;
@@ -39,7 +39,7 @@ internal sealed class ReRoll : IModifier
 
                 if (comparisonResult.IsFailure)
                 {
-                    return Result<List<DiceRoll>>.Failure(comparisonResult.Error!);
+                    return Result<IRollError, List<DiceRoll>>.Failure(comparisonResult.Error);
                 }
 
                 if (firstComparison)
@@ -69,7 +69,7 @@ internal sealed class ReRoll : IModifier
 
         Comparison.Reset();
         
-        return Result<List<DiceRoll>>.Success(comparisonRolls!);
+        return Result<IRollError, List<DiceRoll>>.Success(comparisonRolls!);
     }
 
     public override string ToString()

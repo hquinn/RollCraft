@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace RollCraft;
 
-public sealed class DiceExpressionResult<TNumber> where TNumber : INumber<TNumber>
+public sealed class DiceExpressionResult<RollError, TNumber> where TNumber : INumber<TNumber>
 {
     public DiceExpressionResult(TNumber result, List<DiceRoll>? rolls = null)
     {

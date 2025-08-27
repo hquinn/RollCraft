@@ -1,5 +1,5 @@
 using System.Numerics;
-using LitePrimitives;
+using MonadCraft;
 
 namespace RollCraft.Modifiers;
 
@@ -13,32 +13,32 @@ internal sealed class Minimum<TNumber> : IModifier
 
     internal DiceExpression<TNumber> MinimumValue { get; }
 
-    public Result<List<DiceRoll>> Modify(IRoller roller, List<DiceRoll> diceRolls)
+    public Result<IRollError, List<DiceRoll>> Modify(IRoller roller, List<DiceRoll> diceRolls)
     {
         var minimumValue = MinimumValue.Evaluate(roller);
 
         if (minimumValue.IsFailure)
         {
-            return Result<List<DiceRoll>>.Failure(minimumValue.Error!);
+            return Result<IRollError, List<DiceRoll>>.Failure(minimumValue.Error);
         }
         
-        if (!TNumber.IsInteger(minimumValue.Value!.Result))
+        if (!TNumber.IsInteger(minimumValue.Value.Result))
         {
-            return Error.Default("Evaluator.MinimumError", "Minimum must be an integer!");
+            return new EvaluatorError("Evaluator.MinimumError", "Minimum must be an integer!");
         }
 
-        var minimum = int.CreateSaturating(minimumValue.Value!.Result);
+        var minimum = int.CreateSaturating(minimumValue.Value.Result);
         
         // A normal dice roll cannot have a minimum value less than 1
         if (minimum < 1)
         {
-            return Error.Default("Evaluator.MinimumError", "Cannot have a minimum value less than 1!");
+            return new EvaluatorError("Evaluator.MinimumError", "Cannot have a minimum value less than 1!");
         }
 
         // A normal dice roll cannot have a maximum value more than the dice side count
         if (minimum > diceRolls[0].Sides)
         {
-            return Error.Default("Evaluator.MinimumError", "Cannot have a minimum value greater than the dice side count!");
+            return new EvaluatorError("Evaluator.MinimumError", "Cannot have a minimum value greater than the dice side count!");
         }
 
         foreach (var diceRoll in diceRolls)
@@ -50,7 +50,7 @@ internal sealed class Minimum<TNumber> : IModifier
             }
         }
         
-        return Result<List<DiceRoll>>.Success(minimumValue.Value.Rolls);
+        return Result<IRollError, List<DiceRoll>>.Success(minimumValue.Value.Rolls);
     }
     
     public override string ToString()

@@ -1,5 +1,5 @@
 using System.Numerics;
-using LitePrimitives;
+using MonadCraft;
 
 namespace RollCraft.Nodes;
 
@@ -12,7 +12,7 @@ internal sealed class Unary<TNumber> : DiceExpression<TNumber> where TNumber : I
         Expression = expression;
     }
 
-    internal override Result<(TNumber Result, List<DiceRoll> Rolls)> EvaluateNode(IRoller roller)
+    internal override Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)> EvaluateNode(IRoller roller)
     {
         var result = Expression.EvaluateNode(roller);
         if (result.IsFailure)
@@ -20,7 +20,7 @@ internal sealed class Unary<TNumber> : DiceExpression<TNumber> where TNumber : I
             return result;
         }
 
-        return Result<(TNumber Result, List<DiceRoll> Rolls)>.Success((-result.Value.Result, result.Value.Rolls));
+        return Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)>.Success((-result.Value.Result, result.Value.Rolls));
     }
     
     public override string ToString()

@@ -83,9 +83,9 @@ public class DiceExpressionParserTests
     {
         var result = DiceExpressionParser.Parse<double>(input);
 
-        await result.PerformAsync(
-            success: async actual => await Assert.That(actual.ToString()).IsEqualTo(expected),
-            failure: error => Assert.Fail(error.Message));
+        await result.SwitchAsync(
+            onSuccess: async actual => await Assert.That(actual.ToString()).IsEqualTo(expected),
+            onFailure: error => Assert.Fail(error.Message));
     }
     
     [Test]
@@ -131,15 +131,17 @@ public class DiceExpressionParserTests
     {
         var result = DiceExpressionParser.Parse<double>(input);
 
-        await result.PerformAsync(
-            success: success => Assert.Fail($"Expected a failure, but got {success}"),
-            failure: async error =>
+        await result.SwitchAsync(
+            onSuccess: success => Assert.Fail($"Expected a failure, but got {success}"),
+            onFailure: async error =>
             {
                 using var _ = Assert.Multiple();
-                
-                await Assert.That(error.Code).IsEqualTo(expectedCode);
-                await Assert.That(error.Message).IsEqualTo(expectedMessage);
-                await Assert.That((int)error?.Metadata["Position"]).IsEqualTo(expectedIndex);
+
+                await Assert.That(error).IsAssignableFrom<ParserError>();
+                var parserError = (ParserError)error;
+                await Assert.That(parserError.ErrorCode).IsEqualTo(expectedCode);
+                await Assert.That(parserError.Message).IsEqualTo(expectedMessage);
+                await Assert.That(parserError.Position).IsEqualTo(expectedIndex);
             });
     }
 }

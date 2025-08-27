@@ -1,5 +1,5 @@
 using System.Numerics;
-using LitePrimitives;
+using MonadCraft;
 using RollCraft.Rollers;
 
 namespace RollCraft;
@@ -44,36 +44,36 @@ public class DiceExpressionEvaluator<TNumber>
         return new DiceExpressionEvaluator<TNumber>(new FixedAverageRoller());
     }
 
-    public Result<DiceExpressionResult<TNumber>> Evaluate(Result<DiceExpression<TNumber>> expression)
+    public Result<IRollError, DiceExpressionResult<IRollError, TNumber>> Evaluate(Result<IRollError, DiceExpression<TNumber>> expression)
     {
         if (expression.IsFailure)
         {
-            return Result<DiceExpressionResult<TNumber>>.Failure(expression.Error!);
+            return Result<IRollError, DiceExpressionResult<IRollError, TNumber>>.Failure(expression.Error);
         }
         
-        return Evaluate(expression.Value!);
+        return Evaluate(expression.Value);
     }
 
-    public Result<DiceExpressionResult<TNumber>> Evaluate(DiceExpression<TNumber> expression)
+    public Result<IRollError, DiceExpressionResult<IRollError, TNumber>> Evaluate(DiceExpression<TNumber> expression)
     {
         return expression.Evaluate(_roller);
     }
 
-    public Result<DiceExpressionResult<TNumber>> Evaluate(string expression)
+    public Result<IRollError, DiceExpressionResult<IRollError, TNumber>> Evaluate(string expression)
     {
         var parsedExpression = DiceExpressionParser.Parse<TNumber>(expression);
 
         if (parsedExpression.IsFailure)
         {
-            return Result<DiceExpressionResult<TNumber>>.Failure(parsedExpression.Error!);
+            return Result<IRollError, DiceExpressionResult<IRollError, TNumber>>.Failure(parsedExpression.Error);
         }
 
-        return parsedExpression.Value!.Evaluate(_roller);
+        return parsedExpression.Value.Evaluate(_roller);
     }
 
-    public Result<DiceExpressionResult<TNumber>>[] Evaluate(DiceExpression<TNumber> expression, int repeatCount)
+    public Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[] Evaluate(DiceExpression<TNumber> expression, int repeatCount)
     {
-        var results = new Result<DiceExpressionResult<TNumber>>[repeatCount];
+        var results = new Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[repeatCount];
         
         for (var i = 0; i < repeatCount; i++)
         {
@@ -83,9 +83,9 @@ public class DiceExpressionEvaluator<TNumber>
         return results;
     }
 
-    public Result<DiceExpressionResult<TNumber>>[] Evaluate(string expression, int repeatCount)
+    public Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[] Evaluate(string expression, int repeatCount)
     {
-        var results = new Result<DiceExpressionResult<TNumber>>[repeatCount];
+        var results = new Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[repeatCount];
 
         for (var i = 0; i < repeatCount; i++)
         {

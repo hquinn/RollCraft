@@ -1,4 +1,4 @@
-using LitePrimitives;
+using MonadCraft;
 using RollCraft.Comparisons;
 using RollCraft.Helpers;
 
@@ -15,7 +15,7 @@ internal sealed class Exploding : IModifier
 
     internal IComparison Comparison { get; }
 
-    public Result<List<DiceRoll>> Modify(IRoller roller, List<DiceRoll> diceRolls)
+    public Result<IRollError, List<DiceRoll>> Modify(IRoller roller, List<DiceRoll> diceRolls)
     {
         var originalDiceRollCount = diceRolls.Count;
         var firstComparison = true;
@@ -39,7 +39,7 @@ internal sealed class Exploding : IModifier
 
             if (comparisonResult.IsFailure)
             {
-                return Result<List<DiceRoll>>.Failure(comparisonResult.Error!);
+                return Result<IRollError, List<DiceRoll>>.Failure(comparisonResult.Error);
             }
             
             if (firstComparison)
@@ -62,7 +62,7 @@ internal sealed class Exploding : IModifier
 
         Comparison.Reset();
         
-        return Result<List<DiceRoll>>.Success(comparisonRolls!);
+        return Result<IRollError, List<DiceRoll>>.Success(comparisonRolls!);
     }
     
     public override string ToString()

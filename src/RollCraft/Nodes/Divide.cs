@@ -1,5 +1,5 @@
 using System.Numerics;
-using LitePrimitives;
+using MonadCraft;
 
 namespace RollCraft.Nodes;
 
@@ -14,7 +14,7 @@ internal sealed class Divide<TNumber> : DiceExpression<TNumber> where TNumber : 
         Right = right;
     }
 
-    internal override Result<(TNumber Result, List<DiceRoll> Rolls)> EvaluateNode(IRoller roller)
+    internal override Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)> EvaluateNode(IRoller roller)
     {        
         var leftResult = Left.EvaluateNode(roller);
         if (leftResult.IsFailure)
@@ -30,13 +30,13 @@ internal sealed class Divide<TNumber> : DiceExpression<TNumber> where TNumber : 
         
         if (TNumber.IsZero(rightResult.Value.Result))
         {
-            return Error.Default("Evaluator.DivideByZero", "Division by zero detected!");
+            return new EvaluatorError("Evaluator.DivideByZero", "Division by zero detected!");
         }
         
         var result = leftResult.Value.Result / rightResult.Value.Result;
         leftResult.Value.Rolls.AddRange(rightResult.Value.Rolls);
         
-        return Result<(TNumber Result, List<DiceRoll> Rolls)>.Success((result, leftResult.Value.Rolls));
+        return Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)>.Success((result, leftResult.Value.Rolls));
     }
     
     public override string ToString()

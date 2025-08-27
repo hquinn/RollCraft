@@ -1,8 +1,8 @@
-using LitePrimitives;
+using MonadCraft;
 
 namespace RollCraft.Modifiers;
 
 internal interface IModifier
 {
-    Result<List<DiceRoll>> Modify(IRoller roller, List<DiceRoll> diceRolls);
+    Result<IRollError, List<DiceRoll>> Modify(IRoller roller, List<DiceRoll> diceRolls);
 }

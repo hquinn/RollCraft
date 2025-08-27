@@ -1,5 +1,5 @@
 using System.Numerics;
-using LitePrimitives;
+using MonadCraft;
 using RollCraft.Comparisons;
 using RollCraft.Helpers;
 using RollCraft.Modifiers;
@@ -13,7 +13,7 @@ internal sealed class DiceTokenHandler : ITokenHandler
     private static readonly Max DefaultMaxComparison = new Max();
     private static readonly Min DefaultMinComparison = new Min();
 
-    public Result<DiceExpression<TNumber>> ParsePrefix<TNumber>(Token<TNumber> token, ref TokenReader<TNumber> reader)
+    public Result<IRollError, DiceExpression<TNumber>> ParsePrefix<TNumber>(Token<TNumber> token, ref TokenReader<TNumber> reader)
         where TNumber : INumber<TNumber>
     {
         // Treat 'dX' as '1dX'
@@ -25,18 +25,18 @@ internal sealed class DiceTokenHandler : ITokenHandler
             return rightResult;
         }
 
-        var diceExpression = new Dice<TNumber>(oneExpression, rightResult.Value!);
+        var diceExpression = new Dice<TNumber>(oneExpression, rightResult.Value);
         var modifiersResult = ParseModifiers(ref reader, diceExpression.Modifiers);
         
         if (modifiersResult.IsFailure)
         {
-            return Result<DiceExpression<TNumber>>.Failure(modifiersResult.Error!);
+            return Result<IRollError, DiceExpression<TNumber>>.Failure(modifiersResult.Error);
         }
 
-        return Result<DiceExpression<TNumber>>.Success(diceExpression);
+        return Result<IRollError, DiceExpression<TNumber>>.Success(diceExpression);
     }
 
-    public Result<DiceExpression<TNumber>> ParseInfix<TNumber>(
+    public Result<IRollError, DiceExpression<TNumber>> ParseInfix<TNumber>(
         DiceExpression<TNumber> left, 
         DiceExpression<TNumber> right, 
         Token<TNumber> token, 
@@ -47,13 +47,13 @@ internal sealed class DiceTokenHandler : ITokenHandler
         
         if (modifiersResult.IsFailure)
         {
-            return Result<DiceExpression<TNumber>>.Failure(modifiersResult.Error!);
+            return Result<IRollError, DiceExpression<TNumber>>.Failure(modifiersResult.Error);
         }
 
-        return Result<DiceExpression<TNumber>>.Success(diceExpression);
+        return Result<IRollError, DiceExpression<TNumber>>.Success(diceExpression);
     }
 
-    private static Result<Unit> ParseModifiers<TNumber>(
+    private static Result<IRollError, Unit> ParseModifiers<TNumber>(
         ref TokenReader<TNumber> reader, 
         List<IModifier> modifiers)
         where TNumber : INumber<TNumber>
@@ -76,17 +76,17 @@ internal sealed class DiceTokenHandler : ITokenHandler
 
             if (modifierResult.IsFailure)
             {
-                return Result<Unit>.Failure(modifierResult.Error!);
+                return Result<IRollError, Unit>.Failure(modifierResult.Error);
             }
 
-            modifiers.Add(modifierResult.Value!);
+            modifiers.Add(modifierResult.Value);
         }
 
-        return Result<Unit>.Success(default);
+        return Result<IRollError, Unit>.Success(default);
     }
 
 
-    private static Result<IModifier> ParseModifier<TNumber>(Token<TNumber> token, ref TokenReader<TNumber> reader)
+    private static Result<IRollError, IModifier> ParseModifier<TNumber>(Token<TNumber> token, ref TokenReader<TNumber> reader)
         where TNumber : INumber<TNumber>
     {
         switch (token.TokenDetails.TokenType)
@@ -103,12 +103,12 @@ internal sealed class DiceTokenHandler : ITokenHandler
 
                 if (comparisonResult.IsFailure)
                 {
-                    return Result<IModifier>.Failure(comparisonResult.Error!);
+                    return Result<IRollError, IModifier>.Failure(comparisonResult.Error);
                 }
 
                 var comparison = comparisonResult.Value ?? DefaultMaxComparison;
 
-                return Result<IModifier>.Success(new Exploding(comparison));
+                return Result<IRollError, IModifier>.Success(new Exploding(comparison));
             }
 
             case TokenType.ReRollOnce:
@@ -118,12 +118,12 @@ internal sealed class DiceTokenHandler : ITokenHandler
 
                 if (comparisonResult.IsFailure)
                 {
-                    return Result<IModifier>.Failure(comparisonResult.Error!);
+                    return Result<IRollError, IModifier>.Failure(comparisonResult.Error);
                 }
 
                 var comparison = comparisonResult.Value ?? DefaultMinComparison;
 
-                return Result<IModifier>.Success(new ReRoll(
+                return Result<IRollError, IModifier>.Success(new ReRoll(
                     comparison,
                     token.TokenDetails.TokenType == TokenType.ReRollOnce));
             }
@@ -135,29 +135,29 @@ internal sealed class DiceTokenHandler : ITokenHandler
                 var countResult = DiceExpressionParser.ParseExpression(ref reader, token.TokenDetails.InfixPrecedence);
                 if (countResult.IsFailure)
                 {
-                    return Result<IModifier>.Failure(countResult.Error!);
+                    return Result<IRollError, IModifier>.Failure(countResult.Error);
                 }
 
-                return Result<IModifier>.Success(new Keep<TNumber>(countResult.Value!,
+                return Result<IRollError, IModifier>.Success(new Keep<TNumber>(countResult.Value,
                     token.TokenDetails.TokenType != TokenType.KeepLowest));
             }
 
             default:
-                return ErrorHelpers.Create(
+                return new ParserError(
                     "Parsing.UnknownModifier", 
                     $"Unknown modifier '{token.TokenDetails.TokenType}'",
                     reader.Position - 1);
         }
     }
     
-    private static Result<IComparison?> ParseComparison<TNumber>(ref TokenReader<TNumber> reader)
+    private static Result<IRollError, IComparison?> ParseComparison<TNumber>(ref TokenReader<TNumber> reader)
         where TNumber : INumber<TNumber>
     {
         if (!reader.TryPeek(out var nextToken) ||
             nextToken.TokenDetails.TokenCategory != TokenCategory.Comparison)
         {
             // Return default comparison if no comparison token is found
-            return Result<IComparison?>.Success(null);
+            return Result<IRollError, IComparison?>.Success(null);
         }
 
         reader.Advance(); // Consume the comparison token
@@ -165,24 +165,24 @@ internal sealed class DiceTokenHandler : ITokenHandler
         var comparisonResult = DiceExpressionParser.ParseExpression(ref reader, nextToken.TokenDetails.InfixPrecedence);
         if (comparisonResult.IsFailure)
         {
-            return Result<IComparison?>.Failure(comparisonResult.Error!);
+            return Result<IRollError, IComparison?>.Failure(comparisonResult.Error);
         }
 
         IComparison? comparison = nextToken.TokenDetails.TokenType switch
         {
-            TokenType.Equal => new Equal<TNumber>(comparisonResult.Value!),
-            TokenType.NotEqual => new NotEqual<TNumber>(comparisonResult.Value!),
-            TokenType.GreaterThan => new GreaterThan<TNumber>(comparisonResult.Value!),
-            TokenType.GreaterThanEqual => new GreaterThanEqual<TNumber>(comparisonResult.Value!),
-            TokenType.LesserThan => new LesserThan<TNumber>(comparisonResult.Value!),
-            TokenType.LesserThanEqual => new LesserThanEqual<TNumber>(comparisonResult.Value!),
+            TokenType.Equal => new Equal<TNumber>(comparisonResult.Value),
+            TokenType.NotEqual => new NotEqual<TNumber>(comparisonResult.Value),
+            TokenType.GreaterThan => new GreaterThan<TNumber>(comparisonResult.Value),
+            TokenType.GreaterThanEqual => new GreaterThanEqual<TNumber>(comparisonResult.Value),
+            TokenType.LesserThan => new LesserThan<TNumber>(comparisonResult.Value),
+            TokenType.LesserThanEqual => new LesserThanEqual<TNumber>(comparisonResult.Value),
             _ => null
         };
 
-        return Result<IComparison?>.Success(comparison);
+        return Result<IRollError, IComparison?>.Success(comparison);
     }
     
-    private static Result<IModifier> ParseValueModifier<TNumber>(
+    private static Result<IRollError, IModifier> ParseValueModifier<TNumber>(
         ref TokenReader<TNumber> reader,
         Func<DiceExpression<TNumber>, IModifier> createModifier,
         byte precedence) where TNumber : INumber<TNumber>
@@ -190,10 +190,10 @@ internal sealed class DiceTokenHandler : ITokenHandler
         var valueResult = DiceExpressionParser.ParseExpression(ref reader, precedence);
         if (valueResult.IsFailure)
         {
-            return Result<IModifier>.Failure(valueResult.Error!);
+            return Result<IRollError, IModifier>.Failure(valueResult.Error);
         }
 
-        var modifier = createModifier(valueResult.Value!);
-        return Result<IModifier>.Success(modifier);
+        var modifier = createModifier(valueResult.Value);
+        return Result<IRollError, IModifier>.Success(modifier);
     }
 }

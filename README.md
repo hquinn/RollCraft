@@ -14,7 +14,7 @@ dotnet add package RollCraft
 
 ### Error Handling
 
-RollCraft uses the `Result` type to handle errors in a functional way. This uses the `LitePrimitives` library (which is another library of mine) which provides the `Result` type.
+RollCraft uses the `Result` type to handle errors in a functional way. This uses the `MonadCraft` library (which is another library of mine) which provides the `Result` type.
 
 The rationale behind this decision is to avoid using exceptions, which can be expensive in terms of performance, especially since there's a lot of error handling in this library.
 
@@ -23,10 +23,10 @@ The rationale behind this decision is to avoid using exceptions, which can be ex
 RollCraft can parse dice expressions through the use of strings into a `DiceExpression` object.
 
 ```csharp
-using LitePrimitives;
+using MonadCraft;
 using RollCraft;
 
-Result<DiceExpression<int>> expression = DiceExpressionParser.Parse<int>("2d6 + 3");
+Result<RollError, DiceExpression<int>> expression = DiceExpressionParser.Parse<int>("2d6 + 3");
 ```
 
 RollCraft has the notion of specifying the type of the number result, which is done through generics.
@@ -34,10 +34,10 @@ RollCraft has the notion of specifying the type of the number result, which is d
 ***Note: Only `int` and `double` are supported at the moment.***
 
 ```csharp
-using LitePrimitives;
+using MonadCraft;
 using RollCraft;
 
-Result<DiceExpression<double>> expression = DiceExpressionParser.Parse<double>("2d6 / 2.2");
+Result<RollError, DiceExpression<double>> expression = DiceExpressionParser.Parse<double>("2d6 / 2.2");
 ```
 
 ### Evaluation
@@ -45,11 +45,11 @@ Result<DiceExpression<double>> expression = DiceExpressionParser.Parse<double>("
 Basic usage of RollCraft involves creating a `DiceExpressionEvaluator` object and using it to evaluate a dice expression:
 
 ```csharp
-using LitePrimitives;
+using MonadCraft;
 using RollCraft;
 
 DiceExpressionEvaluator evaluator = DiceExpresionEvaluator.CreateRandom();
-Result<DiceExpressionResult<int>> result = evaluator.Evaluate("2d6 + 3");
+Result<RollError, DiceExpressionResult<RollError, int>> result = evaluator.Evaluate("2d6 + 3");
 
 result.Perform(
     success: (r) => Console.WriteLine(r),
@@ -60,15 +60,15 @@ result.Perform(
 Besides providing the dice expression string directly, you can also use the `DiceExpression` object directly which has the benefit of already being parsed:
 
 ```csharp
-using LitePrimitives;
+using MonadCraft;
 using RollCraft;
 
 DiceExpressionEvaluator evaluator = DiceExpresionEvaluator.CreateRandom();
-Result<DiceExpression<int>> expression = DiceExpressionParser.Parse<int>("2d6 + 3");
+Result<RollError, DiceExpression<int>> expression = DiceExpressionParser.Parse<int>("2d6 + 3");
 
-Result<DiceExpressionResult<int>> result = evaluator.Evaluate(expression);
+Result<RollError, DiceExpressionResult<RollError, int>> result = evaluator.Evaluate(expression);
 // Or
-Result<DiceExpressionResult<int>> result = expression.Bind(e => evaluator.Evaluate(e));
+Result<RollError, DiceExpressionResult<RollError, int>> result = expression.Bind(e => evaluator.Evaluate(e));
 ```
 
 The `DiceExpressionEvaluator` can be created with a variety of static constructors:

@@ -1,5 +1,5 @@
 using System.Numerics;
-using LitePrimitives;
+using MonadCraft;
 
 namespace RollCraft.Modifiers;
 
@@ -16,36 +16,36 @@ internal sealed class Keep<TNumber> : IModifier
 
     internal DiceExpression<TNumber> CountValue { get; }
 
-    public Result<List<DiceRoll>> Modify(IRoller roller, List<DiceRoll> diceRolls)
+    public Result<IRollError, List<DiceRoll>> Modify(IRoller roller, List<DiceRoll> diceRolls)
     {
         var countValue = CountValue.Evaluate(roller);
 
         if (countValue.IsFailure)
         {
-            return Result<List<DiceRoll>>.Failure(countValue.Error!);
+            return Result<IRollError, List<DiceRoll>>.Failure(countValue.Error);
         }
         
-        if (!TNumber.IsInteger(countValue.Value!.Result))
+        if (!TNumber.IsInteger(countValue.Value.Result))
         {
-            return Error.Default("Evaluator.KeepError", "Keep must be an integer!");
+            return new EvaluatorError("Evaluator.KeepError", "Keep must be an integer!");
         }
 
-        var count = int.CreateSaturating(countValue.Value!.Result);
+        var count = int.CreateSaturating(countValue.Value.Result);
         
         // Cannot keep negative numbers
         if (count <= -1)
         {
-            return Error.Default("Evaluator.KeepError", "Keep must be zero or more!");
+            return new EvaluatorError("Evaluator.KeepError", "Keep must be zero or more!");
         }
         
         if (count > diceRolls.Count)
         {
-            return Error.Default("Evaluator.KeepError", "Keep must be less or equal than number of dice rolled!");
+            return new EvaluatorError("Evaluator.KeepError", "Keep must be less or equal than number of dice rolled!");
         }
 
         KeepRolls(diceRolls, count, _keepHighest);
 
-        return Result<List<DiceRoll>>.Success(countValue.Value.Rolls);
+        return Result<IRollError, List<DiceRoll>>.Success(countValue.Value.Rolls);
     }
 
     private static void KeepRolls(List<DiceRoll> diceRolls, int count, bool keepHighest)

@@ -1,5 +1,5 @@
 using System.Numerics;
-using LitePrimitives;
+using MonadCraft;
 
 namespace RollCraft.Modifiers;
 
@@ -13,32 +13,32 @@ internal sealed class Maximum<TNumber> : IModifier
 
     internal DiceExpression<TNumber> MaximumValue { get; }
 
-    public Result<List<DiceRoll>> Modify(IRoller roller, List<DiceRoll> diceRolls)
+    public Result<IRollError, List<DiceRoll>> Modify(IRoller roller, List<DiceRoll> diceRolls)
     {        
         var maximumValue = MaximumValue.Evaluate(roller);
 
         if (maximumValue.IsFailure)
         {
-            return Result<List<DiceRoll>>.Failure(maximumValue.Error!);
+            return Result<IRollError, List<DiceRoll>>.Failure(maximumValue.Error);
         }
         
-        if (!TNumber.IsInteger(maximumValue.Value!.Result))
+        if (!TNumber.IsInteger(maximumValue.Value.Result))
         {
-            return Error.Default("Evaluator.MaximumError", "Maximum must be an integer!");
+            return new EvaluatorError("Evaluator.MaximumError", "Maximum must be an integer!");
         }
 
-        var maximum = int.CreateSaturating(maximumValue.Value!.Result);
+        var maximum = int.CreateSaturating(maximumValue.Value.Result);
         
         // A normal dice roll cannot have a minimum value less than 1
         if (maximum < 1)
         {
-            return Error.Default("Evaluator.MaximumError", "Cannot have a maximum value less than 1!");
+            return new EvaluatorError("Evaluator.MaximumError", "Cannot have a maximum value less than 1!");
         }
 
         // A normal dice roll cannot have a maximum value more than the dice side count
         if (maximum > diceRolls[0].Sides)
         {
-            return Error.Default("Evaluator.MaximumError", "Cannot have a maximum value greater than the dice side count!");
+            return new EvaluatorError("Evaluator.MaximumError", "Cannot have a maximum value greater than the dice side count!");
         }
 
         foreach (var diceRoll in diceRolls)
@@ -50,7 +50,7 @@ internal sealed class Maximum<TNumber> : IModifier
             }
         }
         
-        return Result<List<DiceRoll>>.Success(maximumValue.Value.Rolls);
+        return Result<IRollError, List<DiceRoll>>.Success(maximumValue.Value.Rolls);
     }
     
     public override string ToString()
