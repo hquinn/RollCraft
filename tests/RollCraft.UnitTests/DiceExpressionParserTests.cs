@@ -137,7 +137,7 @@ public class DiceExpressionParserTests
             {
                 using var _ = Assert.Multiple();
 
-                await Assert.That(error).IsAssignableFrom<ParserError>();
+                await Assert.That(error).IsAssignableTo<ParserError>();
                 var parserError = (ParserError)error;
                 await Assert.That(parserError.ErrorCode).IsEqualTo(expectedCode);
                 await Assert.That(parserError.Message).IsEqualTo(expectedMessage);
