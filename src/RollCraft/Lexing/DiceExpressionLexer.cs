@@ -22,7 +22,9 @@ internal static class DiceExpressionLexer
                 continue;
             }
             
-            var token = TNumberLexer.GetNumber(input, ref index) ?? GetOperator<TNumber>(input, ref index);
+            var token = TNumberLexer.GetNumber(input, ref index) 
+                        ?? GetVariable<TNumber>(input, ref index) 
+                        ?? GetOperator<TNumber>(input, ref index);
 
             if (token is null)
             {
@@ -33,6 +35,40 @@ internal static class DiceExpressionLexer
         }
 
         return Result<IRollError, List<Token<TNumber>>>.Success(tokens);
+    }
+    
+    private static Token<TNumber>? GetVariable<TNumber>(ReadOnlySpan<char> input, ref int refIndex)
+        where TNumber : INumber<TNumber>
+    {
+        var index = refIndex;
+
+        if (index >= input.Length || input[index] != '[')
+        {
+            return null;
+        }
+
+        index++; // Skip opening bracket
+        var startIndex = index;
+
+        while (index < input.Length && input[index] != ']')
+        {
+            index++;
+        }
+
+        if (index >= input.Length)
+        {
+            return null; // No closing bracket found
+        }
+
+        var variableName = input.Slice(startIndex, index - startIndex).ToString();
+        
+        if (string.IsNullOrWhiteSpace(variableName))
+        {
+            return null; // Empty variable name
+        }
+
+        refIndex = index + 1; // Skip closing bracket
+        return new Token<TNumber>(variableName);
     }
     
     private static Token<TNumber>? GetOperator<TNumber>(ReadOnlySpan<char> input, ref int refIndex)

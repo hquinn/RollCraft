@@ -32,6 +32,31 @@ internal sealed class Dice<TNumber> : DiceExpression<TNumber> where TNumber : IN
             return countOfSidesResult;
         }
         
+        return EvaluateDice(roller, countOfDiceResult, countOfSidesResult);
+    }
+    
+    internal override Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)> EvaluateNode(IRoller roller, IReadOnlyDictionary<string, TNumber> variables)
+    {        
+        var countOfDiceResult = CountOfDice.EvaluateNode(roller, variables);
+        if (countOfDiceResult.IsFailure)
+        {
+            return countOfDiceResult;
+        }
+
+        var countOfSidesResult = CountOfSides.EvaluateNode(roller, variables);
+        if (countOfSidesResult.IsFailure)
+        {
+            return countOfSidesResult;
+        }
+        
+        return EvaluateDice(roller, countOfDiceResult, countOfSidesResult);
+    }
+    
+    private Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)> EvaluateDice(
+        IRoller roller,
+        Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)> countOfDiceResult,
+        Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)> countOfSidesResult)
+    {
         if (!TNumber.IsInteger(countOfDiceResult.Value.Result))
         {
             return new EvaluatorError("Evaluator.DiceError", "Dice count must be an integer!");

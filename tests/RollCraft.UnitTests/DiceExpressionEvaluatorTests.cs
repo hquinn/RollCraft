@@ -225,6 +225,70 @@ public class DiceExpressionEvaluatorTests
             onFailure: error => Assert.Fail(error.Message));
     }
 
+    [Test]
+    [Arguments("1d6 + [STR]", 5, 6.0)]
+    [Arguments("[STR]", 5, 5.0)]
+    [Arguments("[STR] + [DEX]", 5, 8.0)]
+    [Arguments("[STR] * 2", 5, 10.0)]
+    [Arguments("2 * [STR]", 5, 10.0)]
+    [Arguments("[STR] + [STR]", 5, 10.0)]
+    [Arguments("-[STR]", 5, -5.0)]
+    [Arguments("[STR] - 2", 5, 3.0)]
+    [Arguments("[STR] / 2", 4, 2.0)]
+    [Arguments("([STR] + 1) * 2", 5, 12.0)]
+    [Arguments("[MODIFIER]d6", 2, 3.0)]
+    [Arguments("1d[SIDES]", 8, 1.0)]
+    public async Task Should_Return_Correct_Result_From_DiceExpression_With_Variables(string input, double strValue, double expected)
+    {
+        var variables = new Dictionary<string, double>
+        {
+            ["STR"] = strValue,
+            ["DEX"] = 3.0,
+            ["MODIFIER"] = 2.0,
+            ["SIDES"] = 8.0
+        };
+        
+        var result = EvaluateWithVariables(input, variables);
+
+        await result.SwitchAsync(
+            onSuccess: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
+            onFailure: error => Assert.Fail(error.Message));
+    }
+    
+    [Test]
+    public async Task Should_Return_Error_When_Variable_Not_Defined()
+    {
+        var variables = new Dictionary<string, double>();
+        var result = EvaluateWithVariables("[UNDEFINED]", variables);
+        
+        await result.SwitchAsync(
+            onSuccess: success => Assert.Fail($"Expected a failure, but got {success}"),
+            onFailure: async error =>
+            {
+                using var _ = Assert.Multiple();
+                
+                await Assert.That(error.ErrorCode).IsEqualTo("Evaluator.UndefinedVariable");
+                await Assert.That(error.Message).IsEqualTo("Variable 'UNDEFINED' is not defined!");
+            });
+    }
+    
+    [Test]
+    public async Task Should_Return_Error_When_Variable_Not_Resolved()
+    {
+        // Evaluating without providing variables dictionary should fail for expressions with variables
+        var result = Evaluate("[STR]");
+        
+        await result.SwitchAsync(
+            onSuccess: success => Assert.Fail($"Expected a failure, but got {success}"),
+            onFailure: async error =>
+            {
+                using var _ = Assert.Multiple();
+                
+                await Assert.That(error.ErrorCode).IsEqualTo("Evaluator.UnresolvedVariable");
+                await Assert.That(error.Message).IsEqualTo("Variable 'STR' was not resolved before evaluation!");
+            });
+    }
+
     private static Result<IRollError, DiceExpressionResult<IRollError, double>> Evaluate(string input, RollerType rollerType = RollerType.Sequential, int[] rolls = default!)
     {
         return rollerType switch
@@ -232,6 +296,17 @@ public class DiceExpressionEvaluatorTests
             RollerType.Sequential => DiceExpressionEvaluator<double>.CreateCustom(new SequentialRoller()).Evaluate(input),
             RollerType.Max => DiceExpressionEvaluator<double>.CreateMaximum().Evaluate(input),
             RollerType.Exact => DiceExpressionEvaluator<double>.CreateCustom(new ExactRoller(rolls)).Evaluate(input),
+            _ => throw new ArgumentOutOfRangeException(nameof(rollerType), rollerType, null)
+        };
+    }
+    
+    private static Result<IRollError, DiceExpressionResult<IRollError, double>> EvaluateWithVariables(string input, IReadOnlyDictionary<string, double> variables, RollerType rollerType = RollerType.Sequential, int[] rolls = default!)
+    {
+        return rollerType switch
+        {
+            RollerType.Sequential => DiceExpressionEvaluator<double>.CreateCustom(new SequentialRoller()).Evaluate(input, variables),
+            RollerType.Max => DiceExpressionEvaluator<double>.CreateMaximum().Evaluate(input, variables),
+            RollerType.Exact => DiceExpressionEvaluator<double>.CreateCustom(new ExactRoller(rolls)).Evaluate(input, variables),
             _ => throw new ArgumentOutOfRangeException(nameof(rollerType), rollerType, null)
         };
     }

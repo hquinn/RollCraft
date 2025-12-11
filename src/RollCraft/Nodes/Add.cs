@@ -34,6 +34,26 @@ internal sealed class Add<TNumber> : DiceExpression<TNumber> where TNumber : INu
         return Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)>.Success((result, leftResult.Value.Rolls));
     }
     
+    internal override Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)> EvaluateNode(IRoller roller, IReadOnlyDictionary<string, TNumber> variables)
+    {
+        var leftResult = Left.EvaluateNode(roller, variables);
+        if (leftResult.IsFailure)
+        {
+            return leftResult;
+        }
+
+        var rightResult = Right.EvaluateNode(roller, variables);
+        if (rightResult.IsFailure)
+        {
+            return rightResult;
+        }
+
+        var result = leftResult.Value.Result + rightResult.Value.Result;
+        leftResult.Value.Rolls.AddRange(rightResult.Value.Rolls);
+        
+        return Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)>.Success((result, leftResult.Value.Rolls));
+    }
+    
     public override string ToString()
     {
         return $"ADD({Left}, {Right})";

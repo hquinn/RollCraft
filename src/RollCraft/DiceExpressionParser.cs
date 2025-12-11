@@ -38,6 +38,7 @@ public class DiceExpressionParser
         new NumberTokenHandler(),
         new LeftParenthesisTokenHandler(),
         new RightParenthesisTokenHandler(),
+        new VariableTokenHandler(),
     ];
     
     private static Result<IRollError, List<Token<TNumber>>> Tokenize<TNumber>(ReadOnlySpan<char> input)
