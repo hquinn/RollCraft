@@ -26,4 +26,6 @@ public enum TokenType : byte
     LeftParenthesis,
     RightParenthesis,
     Variable,
+    If,
+    Comma,
 }

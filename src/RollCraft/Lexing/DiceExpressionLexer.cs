@@ -85,6 +85,24 @@ internal static class DiceExpressionLexer
 
         switch (currentChar)
         {
+            case 'i' or 'I':
+            {
+                if (index + 1 >= input.Length)
+                {
+                    return null;
+                }
+                
+                var identifier = input.Slice(index, 2);
+
+                if (identifier.StartsWith("if", StringComparison.OrdinalIgnoreCase))
+                {
+                    refIndex += 2;
+                    return new Token<TNumber>(TokenType.If, TokenCategory.Operator, 100, 0);
+                }
+
+                return null;
+            }
+            
             case 'm' or 'M':
             {
                 if (index + 2 >= input.Length)
@@ -161,14 +179,14 @@ internal static class DiceExpressionLexer
             
             case '=':
                 refIndex++;
-                return new Token<TNumber>(TokenType.Equal, TokenCategory.Comparison, 45, 45);
+                return new Token<TNumber>(TokenType.Equal, TokenCategory.Comparison, 0, 0);
 
             case '<':
             {
                 if (index + 1 >= input.Length)
                 {
                     refIndex++;
-                    return new Token<TNumber>(TokenType.LesserThan, TokenCategory.Comparison, 45, 45);
+                    return new Token<TNumber>(TokenType.LesserThan, TokenCategory.Comparison, 0, 0);
                 }
                 
                 var symbol = input.Slice(index, 2);
@@ -176,17 +194,17 @@ internal static class DiceExpressionLexer
                 if (symbol.StartsWith("<>", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 2;
-                    return new Token<TNumber>(TokenType.NotEqual, TokenCategory.Comparison, 45, 45);
+                    return new Token<TNumber>(TokenType.NotEqual, TokenCategory.Comparison, 0, 0);
                 }
 
                 if (symbol.StartsWith("<=", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 2;
-                    return new Token<TNumber>(TokenType.LesserThanEqual, TokenCategory.Comparison, 45, 45);
+                    return new Token<TNumber>(TokenType.LesserThanEqual, TokenCategory.Comparison, 0, 0);
                 }
 
                 refIndex++;
-                return new Token<TNumber>(TokenType.LesserThan, TokenCategory.Comparison, 45, 45);
+                return new Token<TNumber>(TokenType.LesserThan, TokenCategory.Comparison, 0, 0);
             }
 
             case '>':
@@ -194,7 +212,7 @@ internal static class DiceExpressionLexer
                 if (index + 1 >= input.Length)
                 {
                     refIndex++;
-                    return new Token<TNumber>(TokenType.GreaterThan, TokenCategory.Comparison, 45, 45);
+                    return new Token<TNumber>(TokenType.GreaterThan, TokenCategory.Comparison, 0, 0);
                 }
                 
                 var symbol = input.Slice(index, 2);
@@ -202,11 +220,11 @@ internal static class DiceExpressionLexer
                 if (symbol.StartsWith(">=", StringComparison.OrdinalIgnoreCase))
                 {
                     refIndex += 2;
-                    return new Token<TNumber>(TokenType.GreaterThanEqual, TokenCategory.Comparison, 45, 45);
+                    return new Token<TNumber>(TokenType.GreaterThanEqual, TokenCategory.Comparison, 0, 0);
                 }
 
                 refIndex++;
-                return new Token<TNumber>(TokenType.GreaterThan, TokenCategory.Comparison, 45, 45);
+                return new Token<TNumber>(TokenType.GreaterThan, TokenCategory.Comparison, 0, 0);
             }
             
             case 'd' or 'D':
@@ -236,6 +254,10 @@ internal static class DiceExpressionLexer
             case ')':
                 refIndex++;
                 return new Token<TNumber>(TokenType.RightParenthesis, TokenCategory.Parenthesis, 0, 0);
+            
+            case ',':
+                refIndex++;
+                return new Token<TNumber>(TokenType.Comma, TokenCategory.Operator, 0, 0);
         }
 
         return null;

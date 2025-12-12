@@ -289,6 +289,66 @@ public class DiceExpressionEvaluatorTests
             });
     }
 
+    [Test]
+    [Arguments("if(1 = 1, 10, 20)", 10.0)]
+    [Arguments("if(1 = 2, 10, 20)", 20.0)]
+    [Arguments("if(5 > 3, 100, 0)", 100.0)]
+    [Arguments("if(3 > 5, 100, 0)", 0.0)]
+    [Arguments("if(5 >= 5, 100, 0)", 100.0)]
+    [Arguments("if(4 >= 5, 100, 0)", 0.0)]
+    [Arguments("if(3 < 5, 100, 0)", 100.0)]
+    [Arguments("if(5 < 3, 100, 0)", 0.0)]
+    [Arguments("if(5 <= 5, 100, 0)", 100.0)]
+    [Arguments("if(6 <= 5, 100, 0)", 0.0)]
+    [Arguments("if(1 <> 2, 100, 0)", 100.0)]
+    [Arguments("if(2 <> 2, 100, 0)", 0.0)]
+    [Arguments("if(1+1 = 2, 10, 20)", 10.0)]
+    [Arguments("if(2*3 >= 5, 100, 0)", 100.0)]
+    [Arguments("if(1 = 1, 2d6, 1d6)", 3.0)]
+    [Arguments("if(1 = 2, 2d6, 1d6)", 1.0)]
+    [Arguments("if(1 = 1, 1, 2) + 5", 6.0)]
+    [Arguments("2 * if(1 = 1, 3, 5)", 6.0)]
+    [Arguments("if(1 = 1, if(2 = 2, 100, 50), 0)", 100.0)]
+    [Arguments("if(1 = 2, if(2 = 2, 100, 50), 0)", 0.0)]
+    [Arguments("IF(1 = 1, 10, 20)", 10.0)]
+    public async Task Should_Return_Correct_Result_From_Conditional_Expression(string input, double expected)
+    {
+        var result = Evaluate(input);
+
+        await result.SwitchAsync(
+            onSuccess: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
+            onFailure: error => Assert.Fail(error.Message));
+    }
+    
+    [Test]
+    [Arguments("if(1d6 >= 4, 2d6, 1d6)", 2.0)]
+    public async Task Should_Evaluate_Dice_In_Condition(string input, double expected)
+    {
+        // With sequential roller: 1d6=1, so condition 1>=4 is false, so 1d6=2
+        var result = Evaluate(input);
+
+        await result.SwitchAsync(
+            onSuccess: async actual => await Assert.That(actual.Result).IsEqualTo(expected),
+            onFailure: error => Assert.Fail(error.Message));
+    }
+    
+    [Test]
+    public async Task Should_Return_Correct_Result_From_Conditional_With_Variables()
+    {
+        var variables = new Dictionary<string, double>
+        {
+            ["THRESHOLD"] = 15.0,
+            ["BONUS"] = 5.0
+        };
+        
+        // 1d20 with sequential roller = 1, 1 >= 15 is false, so result is 1d6 = 2
+        var result = EvaluateWithVariables("if(1d20 >= [THRESHOLD], 2d6 + [BONUS], 1d6)", variables);
+
+        await result.SwitchAsync(
+            onSuccess: async actual => await Assert.That(actual.Result).IsEqualTo(2.0),
+            onFailure: error => Assert.Fail(error.Message));
+    }
+
     private static Result<IRollError, DiceExpressionResult<IRollError, double>> Evaluate(string input, RollerType rollerType = RollerType.Sequential, int[] rolls = default!)
     {
         return rollerType switch

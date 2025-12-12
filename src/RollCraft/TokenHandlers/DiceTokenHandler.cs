@@ -162,7 +162,9 @@ internal sealed class DiceTokenHandler : ITokenHandler
 
         reader.Advance(); // Consume the comparison token
 
-        var comparisonResult = DiceExpressionParser.ParseExpression(ref reader, nextToken.TokenDetails.InfixPrecedence);
+        // Use modifier precedence (45) to limit parsing scope within dice modifiers
+        const byte modifierPrecedence = 45;
+        var comparisonResult = DiceExpressionParser.ParseExpression(ref reader, modifierPrecedence);
         if (comparisonResult.IsFailure)
         {
             return Result<IRollError, IComparison?>.Failure(comparisonResult.Error);
