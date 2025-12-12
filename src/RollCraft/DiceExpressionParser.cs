@@ -11,6 +11,7 @@ public class DiceExpressionParser
 {
     private static readonly ModifierTokenHandler ModifierTokenHandler = new();
     private static readonly ComparisonTokenHandler ComparisonTokenHandler = new();
+    private static readonly FunctionTokenHandler FunctionTokenHandler = new();
     
     // Match the order of the TokenHandlers by TokenType
     private static readonly ITokenHandler[] TokenHandlers =
@@ -41,6 +42,15 @@ public class DiceExpressionParser
         new VariableTokenHandler(),
         new IfTokenHandler(),
         new CommaTokenHandler(),
+        
+        // Math functions
+        FunctionTokenHandler,
+        FunctionTokenHandler,
+        FunctionTokenHandler,
+        FunctionTokenHandler,
+        FunctionTokenHandler,
+        FunctionTokenHandler,
+        FunctionTokenHandler,
     ];
     
     private static Result<IRollError, List<Token<TNumber>>> Tokenize<TNumber>(ReadOnlySpan<char> input)

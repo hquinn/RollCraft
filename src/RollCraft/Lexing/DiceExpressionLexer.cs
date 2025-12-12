@@ -1,6 +1,5 @@
 using System.Numerics;
 using MonadCraft;
-using RollCraft.Helpers;
 using RollCraft.Tokens;
 
 namespace RollCraft.Lexing;
@@ -85,6 +84,60 @@ internal static class DiceExpressionLexer
 
         switch (currentChar)
         {
+            case 'a' or 'A':
+            {
+                if (index + 2 >= input.Length)
+                {
+                    return null;
+                }
+                
+                var identifier = input.Slice(index, 3);
+
+                if (identifier.StartsWith("abs", StringComparison.OrdinalIgnoreCase))
+                {
+                    refIndex += 3;
+                    return new Token<TNumber>(TokenType.Abs, TokenCategory.Operator, 100, 0);
+                }
+
+                break;
+            }
+            
+            case 'c' or 'C':
+            {
+                if (index + 3 >= input.Length)
+                {
+                    return null;
+                }
+                
+                var identifier = input.Slice(index, 4);
+
+                if (identifier.StartsWith("ceil", StringComparison.OrdinalIgnoreCase))
+                {
+                    refIndex += 4;
+                    return new Token<TNumber>(TokenType.Ceil, TokenCategory.Operator, 100, 0);
+                }
+
+                break;
+            }
+            
+            case 'f' or 'F':
+            {
+                if (index + 4 >= input.Length)
+                {
+                    return null;
+                }
+                
+                var identifier = input.Slice(index, 5);
+
+                if (identifier.StartsWith("floor", StringComparison.OrdinalIgnoreCase))
+                {
+                    refIndex += 5;
+                    return new Token<TNumber>(TokenType.Floor, TokenCategory.Operator, 100, 0);
+                }
+
+                break;
+            }
+            
             case 'i' or 'I':
             {
                 if (index + 1 >= input.Length)
@@ -100,7 +153,7 @@ internal static class DiceExpressionLexer
                     return new Token<TNumber>(TokenType.If, TokenCategory.Operator, 100, 0);
                 }
 
-                return null;
+                break;
             }
             
             case 'm' or 'M':
@@ -114,17 +167,40 @@ internal static class DiceExpressionLexer
 
                 if (identifier.StartsWith("min", StringComparison.OrdinalIgnoreCase))
                 {
+                    // Only treat as function if followed by '(' AND (at start OR preceded by whitespace/operator)
+                    // Otherwise, treat as a modifier (e.g., 1d6min3)
+                    var isFunction = index + 3 < input.Length && input[index + 3] == '(' &&
+                                     (index == 0 || !char.IsLetterOrDigit(input[index - 1]));
+                    
+                    if (isFunction)
+                    {
+                        refIndex += 3;
+                        return new Token<TNumber>(TokenType.FuncMin, TokenCategory.Operator, 100, 0);
+                    }
+                    
                     refIndex += 3;
                     return new Token<TNumber>(TokenType.Minimum, TokenCategory.Modifier, 45, 45);
                 }
 
                 if (identifier.StartsWith("max", StringComparison.OrdinalIgnoreCase))
                 {
+                    // Only treat as function if followed by '(' AND (at start OR preceded by whitespace/operator)
+                    // Otherwise, treat as a modifier (e.g., 1d6max3)
+                    var isFunction = index + 3 < input.Length && input[index + 3] == '(' &&
+                                     (index == 0 || !char.IsLetterOrDigit(input[index - 1]));
+                    
+                    if (isFunction)
+                    {
+                        refIndex += 3;
+                        return new Token<TNumber>(TokenType.FuncMax, TokenCategory.Operator, 100, 0);
+                    }
+                    
                     refIndex += 3;
                     return new Token<TNumber>(TokenType.Maximum, TokenCategory.Modifier, 45, 45);
                 }
 
-                return null;
+
+                break;
             }
 
             case 'k' or 'K':
@@ -155,6 +231,17 @@ internal static class DiceExpressionLexer
 
             case 'r' or 'R':
             {
+                // Check for round function first (longer match)
+                if (index + 4 < input.Length)
+                {
+                    var longerIdentifier = input.Slice(index, 5);
+                    if (longerIdentifier.StartsWith("round", StringComparison.OrdinalIgnoreCase))
+                    {
+                        refIndex += 5;
+                        return new Token<TNumber>(TokenType.Round, TokenCategory.Operator, 100, 0);
+                    }
+                }
+                
                 if (index + 1 >= input.Length)
                 {
                     refIndex++;
@@ -171,6 +258,24 @@ internal static class DiceExpressionLexer
 
                 refIndex++;
                 return new Token<TNumber>(TokenType.ReRoll, TokenCategory.Modifier, 45, 45);
+            }
+            
+            case 's' or 'S':
+            {
+                if (index + 3 >= input.Length)
+                {
+                    return null;
+                }
+                
+                var identifier = input.Slice(index, 4);
+
+                if (identifier.StartsWith("sqrt", StringComparison.OrdinalIgnoreCase))
+                {
+                    refIndex += 4;
+                    return new Token<TNumber>(TokenType.Sqrt, TokenCategory.Operator, 100, 0);
+                }
+
+                break;
             }
                 
             case '!':

@@ -97,6 +97,37 @@ public class DiceExpressionParserTests
     [Arguments("if(1 = 1, if(2 = 2, 100, 50), 0)", "IF(1 = 1, IF(2 = 2, 100, 50), 0)")]
     [Arguments("if([STR] >= 10, 2d6, 1d6)", "IF([STR] >= 10, DICE(2, 6), DICE(1, 6))")]
     [Arguments("IF(1 = 1, 10, 20)", "IF(1 = 1, 10, 20)")]
+    // Math functions
+    [Arguments("floor(3.5)", "FLOOR(3.5)")]
+    [Arguments("FLOOR(3.5)", "FLOOR(3.5)")]
+    [Arguments("ceil(3.5)", "CEIL(3.5)")]
+    [Arguments("CEIL(3.5)", "CEIL(3.5)")]
+    [Arguments("round(3.5)", "ROUND(3.5)")]
+    [Arguments("ROUND(3.5)", "ROUND(3.5)")]
+    [Arguments("min(1, 2)", "MIN(1, 2)")]
+    [Arguments("MIN(1, 2)", "MIN(1, 2)")]
+    [Arguments("min(1, 2, 3)", "MIN(1, 2, 3)")]
+    [Arguments("max(1, 2)", "MAX(1, 2)")]
+    [Arguments("MAX(1, 2)", "MAX(1, 2)")]
+    [Arguments("max(1, 2, 3)", "MAX(1, 2, 3)")]
+    [Arguments("abs(5)", "ABS(5)")]
+    [Arguments("ABS(-5)", "ABS(UNARY(5))")]
+    [Arguments("sqrt(4)", "SQRT(4)")]
+    [Arguments("SQRT(4)", "SQRT(4)")]
+    // Nested functions
+    [Arguments("floor(ceil(3.5))", "FLOOR(CEIL(3.5))")]
+    [Arguments("max(min(1, 2), 3)", "MAX(MIN(1, 2), 3)")]
+    // Functions with expressions
+    [Arguments("floor(1 + 2)", "FLOOR(ADD(1, 2))")]
+    [Arguments("min(1d6, 10)", "MIN(DICE(1, 6), 10)")]
+    [Arguments("max(1 + 2, 3 * 4)", "MAX(ADD(1, 2), MULTIPLY(3, 4))")]
+    // Functions in expressions
+    [Arguments("floor(3.5) + 1", "ADD(FLOOR(3.5), 1)")]
+    [Arguments("2 * ceil(3.5)", "MULTIPLY(2, CEIL(3.5))")]
+    [Arguments("min(1, 2) + max(3, 4)", "ADD(MIN(1, 2), MAX(3, 4))")]
+    // Ensure min/max modifiers still work
+    [Arguments("1d6min(1+2)", "DICE(1, 6, MINIMUM=ADD(1, 2))")]
+    [Arguments("1d6max(1+2)", "DICE(1, 6, MAXIMUM=ADD(1, 2))")]
     public async Task Should_Parse_Input_Into_Dice_Expression(string input, string expected)
     {
         var result = DiceExpressionParser.Parse<double>(input);
@@ -145,6 +176,15 @@ public class DiceExpressionParserTests
     [Arguments("1k1", "Parsing.InvalidInfix", "Invalid infix found", 3)]
     [Arguments("1kh1", "Parsing.InvalidInfix", "Invalid infix found", 3)]
     [Arguments("1kl1", "Parsing.InvalidInfix", "Invalid infix found", 3)]
+    // Function errors
+    [Arguments("floor", "Parsing.ExpectedOpenParen", "Expected '(' after function name", 1)]
+    [Arguments("floor(", "Parsing.UnexpectedEnd", "Unexpected end of input", 2)]
+    [Arguments("floor()", "Parsing.TooFewArguments", "Function 'floor' requires at least 1 argument(s)", 3)]
+    [Arguments("floor(1", "Parsing.ExpectedCommaOrCloseParen", "Expected ',' or ')' in function call", 3)]
+    [Arguments("min(1)", "Parsing.TooFewArguments", "Function 'min' requires at least 2 argument(s)", 4)]
+    [Arguments("max(1)", "Parsing.TooFewArguments", "Function 'max' requires at least 2 argument(s)", 4)]
+    [Arguments("floor(1, 2)", "Parsing.TooManyArguments", "Function 'floor' accepts at most 1 argument(s)", 6)]
+    [Arguments("abs(1, 2)", "Parsing.TooManyArguments", "Function 'abs' accepts at most 1 argument(s)", 6)]
     public async Task Should_Return_Parser_Error(string input, string expectedCode, string expectedMessage, int expectedIndex)
     {
         var result = DiceExpressionParser.Parse<double>(input);

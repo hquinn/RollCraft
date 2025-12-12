@@ -83,6 +83,52 @@ public class DiceExpressionEvaluatorTests
     [Arguments("10d10ro=(2*2)", 52.0)]
     [Arguments("1+2--3*4/5*-6-7+8*9/10--11/12*13+14*-15", -209.28333333333333)]
     [Arguments("4d10min2max8!=4r=5kh2+5", 15.0)]
+    // Math functions
+    [Arguments("floor(3.7)", 3.0)]
+    [Arguments("floor(3.2)", 3.0)]
+    [Arguments("floor(-3.7)", -4.0)]
+    [Arguments("floor(3)", 3.0)]
+    [Arguments("FLOOR(3.5)", 3.0)]
+    [Arguments("ceil(3.2)", 4.0)]
+    [Arguments("ceil(3.7)", 4.0)]
+    [Arguments("ceil(-3.7)", -3.0)]
+    [Arguments("ceil(3)", 3.0)]
+    [Arguments("CEIL(3.5)", 4.0)]
+    [Arguments("round(3.4)", 3.0)]
+    [Arguments("round(3.5)", 4.0)]
+    [Arguments("round(3.6)", 4.0)]
+    [Arguments("round(-3.5)", -4.0)]
+    [Arguments("ROUND(2.5)", 2.0)] // Banker's rounding
+    [Arguments("min(1, 2)", 1.0)]
+    [Arguments("min(5, 3)", 3.0)]
+    [Arguments("min(1, 2, 3)", 1.0)]
+    [Arguments("min(3, 1, 2)", 1.0)]
+    [Arguments("MIN(10, 5)", 5.0)]
+    [Arguments("max(1, 2)", 2.0)]
+    [Arguments("max(5, 3)", 5.0)]
+    [Arguments("max(1, 2, 3)", 3.0)]
+    [Arguments("max(3, 1, 2)", 3.0)]
+    [Arguments("MAX(10, 5)", 10.0)]
+    [Arguments("abs(5)", 5.0)]
+    [Arguments("abs(-5)", 5.0)]
+    [Arguments("abs(0)", 0.0)]
+    [Arguments("ABS(-10)", 10.0)]
+    [Arguments("sqrt(4)", 2.0)]
+    [Arguments("sqrt(9)", 3.0)]
+    [Arguments("sqrt(2)", 1.4142135623730951)]
+    [Arguments("sqrt(0)", 0.0)]
+    [Arguments("SQRT(16)", 4.0)]
+    // Nested functions
+    [Arguments("floor(ceil(3.2))", 4.0)]
+    [Arguments("max(min(5, 10), 3)", 5.0)]
+    [Arguments("abs(floor(-3.7))", 4.0)]
+    [Arguments("sqrt(abs(-16))", 4.0)]
+    // Functions with expressions
+    [Arguments("floor(1 + 2.5)", 3.0)]
+    [Arguments("ceil(1d6 / 2)", 1.0)]
+    [Arguments("min(1d6, 10)", 1.0)]
+    [Arguments("max(1d6, 0)", 1.0)]
+    [Arguments("round(1d6 + 0.5)", 2.0)]
     public async Task Should_Return_Correct_Result_From_DiceExpression_For_Simple_Math(string input, double expected)
     {
         var result = Evaluate(input);
@@ -141,6 +187,8 @@ public class DiceExpressionEvaluatorTests
     [Arguments("1d6min0", "Evaluator.MinimumError", "Cannot have a minimum value less than 1!")]
     [Arguments("1d6min-1", "Evaluator.MinimumError", "Cannot have a minimum value less than 1!")]
     [Arguments("1d6min7", "Evaluator.MinimumError", "Cannot have a minimum value greater than the dice side count!")]
+    // Function errors
+    [Arguments("sqrt(-1)", "Evaluator.FunctionError", "sqrt() cannot be applied to negative numbers")]
     public async Task Should_Return_Evaluator_Error(string input, string expectedCode, string expectedMessage)
     {
         var result = Evaluate(input);

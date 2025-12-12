@@ -28,4 +28,13 @@ public enum TokenType : byte
     Variable,
     If,
     Comma,
+    
+    // Math functions
+    Floor,
+    Ceil,
+    Round,
+    FuncMin,
+    FuncMax,
+    Abs,
+    Sqrt,
 }
