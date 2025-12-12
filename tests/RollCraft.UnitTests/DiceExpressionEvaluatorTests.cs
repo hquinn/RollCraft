@@ -286,6 +286,10 @@ public class DiceExpressionEvaluatorTests
     [Arguments("([STR] + 1) * 2", 5, 12.0)]
     [Arguments("[MODIFIER]d6", 2, 3.0)]
     [Arguments("1d[SIDES]", 8, 1.0)]
+    // Case insensitive variable names
+    [Arguments("[str]", 5, 5.0)]
+    [Arguments("[Str]", 5, 5.0)]
+    [Arguments("[sTr]", 5, 5.0)]
     public async Task Should_Return_Correct_Result_From_DiceExpression_With_Variables(string input, double strValue, double expected)
     {
         var variables = new Dictionary<string, double>
