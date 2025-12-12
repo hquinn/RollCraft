@@ -145,4 +145,60 @@ public class DiceExpressionEvaluator<TNumber>
 
         return results;
     }
+    
+    public EvaluatorError? TryEvaluate(DiceExpression<TNumber> expression, out DiceExpressionResult<IRollError, TNumber>? result)
+    {
+        var evalResult = Evaluate(expression);
+        
+        if (evalResult.IsSuccess)
+        {
+            result = evalResult.Value;
+            return null;
+        }
+        
+        result = null;
+        return (EvaluatorError)evalResult.Error;
+    }
+    
+    public EvaluatorError? TryEvaluate(DiceExpression<TNumber> expression, IReadOnlyDictionary<string, TNumber> variables, out DiceExpressionResult<IRollError, TNumber>? result)
+    {
+        var evalResult = Evaluate(expression, variables);
+        
+        if (evalResult.IsSuccess)
+        {
+            result = evalResult.Value;
+            return null;
+        }
+        
+        result = null;
+        return (EvaluatorError)evalResult.Error;
+    }
+    
+    public IRollError? TryEvaluate(string expression, out DiceExpressionResult<IRollError, TNumber>? result)
+    {
+        var evalResult = Evaluate(expression);
+        
+        if (evalResult.IsSuccess)
+        {
+            result = evalResult.Value;
+            return null;
+        }
+        
+        result = null;
+        return evalResult.Error;
+    }
+    
+    public IRollError? TryEvaluate(string expression, IReadOnlyDictionary<string, TNumber> variables, out DiceExpressionResult<IRollError, TNumber>? result)
+    {
+        var evalResult = Evaluate(expression, variables);
+        
+        if (evalResult.IsSuccess)
+        {
+            result = evalResult.Value;
+            return null;
+        }
+        
+        result = null;
+        return evalResult.Error;
+    }
 }

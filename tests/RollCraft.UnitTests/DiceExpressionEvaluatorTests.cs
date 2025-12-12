@@ -563,4 +563,124 @@ public class DiceExpressionEvaluatorTests
                 1, 2, 3, 5
             ]);
     }
+    
+    // TryEvaluate tests
+    [Test]
+    [Arguments("1 + 2", 3.0)]
+    [Arguments("2d6", 2.0)]
+    [Arguments("(1 + 2) * 3", 9.0)]
+    public async Task TryEvaluate_Should_Return_Correct_Result_On_Success(string input, double expected)
+    {
+        var sut = DiceExpressionEvaluator<double>.CreateMinimum();
+        DiceExpressionParser.TryParse<double>(input, out var expression);
+        
+        var error = sut.TryEvaluate(expression!, out var result);
+        
+        using var _ = Assert.Multiple();
+        await Assert.That(error).IsNull();
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result!.Result).IsEqualTo(expected);
+    }
+    
+    [Test]
+    [Arguments("[STR] + 1", 5.0, 6.0)]
+    [Arguments("[STR] * [DEX]", 5.0, 15.0)]
+    public async Task TryEvaluate_Should_Return_Correct_Result_On_Success_With_Variables(string input, double strValue, double expected)
+    {
+        var sut = DiceExpressionEvaluator<double>.CreateMinimum();
+        DiceExpressionParser.TryParse<double>(input, out var expression);
+        var variables = new Dictionary<string, double>
+        {
+            ["STR"] = strValue,
+            ["DEX"] = 3.0
+        };
+        
+        var error = sut.TryEvaluate(expression!, variables, out var result);
+        
+        using var _ = Assert.Multiple();
+        await Assert.That(error).IsNull();
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result!.Result).IsEqualTo(expected);
+    }
+    
+    [Test]
+    public async Task TryEvaluate_Should_Return_Error_When_Variable_Not_Defined()
+    {
+        var sut = DiceExpressionEvaluator<double>.CreateMinimum();
+        DiceExpressionParser.TryParse<double>("[UNDEFINED]", out var expression);
+        var variables = new Dictionary<string, double>();
+        
+        var error = sut.TryEvaluate(expression!, variables, out var result);
+        
+        using var _ = Assert.Multiple();
+        await Assert.That(error).IsNotNull();
+        await Assert.That(error!.Value.ErrorCode).IsEqualTo("Evaluator.UndefinedVariable");
+        await Assert.That(result).IsNull();
+    }
+    
+    [Test]
+    public async Task TryEvaluate_Should_Return_Error_When_Variable_Not_Resolved()
+    {
+        var sut = DiceExpressionEvaluator<double>.CreateMinimum();
+        DiceExpressionParser.TryParse<double>("[STR]", out var expression);
+        
+        var error = sut.TryEvaluate(expression!, out var result);
+        
+        using var _ = Assert.Multiple();
+        await Assert.That(error).IsNotNull();
+        await Assert.That(error!.Value.ErrorCode).IsEqualTo("Evaluator.UnresolvedVariable");
+        await Assert.That(result).IsNull();
+    }
+    
+    [Test]
+    public async Task TryEvaluate_String_Should_Return_Correct_Result_On_Success()
+    {
+        var sut = DiceExpressionEvaluator<double>.CreateMinimum();
+        
+        var error = sut.TryEvaluate("1 + 2", out var result);
+        
+        using var _ = Assert.Multiple();
+        await Assert.That(error).IsNull();
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result!.Result).IsEqualTo(3.0);
+    }
+    
+    [Test]
+    public async Task TryEvaluate_String_Should_Return_Correct_Result_On_Success_With_Variables()
+    {
+        var sut = DiceExpressionEvaluator<double>.CreateMinimum();
+        var variables = new Dictionary<string, double> { ["X"] = 5.0 };
+        
+        var error = sut.TryEvaluate("[X] + 1", variables, out var result);
+        
+        using var _ = Assert.Multiple();
+        await Assert.That(error).IsNull();
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result!.Result).IsEqualTo(6.0);
+    }
+    
+    [Test]
+    public async Task TryEvaluate_String_Should_Return_Error_For_Invalid_Expression()
+    {
+        var sut = DiceExpressionEvaluator<double>.CreateMinimum();
+        
+        var error = sut.TryEvaluate("invalid expression !!!!", out var result);
+        
+        using var _ = Assert.Multiple();
+        await Assert.That(error).IsNotNull();
+        await Assert.That(result).IsNull();
+    }
+    
+    [Test]
+    public async Task TryEvaluate_String_Should_Return_Error_For_Undefined_Variable()
+    {
+        var sut = DiceExpressionEvaluator<double>.CreateMinimum();
+        var variables = new Dictionary<string, double>();
+        
+        var error = sut.TryEvaluate("[UNDEFINED]", variables, out var result);
+        
+        using var _ = Assert.Multiple();
+        await Assert.That(error).IsNotNull();
+        await Assert.That(result).IsNull();
+    }
 }

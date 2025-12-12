@@ -85,6 +85,21 @@ public class DiceExpressionParser
 
         return expressionResult;
     }
+    
+    public static ParserError? TryParse<TNumber>(string input, out DiceExpression<TNumber>? expression)
+        where TNumber : INumber<TNumber>
+    {
+        var result = Parse<TNumber>(input);
+        
+        if (result.IsSuccess)
+        {
+            expression = result.Value;
+            return null;
+        }
+        
+        expression = null;
+        return (ParserError)result.Error;
+    }
 
 
     internal static Result<IRollError, DiceExpression<TNumber>> ParseExpression<TNumber>(ref TokenReader<TNumber> reader, byte precedence = 0)

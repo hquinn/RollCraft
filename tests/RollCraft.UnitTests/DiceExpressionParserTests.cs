@@ -162,4 +162,30 @@ public class DiceExpressionParserTests
                 await Assert.That(parserError.Position).IsEqualTo(expectedIndex);
             });
     }
+    
+    [Test]
+    [Arguments("1d6", "DICE(1, 6)")]
+    [Arguments("2d6 + 5", "ADD(DICE(2, 6), 5)")]
+    [Arguments("if(1 = 1, 10, 20)", "IF(1 = 1, 10, 20)")]
+    public async Task TryParse_Should_Return_Null_And_Set_Expression_On_Success(string input, string expected)
+    {
+        var error = DiceExpressionParser.TryParse<double>(input, out var expression);
+        
+        await Assert.That(error).IsNull();
+        await Assert.That(expression).IsNotNull();
+        await Assert.That(expression!.ToString()).IsEqualTo(expected);
+    }
+    
+    [Test]
+    [Arguments("", "Parsing.UnexpectedEnd")]
+    [Arguments("x", "Parsing.InvalidToken")]
+    [Arguments("1=1", "Parsing.UnexpectedToken")]
+    public async Task TryParse_Should_Return_Error_And_Null_Expression_On_Failure(string input, string expectedCode)
+    {
+        var error = DiceExpressionParser.TryParse<double>(input, out var expression);
+        
+        await Assert.That(error).IsNotNull();
+        await Assert.That(error!.Value.ErrorCode).IsEqualTo(expectedCode);
+        await Assert.That(expression).IsNull();
+    }
 }
