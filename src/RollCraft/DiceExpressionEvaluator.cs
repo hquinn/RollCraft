@@ -46,8 +46,10 @@ public class DiceExpressionEvaluator<TNumber>
     /// </summary>
     /// <param name="roller">The custom <see cref="IRoller"/> implementation to use for dice rolls.</param>
     /// <returns>A new <see cref="DiceExpressionEvaluator{TNumber}"/> instance.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="roller"/> is null.</exception>
     public static DiceExpressionEvaluator<TNumber> CreateCustom(IRoller roller)
     {
+        ArgumentNullException.ThrowIfNull(roller);
         return new DiceExpressionEvaluator<TNumber>(roller);
     }
 
