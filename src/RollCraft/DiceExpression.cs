@@ -30,11 +30,31 @@ public abstract class DiceExpression<TNumber> where TNumber : INumber<TNumber>
     
     internal Result<IRollError, DiceExpressionResult<IRollError, TNumber>> Evaluate(IRoller roller, IReadOnlyDictionary<string, TNumber> variables)
     {
-        var result = EvaluateNode(roller, variables);
+        // Normalize to case-insensitive dictionary for O(1) lookups throughout evaluation
+        var normalizedVariables = NormalizeVariables(variables);
+        var result = EvaluateNode(roller, normalizedVariables);
         
         return result.IsSuccess
             ? Result<IRollError, DiceExpressionResult<IRollError, TNumber>>.Success(new DiceExpressionResult<IRollError, TNumber>(result.Value.Result, result.Value.Rolls))
             : Result<IRollError, DiceExpressionResult<IRollError, TNumber>>.Failure(result.Error);
+    }
+    
+    private static IReadOnlyDictionary<string, TNumber> NormalizeVariables(IReadOnlyDictionary<string, TNumber> variables)
+    {
+        // If already case-insensitive, return as-is
+        if (variables is Dictionary<string, TNumber> dict && 
+            dict.Comparer == StringComparer.OrdinalIgnoreCase)
+        {
+            return variables;
+        }
+        
+        // Create case-insensitive dictionary
+        var normalized = new Dictionary<string, TNumber>(variables.Count, StringComparer.OrdinalIgnoreCase);
+        foreach (var kvp in variables)
+        {
+            normalized[kvp.Key] = kvp.Value;
+        }
+        return normalized;
     }
 
     internal abstract Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)> EvaluateNode(IRoller roller);

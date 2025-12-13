@@ -21,13 +21,10 @@ internal sealed class Variable<TNumber> : DiceExpression<TNumber> where TNumber 
     
     internal override Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)> EvaluateNode(IRoller roller, IReadOnlyDictionary<string, TNumber> variables)
     {
-        // Case-insensitive variable lookup
-        foreach (var kvp in variables)
+        // O(1) lookup - dictionary is normalized to case-insensitive in DiceExpression.Evaluate
+        if (variables.TryGetValue(Name, out var value))
         {
-            if (string.Equals(kvp.Key, Name, StringComparison.OrdinalIgnoreCase))
-            {
-                return Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)>.Success((kvp.Value, []));
-            }
+            return Result<IRollError, (TNumber Result, List<DiceRoll> Rolls)>.Success((value, []));
         }
         
         return new EvaluatorError(
