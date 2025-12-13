@@ -7,6 +7,20 @@ using RollCraft.Tokens;
 
 namespace RollCraft;
 
+/// <summary>
+/// Provides methods for parsing dice expression strings into <see cref="DiceExpression{TNumber}"/> AST nodes.
+/// </summary>
+/// <remarks>
+/// <para>
+/// The parser supports standard dice notation (e.g., "2d6", "1d20+5"), modifiers (exploding, keep, reroll, min, max),
+/// arithmetic operators (+, -, *, /, %), variables (e.g., "[STR]"), conditional expressions (if(cond, true, false)),
+/// and math functions (floor, ceil, round, min, max, abs, sqrt).
+/// </para>
+/// <para>
+/// Use <see cref="Parse{TNumber}"/> for result-based error handling or <see cref="TryParse{TNumber}"/> for
+/// out-parameter style error handling.
+/// </para>
+/// </remarks>
 public class DiceExpressionParser
 {
     private static readonly ModifierTokenHandler ModifierTokenHandler = new();
@@ -67,6 +81,25 @@ public class DiceExpressionParser
         };
     }
     
+    /// <summary>
+    /// Parses a dice expression string into an AST representation.
+    /// </summary>
+    /// <typeparam name="TNumber">The numeric type to use for values. Must be <see cref="int"/> or <see cref="double"/>.</typeparam>
+    /// <param name="input">The dice expression string to parse (e.g., "2d6+5", "1d20+[STR]").</param>
+    /// <returns>
+    /// A <see cref="Result{TError, TValue}"/> containing either the parsed <see cref="DiceExpression{TNumber}"/>
+    /// on success, or an <see cref="IRollError"/> (specifically <see cref="ParserError"/>) on failure.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// var result = DiceExpressionParser.Parse&lt;int&gt;("2d6+5");
+    /// if (result.IsSuccess)
+    /// {
+    ///     var expression = result.Value;
+    ///     // Use expression with an evaluator
+    /// }
+    /// </code>
+    /// </example>
     public static Result<IRollError, DiceExpression<TNumber>> Parse<TNumber>(string input)
         where TNumber : INumber<TNumber>
     {
@@ -97,6 +130,31 @@ public class DiceExpressionParser
         return expressionResult;
     }
     
+    /// <summary>
+    /// Attempts to parse a dice expression string into an AST representation using the Try pattern.
+    /// </summary>
+    /// <typeparam name="TNumber">The numeric type to use for values. Must be <see cref="int"/> or <see cref="double"/>.</typeparam>
+    /// <param name="input">The dice expression string to parse (e.g., "2d6+5", "1d20+[STR]").</param>
+    /// <param name="expression">
+    /// When this method returns, contains the parsed <see cref="DiceExpression{TNumber}"/> if parsing succeeded,
+    /// or <c>null</c> if parsing failed.
+    /// </param>
+    /// <returns>
+    /// <c>null</c> if parsing succeeded; otherwise, a <see cref="ParserError"/> describing the failure.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// var error = DiceExpressionParser.TryParse&lt;int&gt;("2d6+5", out var expression);
+    /// if (error is null)
+    /// {
+    ///     // Use expression with an evaluator
+    /// }
+    /// else
+    /// {
+    ///     Console.WriteLine($"Parse error: {error.Message}");
+    /// }
+    /// </code>
+    /// </example>
     public static ParserError? TryParse<TNumber>(string input, out DiceExpression<TNumber>? expression)
         where TNumber : INumber<TNumber>
     {
