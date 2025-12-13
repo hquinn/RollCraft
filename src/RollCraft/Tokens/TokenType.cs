@@ -22,6 +22,7 @@ public enum TokenType : byte
     Plus,
     Asterisk,
     Slash,
+    Percent,
     Number,
     LeftParenthesis,
     RightParenthesis,

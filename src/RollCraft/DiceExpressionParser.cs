@@ -36,6 +36,7 @@ public class DiceExpressionParser
         new PlusTokenHandler(),
         new AsteriskTokenHandler(),
         new SlashTokenHandler(),
+        new PercentTokenHandler(),
         new NumberTokenHandler(),
         new LeftParenthesisTokenHandler(),
         new RightParenthesisTokenHandler(),

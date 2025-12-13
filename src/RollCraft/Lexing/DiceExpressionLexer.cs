@@ -352,6 +352,10 @@ internal static class DiceExpressionLexer
                 refIndex++;
                 return new Token<TNumber>(TokenType.Slash, TokenCategory.Operator, 0, 2);
             
+            case '%':
+                refIndex++;
+                return new Token<TNumber>(TokenType.Percent, TokenCategory.Operator, 0, 2);
+            
             case '(':
                 refIndex++;
                 return new Token<TNumber>(TokenType.LeftParenthesis, TokenCategory.Parenthesis, 100, 0);
