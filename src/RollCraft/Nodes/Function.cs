@@ -99,9 +99,17 @@ internal sealed class Function<TNumber> : DiceExpression<TNumber> where TNumber 
             return Result<IRollError, TNumber>.Success(value);
         }
         
+        // Use decimal-specific path for full precision
+        if (typeof(TNumber) == typeof(decimal))
+        {
+            var decimalValue = decimal.CreateChecked(value);
+            var floored = Math.Floor(decimalValue);
+            return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(floored));
+        }
+        
         var doubleValue = double.CreateChecked(value);
-        var floored = Math.Floor(doubleValue);
-        return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(floored));
+        var flooredDouble = Math.Floor(doubleValue);
+        return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(flooredDouble));
     }
 
     private static Result<IRollError, TNumber> EvaluateCeil(TNumber value)
@@ -111,9 +119,17 @@ internal sealed class Function<TNumber> : DiceExpression<TNumber> where TNumber 
             return Result<IRollError, TNumber>.Success(value);
         }
         
+        // Use decimal-specific path for full precision
+        if (typeof(TNumber) == typeof(decimal))
+        {
+            var decimalValue = decimal.CreateChecked(value);
+            var ceiled = Math.Ceiling(decimalValue);
+            return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(ceiled));
+        }
+        
         var doubleValue = double.CreateChecked(value);
-        var ceiled = Math.Ceiling(doubleValue);
-        return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(ceiled));
+        var ceiledDouble = Math.Ceiling(doubleValue);
+        return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(ceiledDouble));
     }
 
     private static Result<IRollError, TNumber> EvaluateRound(TNumber value)
@@ -123,9 +139,17 @@ internal sealed class Function<TNumber> : DiceExpression<TNumber> where TNumber 
             return Result<IRollError, TNumber>.Success(value);
         }
         
+        // Use decimal-specific path for full precision
+        if (typeof(TNumber) == typeof(decimal))
+        {
+            var decimalValue = decimal.CreateChecked(value);
+            var rounded = Math.Round(decimalValue);
+            return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(rounded));
+        }
+        
         var doubleValue = double.CreateChecked(value);
-        var rounded = Math.Round(doubleValue);
-        return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(rounded));
+        var roundedDouble = Math.Round(doubleValue);
+        return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(roundedDouble));
     }
 
     private static Result<IRollError, TNumber> EvaluateMin(TNumber[] args)
@@ -178,16 +202,49 @@ internal sealed class Function<TNumber> : DiceExpression<TNumber> where TNumber 
             return new EvaluatorError("Evaluator.FunctionError", "sqrt() cannot be applied to negative numbers");
         }
 
+        // Use decimal-specific path for better precision (note: still limited by decimal's capabilities)
+        if (typeof(TNumber) == typeof(decimal))
+        {
+            var decimalValue = decimal.CreateChecked(value);
+            // Decimal doesn't have native sqrt, use Newton-Raphson for better precision than double conversion
+            var result = DecimalSqrt(decimalValue);
+            return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(result));
+        }
+
         var doubleValue = double.CreateChecked(value);
-        var result = Math.Sqrt(doubleValue);
+        var sqrtResult = Math.Sqrt(doubleValue);
 
         if (TNumber.IsInteger(value))
         {
             // Integer sqrt returns truncated value
-            return Result<IRollError, TNumber>.Success(TNumber.CreateTruncating(result));
+            return Result<IRollError, TNumber>.Success(TNumber.CreateTruncating(sqrtResult));
         }
 
-        return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(result));
+        return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(sqrtResult));
+    }
+    
+    private static decimal DecimalSqrt(decimal value)
+    {
+        if (value == 0m)
+        {
+            return 0m;
+        }
+        
+        // Newton-Raphson method for decimal sqrt
+        var guess = (decimal)Math.Sqrt((double)value); // Initial guess from double
+        var epsilon = 0.0000000000000000000000000001m; // Precision threshold
+        
+        for (var i = 0; i < 100; i++) // Max iterations to prevent infinite loop
+        {
+            var newGuess = (guess + value / guess) / 2m;
+            if (Math.Abs(newGuess - guess) < epsilon)
+            {
+                return newGuess;
+            }
+            guess = newGuess;
+        }
+        
+        return guess;
     }
 
     public override string ToString()
