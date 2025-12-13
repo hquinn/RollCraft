@@ -214,7 +214,7 @@ public class DiceExpressionEvaluator<TNumber>
     /// <param name="expression">The parsed <see cref="DiceExpression{TNumber}"/> to evaluate.</param>
     /// <param name="repeatCount">The number of times to evaluate the expression.</param>
     /// <returns>An array of results, one for each evaluation.</returns>
-    public Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[] Evaluate(DiceExpression<TNumber> expression, int repeatCount)
+    public Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[] Evaluate(DiceExpression<TNumber> expression, ushort repeatCount)
     {
         var results = new Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[repeatCount];
         
@@ -233,7 +233,7 @@ public class DiceExpressionEvaluator<TNumber>
     /// <param name="repeatCount">The number of times to evaluate the expression.</param>
     /// <param name="variables">A dictionary mapping variable names (case-insensitive) to their values.</param>
     /// <returns>An array of results, one for each evaluation.</returns>
-    public Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[] Evaluate(DiceExpression<TNumber> expression, int repeatCount, IReadOnlyDictionary<string, TNumber> variables)
+    public Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[] Evaluate(DiceExpression<TNumber> expression, ushort repeatCount, IReadOnlyDictionary<string, TNumber> variables)
     {
         var results = new Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[repeatCount];
         
@@ -256,7 +256,7 @@ public class DiceExpressionEvaluator<TNumber>
     /// evaluations, use <see cref="DiceExpressionParser.Parse{TNumber}"/> once and pass the result
     /// to <see cref="Evaluate(DiceExpression{TNumber}, int)"/>.
     /// </remarks>
-    public Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[] Evaluate(string expression, int repeatCount)
+    public Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[] Evaluate(string expression, ushort repeatCount)
     {
         var results = new Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[repeatCount];
 
@@ -280,7 +280,7 @@ public class DiceExpressionEvaluator<TNumber>
     /// evaluations, use <see cref="DiceExpressionParser.Parse{TNumber}"/> once and pass the result
     /// to <see cref="Evaluate(DiceExpression{TNumber}, int, IReadOnlyDictionary{string, TNumber})"/>.
     /// </remarks>
-    public Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[] Evaluate(string expression, int repeatCount, IReadOnlyDictionary<string, TNumber> variables)
+    public Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[] Evaluate(string expression, ushort repeatCount, IReadOnlyDictionary<string, TNumber> variables)
     {
         var results = new Result<IRollError, DiceExpressionResult<IRollError, TNumber>>[repeatCount];
 

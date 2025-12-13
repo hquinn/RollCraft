@@ -51,4 +51,10 @@ public class InputValidationTests
         await Assert.That(expression).IsNull();
         await Assert.That(error!.Value.ErrorCode).IsEqualTo("Parsing.EmptyInput");
     }
+    
+    [Test]
+    public void CreateCustom_NullRoller_ShouldThrowArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => DiceExpressionEvaluator<int>.CreateCustom(null!));
+    }
 }
