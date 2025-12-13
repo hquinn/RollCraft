@@ -19,7 +19,7 @@ internal sealed class Exploding : IModifier
     {
         var originalDiceRollCount = diceRolls.Count;
         var firstComparison = true;
-        List<DiceRoll> comparisonRolls = null!;
+        List<DiceRoll> comparisonRolls = [];
         
         for (var index = 0; index < diceRolls.Count; index++)
         {
@@ -62,7 +62,7 @@ internal sealed class Exploding : IModifier
 
         Comparison.Reset();
         
-        return Result<IRollError, List<DiceRoll>>.Success(comparisonRolls!);
+        return Result<IRollError, List<DiceRoll>>.Success(comparisonRolls);
     }
     
     public override string ToString()

@@ -37,6 +37,17 @@ internal sealed class Keep<TNumber> : IModifier
         {
             return new EvaluatorError("Evaluator.KeepError", "Keep must be zero or more!");
         }
+
+        if (count == 0)
+        {
+            // Drop everything when explicitly keeping zero dice
+            foreach (var diceRoll in diceRolls)
+            {
+                diceRoll.Modifier |= DiceModifier.Dropped;
+            }
+            
+            return Result<IRollError, List<DiceRoll>>.Success(countValue.Value.Rolls);
+        }
         
         if (count > diceRolls.Count)
         {

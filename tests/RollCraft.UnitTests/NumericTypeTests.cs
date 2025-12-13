@@ -243,6 +243,17 @@ public class NumericTypeTests
         await Assert.That(minResult.Value.Result).IsEqualTo(3.5m);
         await Assert.That(maxResult.Value.Result).IsEqualTo(5.5m);
     }
+
+    [Test]
+    public async Task Evaluate_Decimal_Round_Should_Use_Bankers_Rounding()
+    {
+        var sut = DiceExpressionEvaluator<decimal>.CreateMinimum();
+
+        var result = sut.Evaluate("round(2.5)");
+
+        await Assert.That(result.IsSuccess).IsTrue();
+        await Assert.That(result.Value.Result).IsEqualTo(2m);
+    }
     
     // Conditional tests for new types
     [Test]

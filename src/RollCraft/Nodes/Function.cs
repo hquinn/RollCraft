@@ -94,23 +94,38 @@ internal sealed class Function<TNumber> : DiceExpression<TNumber> where TNumber 
 
     private static Result<IRollError, TNumber> EvaluateFloor(TNumber value)
     {
+        if (TNumber.IsInteger(value))
+        {
+            return Result<IRollError, TNumber>.Success(value);
+        }
+        
         var doubleValue = double.CreateChecked(value);
-        var result = Math.Floor(doubleValue);
-        return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(result));
+        var floored = Math.Floor(doubleValue);
+        return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(floored));
     }
 
     private static Result<IRollError, TNumber> EvaluateCeil(TNumber value)
     {
+        if (TNumber.IsInteger(value))
+        {
+            return Result<IRollError, TNumber>.Success(value);
+        }
+        
         var doubleValue = double.CreateChecked(value);
-        var result = Math.Ceiling(doubleValue);
-        return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(result));
+        var ceiled = Math.Ceiling(doubleValue);
+        return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(ceiled));
     }
 
     private static Result<IRollError, TNumber> EvaluateRound(TNumber value)
     {
+        if (TNumber.IsInteger(value))
+        {
+            return Result<IRollError, TNumber>.Success(value);
+        }
+        
         var doubleValue = double.CreateChecked(value);
-        var result = Math.Round(doubleValue);
-        return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(result));
+        var rounded = Math.Round(doubleValue);
+        return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(rounded));
     }
 
     private static Result<IRollError, TNumber> EvaluateMin(TNumber[] args)
@@ -165,6 +180,13 @@ internal sealed class Function<TNumber> : DiceExpression<TNumber> where TNumber 
 
         var doubleValue = double.CreateChecked(value);
         var result = Math.Sqrt(doubleValue);
+
+        if (TNumber.IsInteger(value))
+        {
+            // Integer sqrt returns truncated value
+            return Result<IRollError, TNumber>.Success(TNumber.CreateTruncating(result));
+        }
+
         return Result<IRollError, TNumber>.Success(TNumber.CreateChecked(result));
     }
 

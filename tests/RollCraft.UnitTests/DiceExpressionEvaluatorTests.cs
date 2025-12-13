@@ -75,6 +75,9 @@ public class DiceExpressionEvaluatorTests
     [Arguments("4d6k3", 9.0)]
     [Arguments("4d6kh3", 9.0)]
     [Arguments("4d6kl3", 6.0)]
+    [Arguments("4d6k0", 0.0)]
+    [Arguments("4d6kh0", 0.0)]
+    [Arguments("4d6kl0", 0.0)]
     [Arguments("10d10r", 56.0)]
     [Arguments("10d10r=5", 51.0)]
     [Arguments("10d10r<>5", 50.0)]
@@ -745,5 +748,41 @@ public class DiceExpressionEvaluatorTests
         using var _ = Assert.Multiple();
         await Assert.That(error).IsNotNull();
         await Assert.That(result).IsNull();
+    }
+
+    [Test]
+    public async Task Keep_Zero_Should_Drop_All_Dice_And_Work_With_Exploding()
+    {
+        var result = Evaluate("4d6k0!", RollerType.Sequential);
+
+        await result.SwitchAsync(
+            onSuccess: async actual =>
+            {
+                await Assert.That(actual.Result).IsEqualTo(0.0);
+                await Assert.That(actual.Rolls.Count).IsEqualTo(4);
+                foreach (var roll in actual.Rolls)
+                {
+                    await Assert.That((roll.Modifier & DiceModifier.Dropped) != 0).IsTrue();
+                }
+            },
+            onFailure: error => Assert.Fail(error.Message));
+    }
+
+    [Test]
+    public async Task Keep_Zero_Should_Drop_All_Dice_And_Work_With_Reroll()
+    {
+        var result = Evaluate("4d6k0r", RollerType.Sequential);
+
+        await result.SwitchAsync(
+            onSuccess: async actual =>
+            {
+                await Assert.That(actual.Result).IsEqualTo(0.0);
+                await Assert.That(actual.Rolls.Count).IsEqualTo(4);
+                foreach (var roll in actual.Rolls)
+                {
+                    await Assert.That((roll.Modifier & DiceModifier.Dropped) != 0).IsTrue();
+                }
+            },
+            onFailure: error => Assert.Fail(error.Message));
     }
 }

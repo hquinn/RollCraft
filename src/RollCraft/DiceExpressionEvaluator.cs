@@ -52,7 +52,7 @@ public class DiceExpressionEvaluator<TNumber>
     }
 
     /// <summary>
-    /// Creates an evaluator that uses a cryptographically secure random number generator for dice rolls.
+    /// Creates an evaluator that uses a random number generator for dice rolls.
     /// </summary>
     /// <returns>A new <see cref="DiceExpressionEvaluator{TNumber}"/> instance.</returns>
     public static DiceExpressionEvaluator<TNumber> CreateRandom()
