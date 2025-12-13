@@ -2,13 +2,17 @@ using RollCraft.Tokens;
 
 namespace RollCraft.Lexing;
 
+/// <summary>
+/// Lexer for parsing double-precision floating-point numbers from dice expressions.
+/// </summary>
 internal readonly struct DoubleLexer : INumberLexer<double>
 {
-    public static Token<double>? GetNumber(ReadOnlySpan<char> input, ref int refIndex)
+    public static NumberLexResult<double> GetNumber(ReadOnlySpan<char> input, ref int refIndex)
     {
         var index = refIndex;
+        var startIndex = index;
 
-        var integerPart = 0L;
+        var integerPart = 0.0;
         var fractionalPart = 0.0;
         var fractionalDivider = 1.0;
         var hasDecimalPoint = false;
@@ -26,6 +30,12 @@ internal readonly struct DoubleLexer : INumberLexer<double>
                 if (!hasDecimalPoint)
                 {
                     integerPart = integerPart * 10 + digit;
+                    
+                    // Check for overflow to infinity
+                    if (double.IsInfinity(integerPart))
+                    {
+                        return NumberLexResult<double>.Overflow(startIndex);
+                    }
                 }
                 else
                 {
@@ -52,12 +62,12 @@ internal readonly struct DoubleLexer : INumberLexer<double>
 
         if (!hasDigits || (hasDecimalPoint && !hasDigitsAfterDecimal))
         {
-            return null; // No digits were parsed
+            return NumberLexResult<double>.NoMatch;
         }
 
         var number = integerPart + fractionalPart;
 
         refIndex = index;
-        return new Token<double>(number);
+        return NumberLexResult<double>.Success(new Token<double>(number));
     }
 }

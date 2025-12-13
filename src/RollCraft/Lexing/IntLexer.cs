@@ -2,11 +2,18 @@ using RollCraft.Tokens;
 
 namespace RollCraft.Lexing;
 
+/// <summary>
+/// Lexer for parsing 32-bit integers from dice expressions.
+/// </summary>
 internal readonly struct IntLexer : INumberLexer<int>
 {
-    public static Token<int>? GetNumber(ReadOnlySpan<char> input, ref int refIndex)
+    private const int MaxValueBeforeMultiply = int.MaxValue / 10;
+    private const int MaxLastDigit = int.MaxValue % 10;
+    
+    public static NumberLexResult<int> GetNumber(ReadOnlySpan<char> input, ref int refIndex)
     {
         var index = refIndex;
+        var startIndex = index;
 
         var number = 0;
         var hasDigits = false;
@@ -19,6 +26,14 @@ internal readonly struct IntLexer : INumberLexer<int>
             {
                 hasDigits = true;
                 var digit = current - '0';
+                
+                // Check for overflow before the operation
+                // Overflow occurs if: number > MaxValue/10 OR (number == MaxValue/10 AND digit > MaxValue%10)
+                if (number > MaxValueBeforeMultiply || (number == MaxValueBeforeMultiply && digit > MaxLastDigit))
+                {
+                    return NumberLexResult<int>.Overflow(startIndex);
+                }
+                
                 number = number * 10 + digit;
                 index++;
             }
@@ -30,10 +45,10 @@ internal readonly struct IntLexer : INumberLexer<int>
 
         if (!hasDigits)
         {
-            return null; // No digits were parsed
+            return NumberLexResult<int>.NoMatch;
         }
 
         refIndex = index;
-        return new Token<int>(number);
+        return NumberLexResult<int>.Success(new Token<int>(number));
     }
 }

@@ -107,6 +107,17 @@ public class DiceExpressionParser
     public static Result<IRollError, DiceExpression<TNumber>> Parse<TNumber>(string input)
         where TNumber : INumber<TNumber>
     {
+        // Validate input
+        if (input is null)
+        {
+            return new ParserError("NULL_INPUT", "Input expression cannot be null", 0);
+        }
+        
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return new ParserError("EMPTY_INPUT", "Input expression cannot be empty or whitespace only", 0);
+        }
+        
         var tokensResult = Tokenize<TNumber>(input);
 
         if (tokensResult.IsFailure)
@@ -178,44 +189,62 @@ public class DiceExpressionParser
     internal static Result<IRollError, DiceExpression<TNumber>> ParseExpression<TNumber>(ref TokenReader<TNumber> reader, byte precedence = 0)
         where TNumber : INumber<TNumber>
     {
-        if (!reader.TryConsume(out var token))
+        // Check depth limit to prevent stack overflow
+        if (reader.Depth >= TokenReader<TNumber>.MaxDepth)
         {
             return new ParserError(
-                "Parsing.UnexpectedEnd", 
-                "Unexpected end of input", 
+                "MAX_DEPTH_EXCEEDED",
+                $"Expression nesting exceeds maximum depth of {TokenReader<TNumber>.MaxDepth}",
                 reader.Position);
         }
-
-        var leftResult = TokenHandlers[(byte) token.TokenDetails.TokenType].ParsePrefix(token, ref reader);
-        if (leftResult.IsFailure)
+        
+        reader.Depth++;
+        
+        try
         {
-            return leftResult;
-        }
-
-        while (true)
-        {
-            if (!reader.TryPeek(out var nextToken))
+            if (!reader.TryConsume(out var token))
             {
-                break;
+                return new ParserError(
+                    "Parsing.UnexpectedEnd", 
+                    "Unexpected end of input", 
+                    reader.Position);
             }
 
-            var nextPrecedence = nextToken.TokenDetails.InfixPrecedence;
-            
-            if (precedence >= nextPrecedence)
-            {
-                break;
-            }
-
-            reader.Advance();
-            leftResult = ParseInfix(leftResult.Value, nextToken, ref reader);
-            
+            var leftResult = TokenHandlers[(byte) token.TokenDetails.TokenType].ParsePrefix(token, ref reader);
             if (leftResult.IsFailure)
             {
                 return leftResult;
             }
-        }
 
-        return leftResult;
+            while (true)
+            {
+                if (!reader.TryPeek(out var nextToken))
+                {
+                    break;
+                }
+
+                var nextPrecedence = nextToken.TokenDetails.InfixPrecedence;
+                
+                if (precedence >= nextPrecedence)
+                {
+                    break;
+                }
+
+                reader.Advance();
+                leftResult = ParseInfix(leftResult.Value, nextToken, ref reader);
+                
+                if (leftResult.IsFailure)
+                {
+                    return leftResult;
+                }
+            }
+
+            return leftResult;
+        }
+        finally
+        {
+            reader.Depth--;
+        }
     }
 
     private static Result<IRollError, DiceExpression<TNumber>> ParseInfix<TNumber>(

@@ -21,7 +21,14 @@ internal static class DiceExpressionLexer
                 continue;
             }
             
-            var token = TNumberLexer.GetNumber(input, ref index) 
+            var numberResult = TNumberLexer.GetNumber(input, ref index);
+            
+            if (numberResult.IsOverflow)
+            {
+                return new ParserError("OVERFLOW", "Numeric literal exceeds the range of the target type", numberResult.OverflowPosition);
+            }
+            
+            var token = numberResult.Token 
                         ?? GetVariable<TNumber>(input, ref index) 
                         ?? GetOperator<TNumber>(input, ref index);
 

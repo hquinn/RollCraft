@@ -7,9 +7,13 @@ namespace RollCraft.Lexing;
 /// </summary>
 internal readonly struct ShortLexer : INumberLexer<short>
 {
-    public static Token<short>? GetNumber(ReadOnlySpan<char> input, ref int refIndex)
+    private const int MaxValueBeforeMultiply = short.MaxValue / 10;
+    private const int MaxLastDigit = short.MaxValue % 10;
+    
+    public static NumberLexResult<short> GetNumber(ReadOnlySpan<char> input, ref int refIndex)
     {
         var index = refIndex;
+        var startIndex = index;
 
         var number = 0;
         var hasDigits = false;
@@ -22,6 +26,14 @@ internal readonly struct ShortLexer : INumberLexer<short>
             {
                 hasDigits = true;
                 var digit = current - '0';
+                
+                // Check for overflow before the operation
+                // Overflow occurs if: number > MaxValue/10 OR (number == MaxValue/10 AND digit > MaxValue%10)
+                if (number > MaxValueBeforeMultiply || (number == MaxValueBeforeMultiply && digit > MaxLastDigit))
+                {
+                    return NumberLexResult<short>.Overflow(startIndex);
+                }
+                
                 number = number * 10 + digit;
                 index++;
             }
@@ -33,10 +45,10 @@ internal readonly struct ShortLexer : INumberLexer<short>
 
         if (!hasDigits)
         {
-            return null; // No digits were parsed
+            return NumberLexResult<short>.NoMatch;
         }
 
         refIndex = index;
-        return new Token<short>((short)number);
+        return NumberLexResult<short>.Success(new Token<short>((short)number));
     }
 }

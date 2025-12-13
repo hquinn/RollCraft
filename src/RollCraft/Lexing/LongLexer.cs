@@ -7,9 +7,13 @@ namespace RollCraft.Lexing;
 /// </summary>
 internal readonly struct LongLexer : INumberLexer<long>
 {
-    public static Token<long>? GetNumber(ReadOnlySpan<char> input, ref int refIndex)
+    private const long MaxValueBeforeMultiply = long.MaxValue / 10;
+    private const long MaxLastDigit = long.MaxValue % 10;
+    
+    public static NumberLexResult<long> GetNumber(ReadOnlySpan<char> input, ref int refIndex)
     {
         var index = refIndex;
+        var startIndex = index;
 
         var number = 0L;
         var hasDigits = false;
@@ -22,6 +26,14 @@ internal readonly struct LongLexer : INumberLexer<long>
             {
                 hasDigits = true;
                 var digit = current - '0';
+                
+                // Check for overflow before the operation
+                // Overflow occurs if: number > MaxValue/10 OR (number == MaxValue/10 AND digit > MaxValue%10)
+                if (number > MaxValueBeforeMultiply || (number == MaxValueBeforeMultiply && digit > MaxLastDigit))
+                {
+                    return NumberLexResult<long>.Overflow(startIndex);
+                }
+                
                 number = number * 10 + digit;
                 index++;
             }
@@ -33,10 +45,10 @@ internal readonly struct LongLexer : INumberLexer<long>
 
         if (!hasDigits)
         {
-            return null; // No digits were parsed
+            return NumberLexResult<long>.NoMatch;
         }
 
         refIndex = index;
-        return new Token<long>(number);
+        return NumberLexResult<long>.Success(new Token<long>(number));
     }
 }

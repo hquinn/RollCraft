@@ -7,11 +7,12 @@ namespace RollCraft.Lexing;
 /// </summary>
 internal readonly struct FloatLexer : INumberLexer<float>
 {
-    public static Token<float>? GetNumber(ReadOnlySpan<char> input, ref int refIndex)
+    public static NumberLexResult<float> GetNumber(ReadOnlySpan<char> input, ref int refIndex)
     {
         var index = refIndex;
+        var startIndex = index;
 
-        var integerPart = 0L;
+        var integerPart = 0.0f;
         var fractionalPart = 0.0f;
         var fractionalDivider = 1.0f;
         var hasDecimalPoint = false;
@@ -29,6 +30,12 @@ internal readonly struct FloatLexer : INumberLexer<float>
                 if (!hasDecimalPoint)
                 {
                     integerPart = integerPart * 10 + digit;
+                    
+                    // Check for overflow to infinity
+                    if (float.IsInfinity(integerPart))
+                    {
+                        return NumberLexResult<float>.Overflow(startIndex);
+                    }
                 }
                 else
                 {
@@ -55,12 +62,12 @@ internal readonly struct FloatLexer : INumberLexer<float>
 
         if (!hasDigits || (hasDecimalPoint && !hasDigitsAfterDecimal))
         {
-            return null; // No digits were parsed
+            return NumberLexResult<float>.NoMatch;
         }
 
         var number = integerPart + fractionalPart;
 
         refIndex = index;
-        return new Token<float>(number);
+        return NumberLexResult<float>.Success(new Token<float>(number));
     }
 }

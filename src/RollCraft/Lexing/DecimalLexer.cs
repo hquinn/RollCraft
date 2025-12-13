@@ -7,16 +7,22 @@ namespace RollCraft.Lexing;
 /// </summary>
 internal readonly struct DecimalLexer : INumberLexer<decimal>
 {
-    public static Token<decimal>? GetNumber(ReadOnlySpan<char> input, ref int refIndex)
+    // Decimal max is 79228162514264337593543950335
+    // We use a simpler approach: track the number of digits
+    private const int MaxDecimalDigits = 29;
+    
+    public static NumberLexResult<decimal> GetNumber(ReadOnlySpan<char> input, ref int refIndex)
     {
         var index = refIndex;
+        var startIndex = index;
 
-        var integerPart = 0L;
+        var integerPart = 0m;
         var fractionalPart = 0m;
         var fractionalDivider = 1m;
         var hasDecimalPoint = false;
         var hasDigitsAfterDecimal = false;
         var hasDigits = false;
+        var digitCount = 0;
 
         while (index < input.Length)
         {
@@ -26,15 +32,43 @@ internal readonly struct DecimalLexer : INumberLexer<decimal>
             {
                 hasDigits = true;
                 var digit = current - '0';
+                
                 if (!hasDecimalPoint)
                 {
-                    integerPart = integerPart * 10 + digit;
+                    // Skip leading zeros for digit count
+                    if (integerPart != 0 || digit != 0)
+                    {
+                        digitCount++;
+                    }
+                    
+                    // Check for potential overflow
+                    if (digitCount > MaxDecimalDigits)
+                    {
+                        return NumberLexResult<decimal>.Overflow(startIndex);
+                    }
+                    
+                    try
+                    {
+                        integerPart = integerPart * 10 + digit;
+                    }
+                    catch (OverflowException)
+                    {
+                        return NumberLexResult<decimal>.Overflow(startIndex);
+                    }
                 }
                 else
                 {
                     hasDigitsAfterDecimal = true;
-                    fractionalDivider *= 10;
-                    fractionalPart += digit / fractionalDivider;
+                    try
+                    {
+                        fractionalDivider *= 10;
+                        fractionalPart += digit / fractionalDivider;
+                    }
+                    catch (OverflowException)
+                    {
+                        // Fractional overflow is less common, but handle it
+                        return NumberLexResult<decimal>.Overflow(startIndex);
+                    }
                 }
                 index++;
             }
@@ -55,12 +89,12 @@ internal readonly struct DecimalLexer : INumberLexer<decimal>
 
         if (!hasDigits || (hasDecimalPoint && !hasDigitsAfterDecimal))
         {
-            return null; // No digits were parsed
+            return NumberLexResult<decimal>.NoMatch;
         }
 
         var number = integerPart + fractionalPart;
 
         refIndex = index;
-        return new Token<decimal>(number);
+        return NumberLexResult<decimal>.Success(new Token<decimal>(number));
     }
 }

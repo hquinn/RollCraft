@@ -7,6 +7,9 @@ namespace RollCraft;
 /// </summary>
 /// <typeparam name="TRollError">The error type used in the result (typically <see cref="IRollError"/>).</typeparam>
 /// <typeparam name="TNumber">The numeric type for the result value.</typeparam>
+/// <remarks>
+/// This type is immutable after construction. The <see cref="Result"/> and <see cref="Rolls"/> properties can only be set during initialization.
+/// </remarks>
 public sealed class DiceExpressionResult<TRollError, TNumber> where TNumber : INumber<TNumber>
 {
     /// <summary>
@@ -21,18 +24,18 @@ public sealed class DiceExpressionResult<TRollError, TNumber> where TNumber : IN
     }
     
     /// <summary>
-    /// Gets or sets the final computed value of the evaluated expression.
+    /// Gets the final computed value of the evaluated expression.
     /// </summary>
-    public TNumber Result { get; set; }
+    public TNumber Result { get; }
     
     /// <summary>
-    /// Gets or sets the list of individual dice rolls that were made during evaluation.
+    /// Gets the list of individual dice rolls that were made during evaluation.
     /// </summary>
     /// <remarks>
     /// Each <see cref="DiceRoll"/> contains information about the die size, the rolled value,
     /// and any modifiers that were applied (such as exploded, dropped, or rerolled).
     /// </remarks>
-    public List<DiceRoll> Rolls { get; set; }
+    public List<DiceRoll> Rolls { get; }
 
     /// <summary>
     /// Returns a string representation of the result in the format "Result: [Roll1, Roll2, ...]".
