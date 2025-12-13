@@ -7,9 +7,6 @@ namespace RollCraft;
 /// </summary>
 /// <typeparam name="TRollError">The error type used in the result (typically <see cref="IRollError"/>).</typeparam>
 /// <typeparam name="TNumber">The numeric type for the result value.</typeparam>
-/// <remarks>
-/// This type is immutable after construction. The <see cref="Result"/> and <see cref="Rolls"/> properties can only be set during initialization.
-/// </remarks>
 public sealed class DiceExpressionResult<TRollError, TNumber> where TNumber : INumber<TNumber>
 {
     /// <summary>
