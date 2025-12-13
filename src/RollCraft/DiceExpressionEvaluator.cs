@@ -7,7 +7,7 @@ namespace RollCraft;
 /// <summary>
 /// Evaluates dice expressions and returns results. Provides multiple factory methods for different rolling strategies.
 /// </summary>
-/// <typeparam name="TNumber">The numeric type for expression values. Must be <see cref="int"/> or <see cref="double"/>.</typeparam>
+/// <typeparam name="TNumber">The numeric type for expression values. Supported types are <see cref="short"/>, <see cref="int"/>, <see cref="long"/>, <see cref="float"/>, <see cref="double"/>, and <see cref="decimal"/>.</typeparam>
 /// <remarks>
 /// <para>
 /// Create an evaluator using one of the static factory methods:

@@ -6,7 +6,7 @@ namespace RollCraft;
 /// <summary>
 /// Base class for all dice expression AST nodes. Represents a parsed dice expression that can be evaluated.
 /// </summary>
-/// <typeparam name="TNumber">The numeric type for expression values. Must be <see cref="int"/> or <see cref="double"/>.</typeparam>
+/// <typeparam name="TNumber">The numeric type for expression values. Supported types are <see cref="short"/>, <see cref="int"/>, <see cref="long"/>, <see cref="float"/>, <see cref="double"/>, and <see cref="decimal"/>.</typeparam>
 /// <remarks>
 /// <para>
 /// This is an abstract base class. Concrete implementations include nodes for dice rolls, arithmetic operations,

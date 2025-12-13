@@ -75,16 +75,20 @@ public class DiceExpressionParser
         
         return numberType switch
         {
+            _ when numberType == typeof(short) => (Result<IRollError, List<Token<TNumber>>>)(object)DiceExpressionLexer.Tokenize<short, ShortLexer>(input),
             _ when numberType == typeof(int) => (Result<IRollError, List<Token<TNumber>>>)(object)DiceExpressionLexer.Tokenize<int, IntLexer>(input),
+            _ when numberType == typeof(long) => (Result<IRollError, List<Token<TNumber>>>)(object)DiceExpressionLexer.Tokenize<long, LongLexer>(input),
+            _ when numberType == typeof(float) => (Result<IRollError, List<Token<TNumber>>>)(object)DiceExpressionLexer.Tokenize<float, FloatLexer>(input),
             _ when numberType == typeof(double) => (Result<IRollError, List<Token<TNumber>>>)(object)DiceExpressionLexer.Tokenize<double, DoubleLexer>(input),
-            _ => new ParserError("Parsing.InvalidNumberType", "Invalid number type", 0)
+            _ when numberType == typeof(decimal) => (Result<IRollError, List<Token<TNumber>>>)(object)DiceExpressionLexer.Tokenize<decimal, DecimalLexer>(input),
+            _ => new ParserError("Parsing.InvalidNumberType", $"Unsupported number type '{numberType.Name}'. Supported types are: short, int, long, float, double, decimal.", 0)
         };
     }
     
     /// <summary>
     /// Parses a dice expression string into an AST representation.
     /// </summary>
-    /// <typeparam name="TNumber">The numeric type to use for values. Must be <see cref="int"/> or <see cref="double"/>.</typeparam>
+    /// <typeparam name="TNumber">The numeric type to use for values. Supported types are <see cref="short"/>, <see cref="int"/>, <see cref="long"/>, <see cref="float"/>, <see cref="double"/>, and <see cref="decimal"/>.</typeparam>
     /// <param name="input">The dice expression string to parse (e.g., "2d6+5", "1d20+[STR]").</param>
     /// <returns>
     /// A <see cref="Result{TError, TValue}"/> containing either the parsed <see cref="DiceExpression{TNumber}"/>
@@ -133,7 +137,7 @@ public class DiceExpressionParser
     /// <summary>
     /// Attempts to parse a dice expression string into an AST representation using the Try pattern.
     /// </summary>
-    /// <typeparam name="TNumber">The numeric type to use for values. Must be <see cref="int"/> or <see cref="double"/>.</typeparam>
+    /// <typeparam name="TNumber">The numeric type to use for values. Supported types are <see cref="short"/>, <see cref="int"/>, <see cref="long"/>, <see cref="float"/>, <see cref="double"/>, and <see cref="decimal"/>.</typeparam>
     /// <param name="input">The dice expression string to parse (e.g., "2d6+5", "1d20+[STR]").</param>
     /// <param name="expression">
     /// When this method returns, contains the parsed <see cref="DiceExpression{TNumber}"/> if parsing succeeded,
