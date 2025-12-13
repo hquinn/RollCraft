@@ -7,7 +7,7 @@
         <Authors>hquinn</Authors>
         <Description>A sophisticated library for creating dice expressions in .NET</Description>
         <PackageProjectUrl>https://github.com/hquinn/RollCraft/</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/hquinn/Dicer</RepositoryUrl>
+        <RepositoryUrl>https://github.com/hquinn/RollCraft</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
