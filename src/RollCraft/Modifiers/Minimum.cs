@@ -35,6 +35,12 @@ internal sealed class Minimum<TNumber> : IModifier
             return new EvaluatorError("Evaluator.MinimumError", "Cannot have a minimum value less than 1!");
         }
 
+        // No dice to modify
+        if (diceRolls.Count == 0)
+        {
+            return Result<IRollError, List<DiceRoll>>.Success(minimumValue.Value.Rolls);
+        }
+
         // A normal dice roll cannot have a maximum value more than the dice side count
         if (minimum > diceRolls[0].Sides)
         {

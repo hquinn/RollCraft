@@ -35,6 +35,12 @@ internal sealed class Maximum<TNumber> : IModifier
             return new EvaluatorError("Evaluator.MaximumError", "Cannot have a maximum value less than 1!");
         }
 
+        // No dice to modify
+        if (diceRolls.Count == 0)
+        {
+            return Result<IRollError, List<DiceRoll>>.Success(maximumValue.Value.Rolls);
+        }
+
         // A normal dice roll cannot have a maximum value more than the dice side count
         if (maximum > diceRolls[0].Sides)
         {
