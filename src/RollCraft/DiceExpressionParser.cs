@@ -110,12 +110,12 @@ public class DiceExpressionParser
         // Validate input
         if (input is null)
         {
-            return new ParserError("NULL_INPUT", "Input expression cannot be null", 0);
+            return new ParserError("Parsing.NullInput", "Input expression cannot be null", 0);
         }
         
         if (string.IsNullOrWhiteSpace(input))
         {
-            return new ParserError("EMPTY_INPUT", "Input expression cannot be empty or whitespace only", 0);
+            return new ParserError("Parsing.EmptyInput", "Input expression cannot be empty or whitespace only", 0);
         }
         
         var tokensResult = Tokenize<TNumber>(input);
@@ -193,7 +193,7 @@ public class DiceExpressionParser
         if (reader.Depth >= TokenReader<TNumber>.MaxDepth)
         {
             return new ParserError(
-                "MAX_DEPTH_EXCEEDED",
+                "Parsing.MaxDepthExceeded",
                 $"Expression nesting exceeds maximum depth of {TokenReader<TNumber>.MaxDepth}",
                 reader.Position);
         }

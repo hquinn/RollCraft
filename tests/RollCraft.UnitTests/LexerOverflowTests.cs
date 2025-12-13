@@ -13,7 +13,7 @@ public class LexerOverflowTests
         var result = DiceExpressionParser.Parse<short>("32768");
         
         await Assert.That(result.IsFailure).IsTrue();
-        await Assert.That(result.Error.ErrorCode).IsEqualTo("OVERFLOW");
+        await Assert.That(result.Error.ErrorCode).IsEqualTo("Parsing.Overflow");
     }
     
     [Test]
@@ -32,7 +32,7 @@ public class LexerOverflowTests
         var result = DiceExpressionParser.Parse<short>("999999999");
         
         await Assert.That(result.IsFailure).IsTrue();
-        await Assert.That(result.Error.ErrorCode).IsEqualTo("OVERFLOW");
+        await Assert.That(result.Error.ErrorCode).IsEqualTo("Parsing.Overflow");
     }
     
     // Int: max value is 2147483647
@@ -43,7 +43,7 @@ public class LexerOverflowTests
         var result = DiceExpressionParser.Parse<int>("2147483648");
         
         await Assert.That(result.IsFailure).IsTrue();
-        await Assert.That(result.Error.ErrorCode).IsEqualTo("OVERFLOW");
+        await Assert.That(result.Error.ErrorCode).IsEqualTo("Parsing.Overflow");
     }
     
     [Test]
@@ -62,7 +62,7 @@ public class LexerOverflowTests
         var result = DiceExpressionParser.Parse<int>("99999999999999999999");
         
         await Assert.That(result.IsFailure).IsTrue();
-        await Assert.That(result.Error.ErrorCode).IsEqualTo("OVERFLOW");
+        await Assert.That(result.Error.ErrorCode).IsEqualTo("Parsing.Overflow");
     }
     
     // Long: max value is 9223372036854775807
@@ -73,7 +73,7 @@ public class LexerOverflowTests
         var result = DiceExpressionParser.Parse<long>("9223372036854775808");
         
         await Assert.That(result.IsFailure).IsTrue();
-        await Assert.That(result.Error.ErrorCode).IsEqualTo("OVERFLOW");
+        await Assert.That(result.Error.ErrorCode).IsEqualTo("Parsing.Overflow");
     }
     
     [Test]
@@ -92,7 +92,7 @@ public class LexerOverflowTests
         var result = DiceExpressionParser.Parse<long>("99999999999999999999999999999999");
         
         await Assert.That(result.IsFailure).IsTrue();
-        await Assert.That(result.Error.ErrorCode).IsEqualTo("OVERFLOW");
+        await Assert.That(result.Error.ErrorCode).IsEqualTo("Parsing.Overflow");
     }
     
     // Test overflow in expressions
@@ -103,7 +103,7 @@ public class LexerOverflowTests
         var result = DiceExpressionParser.Parse<int>("1 + 2147483648 + 2");
         
         await Assert.That(result.IsFailure).IsTrue();
-        await Assert.That(result.Error.ErrorCode).IsEqualTo("OVERFLOW");
+        await Assert.That(result.Error.ErrorCode).IsEqualTo("Parsing.Overflow");
     }
     
     [Test]
@@ -113,6 +113,6 @@ public class LexerOverflowTests
         var result = DiceExpressionParser.Parse<short>("1d40000");
         
         await Assert.That(result.IsFailure).IsTrue();
-        await Assert.That(result.Error.ErrorCode).IsEqualTo("OVERFLOW");
+        await Assert.That(result.Error.ErrorCode).IsEqualTo("Parsing.Overflow");
     }
 }

@@ -16,7 +16,7 @@ public class DepthProtectionTests
         var result = DiceExpressionParser.Parse<int>(expression);
         
         await Assert.That(result.IsFailure).IsTrue();
-        await Assert.That(result.Error.ErrorCode).IsEqualTo("MAX_DEPTH_EXCEEDED");
+        await Assert.That(result.Error.ErrorCode).IsEqualTo("Parsing.MaxDepthExceeded");
     }
     
     [Test]
@@ -29,7 +29,7 @@ public class DepthProtectionTests
         var result = DiceExpressionParser.Parse<int>(expression);
         
         await Assert.That(result.IsFailure).IsTrue();
-        await Assert.That(result.Error.ErrorCode).IsEqualTo("MAX_DEPTH_EXCEEDED");
+        await Assert.That(result.Error.ErrorCode).IsEqualTo("Parsing.MaxDepthExceeded");
     }
     
     [Test]
@@ -42,7 +42,7 @@ public class DepthProtectionTests
         var result = DiceExpressionParser.Parse<int>(expression);
         
         await Assert.That(result.IsFailure).IsTrue();
-        await Assert.That(result.Error.ErrorCode).IsEqualTo("MAX_DEPTH_EXCEEDED");
+        await Assert.That(result.Error.ErrorCode).IsEqualTo("Parsing.MaxDepthExceeded");
     }
     
     [Test]

@@ -11,7 +11,7 @@ public class InputValidationTests
         var result = DiceExpressionParser.Parse<int>(null!);
         
         await Assert.That(result.IsFailure).IsTrue();
-        await Assert.That(result.Error.ErrorCode).IsEqualTo("NULL_INPUT");
+        await Assert.That(result.Error.ErrorCode).IsEqualTo("Parsing.NullInput");
     }
     
     [Test]
@@ -20,7 +20,7 @@ public class InputValidationTests
         var result = DiceExpressionParser.Parse<int>("");
         
         await Assert.That(result.IsFailure).IsTrue();
-        await Assert.That(result.Error.ErrorCode).IsEqualTo("EMPTY_INPUT");
+        await Assert.That(result.Error.ErrorCode).IsEqualTo("Parsing.EmptyInput");
     }
     
     [Test]
@@ -29,7 +29,7 @@ public class InputValidationTests
         var result = DiceExpressionParser.Parse<int>("   ");
         
         await Assert.That(result.IsFailure).IsTrue();
-        await Assert.That(result.Error.ErrorCode).IsEqualTo("EMPTY_INPUT");
+        await Assert.That(result.Error.ErrorCode).IsEqualTo("Parsing.EmptyInput");
     }
     
     [Test]
@@ -39,7 +39,7 @@ public class InputValidationTests
         
         await Assert.That(error).IsNotNull();
         await Assert.That(expression).IsNull();
-        await Assert.That(error!.Value.ErrorCode).IsEqualTo("NULL_INPUT");
+        await Assert.That(error!.Value.ErrorCode).IsEqualTo("Parsing.NullInput");
     }
     
     [Test]
@@ -49,6 +49,6 @@ public class InputValidationTests
         
         await Assert.That(error).IsNotNull();
         await Assert.That(expression).IsNull();
-        await Assert.That(error!.Value.ErrorCode).IsEqualTo("EMPTY_INPUT");
+        await Assert.That(error!.Value.ErrorCode).IsEqualTo("Parsing.EmptyInput");
     }
 }

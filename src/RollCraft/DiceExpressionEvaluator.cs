@@ -13,7 +13,7 @@ namespace RollCraft;
 /// Create an evaluator using one of the static factory methods:
 /// </para>
 /// <list type="bullet">
-/// <item><description><see cref="CreateRandom"/> - Uses cryptographically random dice rolls</description></item>
+/// <item><description><see cref="CreateRandom"/> - Uses random dice rolls</description></item>
 /// <item><description><see cref="CreateSeededRandom"/> - Uses a seeded random number generator for reproducible results</description></item>
 /// <item><description><see cref="CreateMinimum"/> - Always rolls 1 on every die</description></item>
 /// <item><description><see cref="CreateMaximum"/> - Always rolls the maximum value on every die</description></item>

@@ -8,7 +8,7 @@ namespace RollCraft;
 /// Implement this interface to provide custom dice rolling behavior. Built-in implementations include:
 /// </para>
 /// <list type="bullet">
-/// <item><description>Random roller - Uses a cryptographically secure random number generator</description></item>
+/// <item><description>Random roller - Uses a random number generator</description></item>
 /// <item><description>Seeded random roller - Uses a seeded RNG for reproducible results</description></item>
 /// <item><description><see cref="Rollers.MinimumRoller"/> - Always rolls 1</description></item>
 /// <item><description><see cref="Rollers.MaximumRoller"/> - Always rolls the maximum value</description></item>

@@ -25,7 +25,7 @@ internal static class DiceExpressionLexer
             
             if (numberResult.IsOverflow)
             {
-                return new ParserError("OVERFLOW", "Numeric literal exceeds the range of the target type", numberResult.OverflowPosition);
+                return new ParserError("Parsing.Overflow", "Numeric literal exceeds the range of the target type", numberResult.OverflowPosition);
             }
             
             var token = numberResult.Token 

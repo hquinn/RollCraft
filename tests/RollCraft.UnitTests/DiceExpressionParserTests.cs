@@ -148,7 +148,7 @@ public class DiceExpressionParserTests
     [Arguments("1.", "Parsing.InvalidToken", "Invalid token found", 0)]
     [Arguments("1..", "Parsing.InvalidToken", "Invalid token found", 0)]
     [Arguments("1.0.", "Parsing.InvalidToken", "Invalid token found", 3)]
-    [Arguments("", "EMPTY_INPUT", "Input expression cannot be empty or whitespace only", 0)]
+    [Arguments("", "Parsing.EmptyInput", "Input expression cannot be empty or whitespace only", 0)]
     [Arguments("-", "Parsing.UnexpectedEnd", "Unexpected end of input", 1)]
     [Arguments("--", "Parsing.UnexpectedEnd", "Unexpected end of input", 2)]
     [Arguments("(", "Parsing.UnexpectedEnd", "Unexpected end of input", 1)]
@@ -223,7 +223,7 @@ public class DiceExpressionParserTests
     }
     
     [Test]
-    [Arguments("", "EMPTY_INPUT")]
+    [Arguments("", "Parsing.EmptyInput")]
     [Arguments("x", "Parsing.InvalidToken")]
     [Arguments("1=1", "Parsing.UnexpectedToken")]
     public async Task TryParse_Should_Return_Error_And_Null_Expression_On_Failure(string input, string expectedCode)
