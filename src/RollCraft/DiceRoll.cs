@@ -69,14 +69,23 @@ public sealed class DiceRoll : IEquatable<DiceRoll>, IComparable<DiceRoll>
     /// <summary>
     /// Compares this roll to another based on the rolled value.
     /// </summary>
+    /// <param name="other">The other dice roll to compare to.</param>
+    /// <returns>
+    /// A value less than zero if this roll is less than <paramref name="other"/>,
+    /// zero if they are equal, or greater than zero if this roll is greater.
+    /// Null values are considered less than any non-null value.
+    /// </returns>
     public int CompareTo(DiceRoll? other)
     {
-        return Roll.CompareTo(other!.Roll);
+        if (other is null) return 1;
+        return Roll.CompareTo(other.Roll);
     }
 
     /// <summary>
     /// Determines whether this roll equals another roll.
     /// </summary>
+    /// <param name="other">The other dice roll to compare for equality.</param>
+    /// <returns><c>true</c> if the rolls are equal; otherwise, <c>false</c>.</returns>
     public bool Equals(DiceRoll? other)
     {
         if (other is null) return false;
